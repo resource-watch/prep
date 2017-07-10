@@ -50,6 +50,7 @@ class SaveWidgetModal extends React.Component {
       submitting: false,
       loading: false,
       saved: false,
+      error: false,
       widget: {}
     };
 
@@ -63,14 +64,16 @@ class SaveWidgetModal extends React.Component {
     this.props.toggleModal(false);
   }
 
+  handleGoToMyRW() {
+    Router.pushRoute('myrw', { tab: 'widgets', subtab: 'my-widgets' });
+  }
+
   @Autobind
   onSubmit(event) {
     event.preventDefault();
 
     this.setState({
       loading: true
-    }, () => {
-
     });
     const { widgetEditor, tableName, dataset } = this.props;
     const { limit, value, category, color, size, orderBy, aggregateFunction } = widgetEditor;
@@ -78,24 +81,40 @@ class SaveWidgetModal extends React.Component {
     const widgetConfig = { widgetConfig: Object.assign(
       {},
       { paramsConfig: {
-          limit,
-          value,
-          category,
-          color,
-          size,
-          orderBy,
-          aggregateFunction
-        }
+        limit,
+        value,
+        category,
+        color,
+        size,
+        orderBy,
+        aggregateFunction
+      }
       },
       getChartConfig(widgetEditor, tableName, dataset)
-    )};
+    ) };
     const widgetObj = Object.assign({}, this.state.widget, widgetConfig);
 
     this.widgetService.saveUserWidget(widgetObj, this.props.dataset, this.props.user.token)
       .then((response) => {
-        console.log('response', response);
+        if (response.errors) {
+          this.setState({
+            saved: false,
+            loading: false,
+            error: true,
+            errorMessage: response.errors[0].detail
+          });
+        } else {
+          this.setState({
+            saved: true,
+            loading: false,
+            error: false
+          });
+        }
       }).catch((err) => {
-        console.log(err);
+        this.setState({
+          saved: false,
+          error: true
+        });
       });
   }
 
@@ -106,7 +125,7 @@ class SaveWidgetModal extends React.Component {
   }
 
   render() {
-    const { submitting, loading, saved } = this.state;
+    const { submitting, loading, saved, error, errorMessage } = this.state;
 
     return (
       <div className="c-save-widget-modal">
@@ -120,8 +139,14 @@ class SaveWidgetModal extends React.Component {
           isLoading={loading}
           className="-light -relative"
         />
+        {error &&
+        <div className="error-container">
+          <div>Error</div>
+          {errorMessage}
+        </div>
+        }
         {!saved &&
-          <form className="c-form" onSubmit={this.onSubmit}>
+          <form className="form-container" onSubmit={this.onSubmit}>
             <fieldset className="c-field-container">
               <Field
                 ref={(c) => { if (c) FORM_ELEMENTS.elements.title = c; }}
@@ -155,7 +180,7 @@ class SaveWidgetModal extends React.Component {
                 properties={{
                   type: 'submit',
                   disabled: submitting,
-                  className: '-primary'
+                  className: '-secondary'
                 }}
               >
                   Save
@@ -163,7 +188,7 @@ class SaveWidgetModal extends React.Component {
               <Button
                 properties={{
                   disabled: submitting,
-                  className: '-secondary'
+                  className: '-primary'
                 }}
                 onClick={this.handleCancel}
               >
@@ -175,7 +200,7 @@ class SaveWidgetModal extends React.Component {
         {saved &&
         <div>
           <div className="icon-container">
-            <img alt="" src="static/images/components/modal/widget-saved.svg" />
+            <img alt="" src="/static/images/components/modal/widget-saved.svg" />
           </div>
           <div className="buttons-widget-saved">
             <Button
@@ -190,7 +215,7 @@ class SaveWidgetModal extends React.Component {
               properties={{
                 className: '-secondary'
               }}
-              onClick={Router.pushRoute('myrw')}
+              onClick={this.handleGoToMyRW}
             >
                 Check my widgets
               </Button>

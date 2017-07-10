@@ -10,7 +10,8 @@ routes.add('admin_data_detail', '/admin/data/:tab/:id/:subtab?', 'admin/DataDeta
 // PARTNERS
 routes.add('admin_partners', '/admin/partners/:tab?/:subtab?', 'admin/partners');
 // PAGES
-routes.add('admin_pages', '/admin/pages/:tab?/:subtab?', 'admin/pages');
+routes.add('admin_pages', '/admin/pages/:tab?/:subtab?', 'admin/Pages');
+routes.add('admin_pages_detail', '/admin/pages/:tab/:id/:subtab?', 'admin/PagesDetail');
 // USERS
 routes.add('admin_users', '/admin/users/:tab?/:subtab?', 'admin/users');
 
@@ -27,7 +28,7 @@ routes.add('explore_detail', '/explore/:id', 'app/ExploreDetail');
 
 routes.add('pulse', '/pulse', 'app/Pulse');
 
-routes.add('dashboards', '/home', 'app/Dashboards'); // TODO: create the dashboards page
+routes.add('dashboards', '/dashboards/:slug?', 'app/Dashboards');
 
 routes.add('insights', '/insights', 'app/Home'); // TODO: create the insights page
 

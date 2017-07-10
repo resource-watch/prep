@@ -1,0 +1,85 @@
+.c-page-explore-detail {
+  .c-configurable-widget {
+
+    position:relative;
+    margin-top: 30px;
+    width: 100%;
+
+    //temporal
+    height: 300px;
+    background: #34B7DA;
+
+    button {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      text-align: center;
+      fill: $color-white;
+      color: $color-white;
+    }
+
+    .dropdown {
+      min-width: 100px;
+      min-height: 100px;
+      background: $color-white;
+    }
+
+  }
+
+  .widget-row {
+    position: relative;
+    margin-top: 60px;
+    width: 100%;
+    min-height: 100px;
+  }
+
+  .dataset-info-actions {
+    * {
+      margin-bottom: 20px;
+    }
+  }
+
+  .c-page-section.similar-datasets {
+
+    h2 {
+      font-weight:normal;
+      color: $color-dark-pink;
+    }
+  }
+
+  .c-page-section.pulse-banner-section {
+
+    .pulse-banner {
+
+      h2 {
+        font-weight:normal;
+        color: $color-dark-pink;
+      }
+
+      .pulse-banner-container {
+        background-image: url('/static/images/pages/app/bg-banner-planetPulse.jpg');
+        width: 100%;
+        height: 280px;
+        border-radius: 4px;
+        display: flex;
+        justify-content: center;
+
+        .action-container {
+          width: 230px;
+
+          h1 {
+            text-align: center;
+            color: $color-white;
+          }
+
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+        }
+      }
+    }
+
+  }
+
+}

@@ -1,0 +1,24 @@
+# Mac OS
+.DS_Store
+
+# Text editors
+*.sublime*
+.sublime*
+.vscode*
+
+# Vendors
+/node_modules
+
+# Logs
+*.log*
+
+# Compiled files
+/dist
+.next
+
+# Next files
+.next
+
+# Ignore environment variables
+.env
+package-lock.json

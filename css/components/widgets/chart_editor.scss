@@ -1,0 +1,37 @@
+.c-chart-editor {
+  margin-top: 20px;
+
+  .chart-type {
+
+    h5 {
+      margin: 0 0 10px;
+      font-size: $font-size-small-medium;
+    }
+  }
+
+  .actions-div {
+    display: flex;
+    margin-top: 22px;
+    justify-content: flex-start;
+    padding-bottom: 20px;
+    border-bottom: 1px solid $color-grey;
+
+    .customization-container {
+      flex-grow: 1;
+      margin-left: 20px;
+    }
+  }
+
+  .save-widget-container {
+    color: $color-dark-pink;
+    display: flex;
+    justify-content: center;
+    padding-top: 10px;
+    padding-bottom: 20px;
+
+    a {
+      cursor: pointer;
+    }
+  }
+
+}

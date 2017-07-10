@@ -1,0 +1,61 @@
+.c-widget-editor {
+  display: flex;
+  position: relative;
+  background-color: $color-pale-grey;
+
+  .customize-visualization {
+    position: relative;
+    min-height: 630px;
+    max-height: 700px;
+    min-width: 430px;
+    max-width: 430px;
+    margin-top: -20px;
+    margin-bottom: -20px;
+    flex-basis: 430px;
+    flex-shrink: 0;
+    flex-grow: 0;
+    padding: 20px 40px;
+    border: 1px solid rgba($color-black, .15);
+    box-shadow: 0 1px 2px 0 rgba($color-black, .09);
+    background-color: $color-white;
+
+    .title {
+      margin: 20px 0;
+      color: $color-dark-pink;
+      font-weight: $font-weight-light;
+    }
+
+    h5 {
+      margin: 0 0 10px;
+      font-size: $font-size-small-medium;
+    }
+
+  }
+
+  .visualization {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+
+    &.-chart {
+      margin-left: 20px;
+    }
+
+    > .c-chart {
+      display: flex;
+      align-items: center;
+      height: 100%;
+
+      .chart {
+        height: calc(100% - 100px);
+      }
+    }
+  }
+
+  // We want the visualisation and the editor to be at the same level
+  > .l-container > .row {
+    flex-wrap: nowrap;
+  }
+}

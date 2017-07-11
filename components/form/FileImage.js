@@ -46,10 +46,15 @@ class FileImage extends FormElement {
 
   onDrop(accepted, rejected) {
     this.setState({
+      value: accepted[0],
       accepted,
       rejected,
       dropzoneActive: false
     }, () => {
+      // Publish the new value to the form
+      if (this.props.onChange) this.props.onChange(this.state.value);
+      // Trigger validation
+      this.triggerValidate();
       console.log(this.state.accepted);
     });
   }

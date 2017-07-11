@@ -14,8 +14,11 @@ export const STATE_DEFAULT = {
     url: '',
     contact_name: '',
     contact_email: '',
+    thumbnail: '',
+    logo: '',
+    white_logo: '',
     featured: false,
-    published: false,
+    published: false
   }
 };
 

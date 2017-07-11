@@ -59,7 +59,7 @@ export default class Header extends React.Component {
             <h1 className="header-logo -admin">
               <Link route="admin_home">
                 <a>
-                  <svg><use xlinkHref="#icon-logo-cms" /></svg>
+                  {/* <svg><use xlinkHref="#icon-logo-cms" /></svg> */}
                   <span>PREP Manager</span>
                 </a>
               </Link>

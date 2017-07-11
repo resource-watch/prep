@@ -8,15 +8,15 @@ import { Link } from 'routes';
 // Redux
 import withRedux from 'next-redux-wrapper';
 import { initStore } from 'store';
-import { setFilters } from 'redactions/admin/datasets';
+import { setFilters } from 'redactions/admin/partners';
 
 // Components
-import DatasetTable from 'components/admin/dataset/table/DatasetTable';
+import PartnersTable from 'components/admin/partners/table/PartnersTable';
 import CustomSelect from 'components/ui/CustomSelect';
 
-class DatasetIndex extends React.Component {
+class PartnersIndex extends React.Component {
   /**
-   * Event handler executed when the user search for a dataset
+   * Event handler executed when the user search for a page
    * @param {string} { value } Search keywords
    */
   @Autobind
@@ -29,33 +29,33 @@ class DatasetIndex extends React.Component {
   }
 
   /**
-   * Return the dataset options for the search input
+   * Return the page options for the search input
    * @returns {{ label: string, value: string }}
    */
   getSelectOptions() {
-    return this.props.datasets.map(dataset => ({
-      label: dataset.attributes.name,
-      value: dataset.id
+    return this.props.partners.map(page => ({
+      label: page.attributes.name,
+      value: page.id
     }));
   }
 
   render() {
     const { user } = this.props;
     return (
-      <div className="c-datasets-index">
+      <div className="c-partners-index">
         <div className="c-table-actions">
           <CustomSelect
             options={this.getSelectOptions()}
             onKeyPressed={this.onSearch}
             search
-            placeholder="Search dataset"
+            placeholder="Search page"
             hideList
           />
-          <Link route="admin_data_detail" params={{ tab: 'datasets', id: 'new' }}>
-            <a className="c-button -secondary">New Dataset</a>
+          <Link route="admin_partners_detail" params={{ tab: 'partners', id: 'new' }}>
+            <a className="c-button -secondary">New Page</a>
           </Link>
         </div>
-        <DatasetTable
+        <PartnersTable
           application={[process.env.APPLICATIONS]}
           authorization={user.token}
         />
@@ -64,19 +64,19 @@ class DatasetIndex extends React.Component {
   }
 }
 
-DatasetIndex.propTypes = {
+PartnersIndex.propTypes = {
   user: PropTypes.object.isRequired,
-  datasets: PropTypes.array.isRequired,
+  partners: PropTypes.array.isRequired,
   // Redux
   setFilters: PropTypes.func.isRequired
 };
 
-DatasetIndex.defaultProps = {
-  datasets: []
+PartnersIndex.defaultProps = {
+  partners: []
 };
 
-const mapStateToProps = ({ datasets, user }) => ({
-  datasets: datasets.datasets.list,
+const mapStateToProps = ({ partners, user }) => ({
+  partners: partners.list,
   user
 });
 
@@ -84,4 +84,4 @@ const mapDispatchToProps = dispatch => ({
   setFilters: filters => dispatch(setFilters(filters))
 });
 
-export default withRedux(initStore, mapStateToProps, mapDispatchToProps)(DatasetIndex);
+export default withRedux(initStore, mapStateToProps, mapDispatchToProps)(PartnersIndex);

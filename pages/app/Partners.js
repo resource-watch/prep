@@ -3,7 +3,7 @@ import React from 'react';
 // Redux
 import withRedux from 'next-redux-wrapper';
 import { initStore } from 'store';
-import { getPartners } from 'redactions/partners';
+import { getPartners } from 'redactions/admin/partners';
 
 // Components
 import Page from 'components/app/layout/Page';

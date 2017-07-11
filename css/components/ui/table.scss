@@ -1,8 +1,9 @@
 .c-table {
+  width: 100%;
+
   .table {
     border-collapse: collapse;
     border: none;
-    width: 100%;
     padding: $space-1;
 
     li {
@@ -122,6 +123,31 @@
       &:hover {
         color: darken($color-text-1, 10%);
         text-decoration: underline;
+      }
+    }
+  }
+
+  td.boolean {
+    span {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: $color-text-1;
+      fill: $color-text-1;
+      padding: $space-1 / 2 6px;
+      border-radius: 4px;
+      font-size: $font-size-default;
+
+      &.-true {
+        color: $color-white;
+        fill: $color-white;
+        background: $color-primary;
+      }
+
+      &.-false {
+        color: $color-white;
+        fill: $color-white;
+        background: $color-dark-grey;
       }
     }
   }

@@ -1,36 +1,33 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import debounce from 'lodash/debounce';
+
+// Utils
+import { get } from 'utils/request';
 
 // Next components
 import { Link } from 'routes';
 
-// Components
-import HeaderUser from 'components/app/layout/header/HeaderUser';
-
 export default class Header extends React.Component {
-  constructor(props) {
-    super(props);
+  /**
+   * UI EVENTS
+   * - logout
+  */
+  logout(e) {
+    e && e.preventDefault();
 
-    this.state = {
-      myrwActive: false
-    };
-
-    this.listeners = {};
-
-    // BINDINGS
-    this.toggleDropdown = debounce(this.toggleDropdown.bind(this), 50);
-  }
-
-  // This function is debounced. If you don't do that insane things will happen
-  toggleDropdown(specificDropdown, to) {
-    this.setState({
-      ...{ myrwActive: false },
-      [specificDropdown]: to
+    // Get to logout
+    get({
+      url: `${process.env.CONTROL_TOWER_URL}/auth/logout`,
+      withCredentials: true,
+      onSuccess: () => {
+        window.location.href = `/logout?callbackUrl=${window.location.href}`;
+      },
+      onError: (err) => {
+        console.error(err);
+      }
     });
   }
-
 
   render() {
     const { url } = this.props;
@@ -42,28 +39,13 @@ export default class Header extends React.Component {
         component: <Link route="admin_data"><a>Data</a></Link>
       },
       {
-        name: 'Pages',
-        pathnames: ['/admin/Pages', '/admin/PagesDetail'],
-        component: <Link route="admin_pages"><a>Pages</a></Link>
-      },
-      {
-        name: 'Users',
-        pathnames: ['/admin/Users'],
-        component: <Link route="admin_users"><a>Users</a></Link>
-      },
-      {
         name: 'Partners',
-        pathnames: ['/admin/Partners'],
+        pathnames: ['/admin/Partners', '/admin/PartnersDetail'],
         component: <Link route="admin_partners"><a>Partners</a></Link>
       },
       {
-        name: 'My RW',
-        component: <HeaderUser
-          user={this.props.user}
-          active={this.state.myrwActive}
-          onMouseEnter={() => this.toggleDropdown('myrwActive', true)}
-          onMouseLeave={() => this.toggleDropdown('myrwActive', false)}
-        />
+        name: 'Logout',
+        component: <a onClick={this.logout} href="/logout">Logout</a>
       }
     ];
 
@@ -78,7 +60,7 @@ export default class Header extends React.Component {
               <Link route="admin_home">
                 <a>
                   <svg><use xlinkHref="#icon-logo-cms" /></svg>
-                  <span>Resource Watch Content Manager</span>
+                  <span>PREP Manager</span>
                 </a>
               </Link>
             </h1>

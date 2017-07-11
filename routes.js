@@ -8,10 +8,8 @@ routes.add('admin_home', '/admin', 'admin/Data');
 routes.add('admin_data', '/admin/data/:tab?', 'admin/Data');
 routes.add('admin_data_detail', '/admin/data/:tab/:id/:subtab?', 'admin/DataDetail');
 // PARTNERS
-routes.add('admin_partners', '/admin/partners/:tab?/:subtab?', 'admin/partners');
-// PAGES
-routes.add('admin_pages', '/admin/pages/:tab?/:subtab?', 'admin/Pages');
-routes.add('admin_pages_detail', '/admin/pages/:tab/:id/:subtab?', 'admin/PagesDetail');
+routes.add('admin_partners', '/admin/partners/:tab?/:subtab?', 'admin/Partners');
+routes.add('admin_partners_detail', '/admin/partners/:tab/:id/:subtab?', 'admin/PartnersDetail');
 // USERS
 routes.add('admin_users', '/admin/users/:tab?/:subtab?', 'admin/users');
 

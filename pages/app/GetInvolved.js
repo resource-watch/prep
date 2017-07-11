@@ -83,7 +83,7 @@ class GetInvolved extends Page {
     const { data } = this.props;
     const styles = {};
     if (data.photo) {
-      styles.backgroundImage = `url(${process.env.CMS_API_URL}${data.photo.large})`;
+      styles.backgroundImage = `url(${process.env.BACKOFFICE_API_URL}${data.photo.large})`;
     }
 
     const introLines = intro => (

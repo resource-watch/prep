@@ -34,9 +34,21 @@ export default class TableContent extends React.Component {
 
     /* Apply sorting to data */
     if (!isEmpty(sort)) {
-      data = data.slice().sort((rowA, rowB) => rowA[sort.field].toString().toLowerCase() > rowB[sort.field].toString().toLowerCase() ?
+      data = data.slice().sort((rowA, rowB) => {
+        const rowAField = rowA[sort.field];
+        const rowBField = rowB[sort.field];
+
+        const rowAFieldCondition = (rowAField && rowAField.toString) ?
+          rowAField.toString().toLowerCase() :
+          rowAField;
+        const rowBFieldCondition = (rowBField && rowBField.toString) ?
+          rowBField.toString().toLowerCase() :
+          rowBField;
+
+        return rowAFieldCondition > rowBFieldCondition ?
           sort.value :
-          (sort.value * -1));
+          sort.value * -1;
+      });
     }
 
     /* Apply pagination to data */

@@ -24,7 +24,7 @@ class About extends Page {
     const { data } = this.props;
     const styles = {};
     if (data && data.photo) {
-      styles.backgroundImage = `url(${process.env.CMS_API_URL}${data.photo.large})`;
+      styles.backgroundImage = `url(${process.env.BACKOFFICE_API_URL}${data.photo.large})`;
     }
 
     return (

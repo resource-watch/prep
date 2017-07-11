@@ -1,9 +1,23 @@
-export const LANGUAGE_OPTIONS = [
-  { label: 'English', value: 'en' },
-  { label: 'Español', value: 'es' },
-  { label: 'Français', value: 'fr' },
-  { label: 'Português', value: 'pt' }
-];
+export const STATE_DEFAULT = {
+  step: 1,
+  stepLength: 1,
+  submitting: false,
+  loading: false,
+  dataset: {},
+  form: {
+    authorization: '',
+    // STEP 1
+    name: '',
+    partner_type: null,
+    description: '',
+    content: '',
+    url: '',
+    contact_name: '',
+    contact_email: '',
+    featured: false,
+    published: false,
+  }
+};
 
 export const FORM_ELEMENTS = {
   elements: {
@@ -24,3 +38,11 @@ export const FORM_ELEMENTS = {
     return valid;
   }
 };
+
+export const PARTNER_TYPES = [{
+  label: 'Partner',
+  value: 'partner'
+}, {
+  label: 'Founding partner',
+  value: 'founding partner'
+}];

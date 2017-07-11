@@ -16,7 +16,6 @@ class PartnersNew extends React.Component {
     return (
       <div className="c-partners-new">
         <PartnersForm
-          application={[process.env.APPLICATIONS]}
           authorization={user.token}
           onSubmit={() => Router.pushRoute('admin_partners', { tab: 'partners' })}
         />

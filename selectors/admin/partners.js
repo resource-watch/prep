@@ -14,13 +14,13 @@ const getFilteredPartners = (partners, filters) => { // eslint-disable-line no-s
   return partners.filter((partner) => { // eslint-disable-line arrow-body-style
     return filters.every((filter) => {
       if (filter.key === 'id') return partner.id === filter.value;
-      if (!partner.attributes[filter.key]) return false;
+      if (!partner[filter.key]) return false;
 
       if (typeof filter.value === 'string') {
-        return partner.attributes[filter.key].toLowerCase().match(filter.value.toLowerCase());
+        return partner[filter.key].toLowerCase().match(filter.value.toLowerCase());
       }
 
-      return partner.attributes[filter.key] === filter.value;
+      return partner[filter.key] === filter.value;
     });
   });
 };

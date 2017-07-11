@@ -16,7 +16,7 @@ import CustomSelect from 'components/ui/CustomSelect';
 
 class PartnersIndex extends React.Component {
   /**
-   * Event handler executed when the user search for a page
+   * Event handler executed when the user search for a partner
    * @param {string} { value } Search keywords
    */
   @Autobind
@@ -29,13 +29,13 @@ class PartnersIndex extends React.Component {
   }
 
   /**
-   * Return the page options for the search input
+   * Return the partner options for the search input
    * @returns {{ label: string, value: string }}
    */
   getSelectOptions() {
-    return this.props.partners.map(page => ({
-      label: page.attributes.name,
-      value: page.id
+    return this.props.partners.map(partner => ({
+      label: partner.attributes.name,
+      value: partner.id
     }));
   }
 
@@ -48,7 +48,7 @@ class PartnersIndex extends React.Component {
             options={this.getSelectOptions()}
             onKeyPressed={this.onSearch}
             search
-            placeholder="Search page"
+            placeholder="Search partner"
             hideList
           />
           <Link route="admin_partners_detail" params={{ tab: 'partners', id: 'new' }}>

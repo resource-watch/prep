@@ -38,10 +38,10 @@ export default class TableContent extends React.Component {
         const rowAField = rowA[sort.field];
         const rowBField = rowB[sort.field];
 
-        const rowAFieldCondition = (rowAField && rowAField.toString) ?
+        const rowAFieldCondition = (typeof rowAField !== 'undefined' && rowAField !== null && rowAField.toString) ?
           rowAField.toString().toLowerCase() :
           rowAField;
-        const rowBFieldCondition = (rowBField && rowBField.toString) ?
+        const rowBFieldCondition = (typeof rowBField !== 'undefined' && rowBField !== null && rowBField.toString) ?
           rowBField.toString().toLowerCase() :
           rowBField;
 

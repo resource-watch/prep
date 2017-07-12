@@ -11,10 +11,14 @@ class FileImage extends FormElement {
   constructor(props) {
     super(props);
 
+    const defaultValue = props.properties.default;
+    const previewURL = `${process.env.BACKOFFICE_API_URL}/${defaultValue || ''}`;
     this.state = {
-      value: props.properties.default ? this.getBase64FromURL(`${process.env.BACKOFFICE_API_URL}/${props.properties.default}`) : '',
-      accepted: (props.properties.default) ?
-        [{ name: props.properties.default, preview: `${process.env.BACKOFFICE_API_URL}/${props.properties.default}` }] :
+      value: (defaultValue) ?
+        this.getBase64FromURL(previewURL) :
+        '',
+      accepted: (defaultValue) ?
+        [{ name: defaultValue, preview: previewURL }] :
         [],
       rejected: [],
       dropzoneActive: false,

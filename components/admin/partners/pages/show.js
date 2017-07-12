@@ -9,19 +9,18 @@ import { initStore } from 'store';
 // Components
 import PartnersForm from 'components/admin/partners/form/PartnersForm';
 
-class PartnersShow extends React.Component {
-  render() {
-    const { id, user } = this.props;
-    return (
-      <div className="c-partners-show">
-        <PartnersForm
-          id={id}
-          authorization={user.token}
-          onSubmit={() => Router.pushRoute('admin_partners', { tab: 'partners' })}
-        />
-      </div>
-    );
-  }
+function PartnersShow(props) {
+  const { id, user } = props;
+
+  return (
+    <div className="c-partners-show">
+      <PartnersForm
+        id={id}
+        authorization={user.token}
+        onSubmit={() => Router.pushRoute('admin_partners', { tab: 'partners' })}
+      />
+    </div>
+  );
 }
 
 PartnersShow.propTypes = {

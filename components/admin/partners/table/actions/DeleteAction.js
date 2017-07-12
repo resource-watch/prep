@@ -1,6 +1,9 @@
 import React from 'react';
 import { remove } from 'utils/request';
 
+// Services
+import PartnersService from 'services/PartnersService';
+
 class DeleteAction extends React.Component {
 
   constructor(props) {
@@ -8,6 +11,11 @@ class DeleteAction extends React.Component {
 
     // BINDINGS
     this.handleOnClickDelete = this.handleOnClickDelete.bind(this);
+
+    // SERVICES
+    this.service = new PartnersService(props.id, {
+      apiURL: process.env.BACKOFFICE_API_URL
+    });
   }
 
   handleOnClickDelete(e) {
@@ -17,11 +25,11 @@ class DeleteAction extends React.Component {
 
     if (confirm(`Are you sure that you want to delete: "${data.name}" `)) {
       remove({
-        url: `${process.env.WRI_API_URL}/dataset/${data.id}`,
-        headers: [{
-          key: 'Authorization',
-          value: authorization
-        }],
+        url: `${process.env.BACKOFFICE_API_URL}/api/partners/${data.id}`,
+        // headers: [{
+        //   key: 'Authorization',
+        //   value: authorization
+        // }],
         onSuccess: () => {
           this.props.onRowDelete(data.id);
         },

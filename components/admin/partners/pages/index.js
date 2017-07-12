@@ -52,7 +52,7 @@ class PartnersIndex extends React.Component {
             hideList
           />
           <Link route="admin_partners_detail" params={{ tab: 'partners', id: 'new' }}>
-            <a className="c-button -secondary">New Page</a>
+            <a className="c-button -secondary">New Partner</a>
           </Link>
         </div>
         <PartnersTable

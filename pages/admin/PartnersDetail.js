@@ -38,8 +38,8 @@ class Partners extends Page {
     switch (tab) {
       case 'partners':
         if (id !== 'new') {
-          this.service = new PartnersService(id, {
-            apiURL: process.env.BACKOFFICE_API_URL
+          this.service = new PartnersService({
+            authorization: props.user.token
           });
         }
         break;
@@ -50,9 +50,10 @@ class Partners extends Page {
   }
 
   componentWillMount() {
+    const { id } = this.state;
+
     if (this.service) {
-      // Fetch the dataset / layer / widget depending on the tab
-      this.service.fetchData()
+      this.service.fetchData(id)
         .then((data) => {
           this.setState({
             data: data || {}

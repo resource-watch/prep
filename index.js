@@ -79,7 +79,7 @@ app.prepare()
 
     server.get('/auth', passport.authenticate('control-tower', { failureRedirect: '/' }), function (req, res) {
       // On success, redirecting to My RW
-      res.redirect('/myrw');
+      res.redirect('/admin');
     });
 
     server.get('/auth/user', function (req, res) {

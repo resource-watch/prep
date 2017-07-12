@@ -12,8 +12,10 @@ class FileImage extends FormElement {
     super(props);
 
     this.state = {
-      ...this.state,
-      accepted: [],
+      value: props.properties.default,
+      accepted: (props.properties.default) ?
+        [{ name: props.properties.default, preview: `${process.env.BACKOFFICE_API_URL}/${props.properties.default}` }] :
+        [],
       rejected: [],
       dropzoneActive: false,
       loading: false
@@ -61,8 +63,6 @@ class FileImage extends FormElement {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => {
-      console.log(reader.result);
-
       this.setState({
         value: reader.result
       }, () => {
@@ -139,7 +139,7 @@ class FileImage extends FormElement {
 
   render() {
     const { properties } = this.props;
-    const { accepted } = this.state;
+    const { accepted, value } = this.state;
 
     return (
       <div className="c-file-image">

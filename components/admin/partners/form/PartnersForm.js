@@ -1,11 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import omit from 'lodash/omit';
 
 // Services
 import PartnersService from 'services/PartnersService';
-
-import { post } from 'utils/request';
 
 import { STATE_DEFAULT, FORM_ELEMENTS } from 'components/admin/partners/form/constants';
 
@@ -20,9 +17,7 @@ class PartnersForm extends React.Component {
     this.state = Object.assign({}, STATE_DEFAULT, {
       id: props.id,
       loading: !!props.id,
-      form: Object.assign({}, STATE_DEFAULT.form, {
-        authorization: props.authorization
-      })
+      form: STATE_DEFAULT.form
     });
 
     // BINDINGS
@@ -30,19 +25,18 @@ class PartnersForm extends React.Component {
     this.onChange = this.onChange.bind(this);
     this.onStepChange = this.onStepChange.bind(this);
 
-    this.service = new PartnersService(props.id, {
-      apiURL: process.env.BACKOFFICE_API_URL
+    this.service = new PartnersService({
+      authorization: props.authorization
     });
   }
 
   componentDidMount() {
+    const { id } = this.state;
     // Get the partners and fill the
-    // state with its params if it exists
-
-    if (this.state.id) {
-      this.service.fetchData()
+    // state form with its params if the id exists
+    if (id) {
+      this.service.fetchData(id)
         .then((data) => {
-          console.log(data);
           this.setState({
             form: this.setFormFromParams(data),
             // Stop the loading
@@ -79,10 +73,11 @@ class PartnersForm extends React.Component {
           // Start the submitting
           this.setState({ submitting: true });
 
+          // Save data
           this.service.saveData({
             id: id || '',
             type: (id) ? 'PATCH' : 'POST',
-            body: omit(this.state.form, ['authorization'])
+            body: this.state.form
           })
             .then((data) => {
               const successMessage = `The partners "${data.id}" - "${data.name}" has been uploaded correctly`;

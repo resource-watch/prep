@@ -85,21 +85,16 @@ class PartnersForm extends React.Component {
             omit: ['authorization']
           };
 
-          // Create formData and append all the necessaries keys
-          const formData = new FormData();
-          Object.keys(omit(this.state.form, requestOptions.omit)).forEach((key) => {
-            formData.append(`partner[${key}]`, this.state.form[key]);
-          });
-
           post({
             type: requestOptions.type,
             url: `${process.env.BACKOFFICE_API_URL}/api/partners/${partner || ''}`,
-            multipart: true,
-            body: formData,
-            headers: [],
+            body: omit(this.state.form, requestOptions.omit),
+            headers: [{
+              key: 'Content-Type',
+              value: 'application/json'
+            }],
             onSuccess: (response) => {
-              debugger;
-              const successMessage = `The partners "${response.data.id}" - "${response.data.attributes.name}" has been uploaded correctly`;
+              const successMessage = `The partners "${response.id}" - "${response.name}" has been uploaded correctly`;
               alert(successMessage);
 
               this.props.onSubmit && this.props.onSubmit();

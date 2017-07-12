@@ -46,17 +46,45 @@ class FileImage extends FormElement {
 
   onDrop(accepted, rejected) {
     this.setState({
-      value: accepted[0],
       accepted,
       rejected,
       dropzoneActive: false
     }, () => {
-      // Publish the new value to the form
-      if (this.props.onChange) this.props.onChange(this.state.value);
-      // Trigger validation
-      this.triggerValidate();
-      console.log(this.state.accepted);
+      if (accepted.length) {
+        this.getBase64(accepted[0]);
+      }
     });
+  }
+
+
+  getBase64(file) {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      console.log(reader.result);
+
+      this.setState({
+        value: reader.result
+      }, () => {
+        // Publish the new value to the form
+        if (this.props.onChange) this.props.onChange(this.state.value);
+        // Trigger validation
+        this.triggerValidate();
+      });
+    };
+    reader.onerror = (error) => {
+      console.log('Error: ', error);
+
+      this.setState({
+        value: '',
+        error
+      }, () => {
+        // Publish the new value to the form
+        if (this.props.onChange) this.props.onChange(this.state.value);
+        // Trigger validation
+        this.triggerValidate();
+      });
+    };
   }
 
   /**
@@ -82,6 +110,7 @@ class FileImage extends FormElement {
   }
 
   triggerChange(e) {
+    console.log('Inside when?');
     this.setState({
       value: e.currentTarget.value
     }, () => {

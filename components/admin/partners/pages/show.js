@@ -7,25 +7,24 @@ import withRedux from 'next-redux-wrapper';
 import { initStore } from 'store';
 
 // Components
-import PageForm from 'components/admin/pages/form/PageForm';
+import PartnersForm from 'components/admin/partners/form/PartnersForm';
 
-class PageNew extends React.Component {
+class PartnersShow extends React.Component {
 
   render() {
     const { user } = this.props;
     return (
-      <div className="c-pages-new">
-        <PageForm
-          application={[process.env.APPLICATIONS]}
+      <div className="c-partners-show">
+        <PartnersForm
           authorization={user.token}
-          onSubmit={() => Router.pushRoute('admin_pages', { tab: 'pages' })}
+          onSubmit={() => Router.pushRoute('admin_partners', { tab: 'partners' })}
         />
       </div>
     );
   }
 }
 
-PageNew.propTypes = {
+PartnersShow.propTypes = {
   // Store
   user: PropTypes.object.isRequired
 };
@@ -34,4 +33,4 @@ const mapStateToProps = state => ({
   user: state.user
 });
 
-export default withRedux(initStore, mapStateToProps, null)(PageNew);
+export default withRedux(initStore, mapStateToProps, null)(PartnersShow);

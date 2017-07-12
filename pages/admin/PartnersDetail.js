@@ -1,6 +1,9 @@
 import React from 'react';
 import { singular } from 'pluralize';
 
+// Services
+import PartnersService from 'services/PartnersService';
+
 // Utils
 import { capitalizeFirstLetter } from 'utils/utils';
 
@@ -25,10 +28,40 @@ class Partners extends Page {
     this.state = {
       tab,
       id,
-      subtab
+      subtab,
+      data: {}
     };
 
+
     this.service = null;
+
+    switch (tab) {
+      case 'partners':
+        if (id !== 'new') {
+          this.service = new PartnersService(id, {
+            apiURL: process.env.BACKOFFICE_API_URL
+          });
+        }
+        break;
+      // TODO: do the same service for widgets and layers
+      default:
+
+    }
+  }
+
+  componentWillMount() {
+    if (this.service) {
+      // Fetch the dataset / layer / widget depending on the tab
+      this.service.fetchData()
+        .then((data) => {
+          this.setState({
+            data
+          });
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    }
   }
 
   componentWillReceiveProps(nextProps) {

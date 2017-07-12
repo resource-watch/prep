@@ -73,7 +73,7 @@ export default class PartnersService {
     });
   }
 
-  deleteData({ id }) {
+  deleteData(id) {
     return new Promise((resolve, reject) => {
       remove({
         url: `${process.env.BACKOFFICE_API_URL}/api/partners/${id}`,

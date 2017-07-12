@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Autobind } from 'es-decorators';
 
 // Redux
 import withRedux from 'next-redux-wrapper';
@@ -12,6 +13,7 @@ import getFilteredPartners from 'selectors/admin/partners';
 // Components
 import Spinner from 'components/ui/Spinner';
 import CustomTable from 'components/ui/customtable/CustomTable';
+import TableHeaderSearch from 'components/ui/customtable/header/TableHeaderSearch';
 
 // Table components
 import EditAction from './actions/EditAction';
@@ -29,8 +31,30 @@ class PartnersTable extends React.Component {
     this.props.getPartners();
   }
 
+  /**
+   * Event handler executed when the user search for a dataset
+   * @param {string} { value } Search keywords
+   */
+  @Autobind
+  onSearch({ value }) {
+    if (!value.length) {
+      this.props.setFilters([]);
+    } else {
+      this.props.setFilters([{ key: 'name', value }]);
+    }
+  }
+
+  /**
+   * HELPERS
+   * - getPartners
+   * - getFilteredPartners
+  */
   getPartners() {
     return this.props.partners;
+  }
+
+  getFilteredPartners() {
+    return this.props.filteredPartners;
   }
 
   render() {
@@ -38,11 +62,20 @@ class PartnersTable extends React.Component {
       <div className="c-partners-table">
         <Spinner className="-light" isLoading={this.props.loading} />
 
-        { this.props.error && (
+        {this.props.error && (
           <p>Error: {this.props.error}</p>
-        ) }
+        )}
 
-        { !this.props.error && (
+        <TableHeaderSearch
+          link={{
+            label: 'New partner',
+            route: 'admin_partners_detail',
+            params: { tab: 'partners', id: 'new' }
+          }}
+          onSearch={this.onSearch}
+        />
+
+        {!this.props.error && (
           <CustomTable
             columns={[
               { label: 'Name', value: 'name', td: NameTD },
@@ -62,7 +95,7 @@ class PartnersTable extends React.Component {
               value: 1
             }}
             filters={false}
-            data={this.getPartners()}
+            data={this.getFilteredPartners()}
             pageSize={20}
             pagination={{
               enabled: true,
@@ -72,7 +105,7 @@ class PartnersTable extends React.Component {
             onToggleSelectedRow={(ids) => { console.info(ids); }}
             onRowDelete={(id) => { console.info(id); }}
           />
-        ) }
+        )}
       </div>
     );
   }
@@ -82,7 +115,8 @@ PartnersTable.defaultProps = {
   columns: [],
   actions: {},
   // Store
-  partners: []
+  partners: [],
+  filteredPartners: []
 };
 
 PartnersTable.propTypes = {
@@ -90,6 +124,7 @@ PartnersTable.propTypes = {
   // Store
   loading: PropTypes.bool.isRequired,
   partners: PropTypes.array.isRequired,
+  filteredPartners: PropTypes.array.isRequired,
   error: PropTypes.string,
 
   // Actions
@@ -99,7 +134,8 @@ PartnersTable.propTypes = {
 
 const mapStateToProps = state => ({
   loading: state.partners.partners.loading,
-  partners: getFilteredPartners(state),
+  partners: state.partners.partners.list,
+  filteredPartners: getFilteredPartners(state),
   error: state.partners.partners.error
 });
 const mapDispatchToProps = dispatch => ({

@@ -1,5 +1,4 @@
 import React from 'react';
-import { remove } from 'utils/request';
 
 // Services
 import PartnersService from 'services/PartnersService';
@@ -13,30 +12,22 @@ class DeleteAction extends React.Component {
     this.handleOnClickDelete = this.handleOnClickDelete.bind(this);
 
     // SERVICES
-    this.service = new PartnersService(props.id, {
-      apiURL: process.env.BACKOFFICE_API_URL
-    });
+    this.service = new PartnersService();
   }
 
   handleOnClickDelete(e) {
     e && e.preventDefault() && e.stopPropagation();
 
-    const { data, authorization } = this.props;
+    const { data } = this.props;
 
     if (confirm(`Are you sure that you want to delete: "${data.name}" `)) {
-      remove({
-        url: `${process.env.BACKOFFICE_API_URL}/api/partners/${data.id}`,
-        // headers: [{
-        //   key: 'Authorization',
-        //   value: authorization
-        // }],
-        onSuccess: () => {
+      this.service.deleteData(data.id)
+        .then(() => {
           this.props.onRowDelete(data.id);
-        },
-        onError: () => {
+        })
+        .catch((err) => {
           console.error('There was an error with the request. The object was not deleted');
-        }
-      });
+        });
     }
   }
 
@@ -51,8 +42,6 @@ class DeleteAction extends React.Component {
 
 DeleteAction.propTypes = {
   data: React.PropTypes.object,
-
-  authorization: React.PropTypes.string,
   onRowDelete: React.PropTypes.func
 };
 

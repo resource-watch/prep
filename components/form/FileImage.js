@@ -12,7 +12,7 @@ class FileImage extends FormElement {
     super(props);
 
     this.state = {
-      value: props.properties.default,
+      value: props.properties.default ? this.getBase64FromURL(`${process.env.BACKOFFICE_API_URL}/${props.properties.default}`) : '',
       accepted: (props.properties.default) ?
         [{ name: props.properties.default, preview: `${process.env.BACKOFFICE_API_URL}/${props.properties.default}` }] :
         [],
@@ -58,7 +58,10 @@ class FileImage extends FormElement {
     });
   }
 
-
+  /**
+   * - getBase64
+   * - getFileFromUrl
+  */
   getBase64(file) {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -73,8 +76,6 @@ class FileImage extends FormElement {
       });
     };
     reader.onerror = (error) => {
-      console.log('Error: ', error);
-
       this.setState({
         value: '',
         error
@@ -85,6 +86,16 @@ class FileImage extends FormElement {
         this.triggerValidate();
       });
     };
+  }
+
+  getBase64FromURL(url) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('get', url);
+    xhr.responseType = 'blob';
+    xhr.onload = () => {
+      this.getBase64(xhr.response);
+    };
+    xhr.send();
   }
 
   /**
@@ -110,7 +121,6 @@ class FileImage extends FormElement {
   }
 
   triggerChange(e) {
-    console.log('Inside when?');
     this.setState({
       value: e.currentTarget.value
     }, () => {
@@ -139,7 +149,7 @@ class FileImage extends FormElement {
 
   render() {
     const { properties } = this.props;
-    const { accepted, value } = this.state;
+    const { accepted } = this.state;
 
     return (
       <div className="c-file-image">

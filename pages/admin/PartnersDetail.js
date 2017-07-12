@@ -55,7 +55,7 @@ class Partners extends Page {
       this.service.fetchData()
         .then((data) => {
           this.setState({
-            data
+            data: data || {}
           });
         })
         .catch((err) => {

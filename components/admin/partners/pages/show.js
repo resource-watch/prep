@@ -10,12 +10,12 @@ import { initStore } from 'store';
 import PartnersForm from 'components/admin/partners/form/PartnersForm';
 
 class PartnersShow extends React.Component {
-
   render() {
-    const { user } = this.props;
+    const { id, user } = this.props;
     return (
       <div className="c-partners-show">
         <PartnersForm
+          id={id}
           authorization={user.token}
           onSubmit={() => Router.pushRoute('admin_partners', { tab: 'partners' })}
         />
@@ -25,6 +25,7 @@ class PartnersShow extends React.Component {
 }
 
 PartnersShow.propTypes = {
+  id: PropTypes.string,
   // Store
   user: PropTypes.object.isRequired
 };

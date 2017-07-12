@@ -2,7 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import omit from 'lodash/omit';
 
-import { get, post } from 'utils/request';
+// Services
+import PartnersService from 'services/PartnersService';
+
+import { post } from 'utils/request';
 
 import { STATE_DEFAULT, FORM_ELEMENTS } from 'components/admin/partners/form/constants';
 
@@ -15,8 +18,8 @@ class PartnersForm extends React.Component {
     super(props);
 
     this.state = Object.assign({}, STATE_DEFAULT, {
-      partner: props.partner,
-      loading: !!props.partner,
+      id: props.id,
+      loading: !!props.id,
       form: Object.assign({}, STATE_DEFAULT.form, {
         authorization: props.authorization
       })
@@ -26,32 +29,29 @@ class PartnersForm extends React.Component {
     this.onSubmit = this.onSubmit.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onStepChange = this.onStepChange.bind(this);
+
+    this.service = new PartnersService(props.id, {
+      apiURL: process.env.BACKOFFICE_API_URL
+    });
   }
 
   componentDidMount() {
     // Get the partners and fill the
     // state with its params if it exists
 
-    if (this.state.partners) {
-      get({
-        url: `${process.env.BACKOFFICE_API_URL}/partners/${this.state.partners}`,
-        headers: [{
-          key: 'Content-Type',
-          value: 'application/json'
-        }],
-        onSuccess: (response) => {
+    if (this.state.id) {
+      this.service.fetchData()
+        .then((data) => {
+          console.log(data);
           this.setState({
-            partners: response.data.id,
-            form: this.setFormFromParams(response.data.attributes),
+            form: this.setFormFromParams(data),
             // Stop the loading
             loading: false
           });
-        },
-        onError: (error) => {
-          this.setState({ loading: false });
-          console.error(error);
-        }
-      });
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     }
   }
 
@@ -74,36 +74,26 @@ class PartnersForm extends React.Component {
       if (valid) {
         // if we are in the last step we will submit the form
         if (this.state.step === this.state.stepLength && !this.state.submitting) {
-          const { partner } = this.state;
+          const { id } = this.state;
 
           // Start the submitting
           this.setState({ submitting: true });
 
-          // Set the request
-          const requestOptions = {
-            type: (partner) ? 'PATCH' : 'POST',
-            omit: ['authorization']
-          };
-
-          post({
-            type: requestOptions.type,
-            url: `${process.env.BACKOFFICE_API_URL}/api/partners/${partner || ''}`,
-            body: omit(this.state.form, requestOptions.omit),
-            headers: [{
-              key: 'Content-Type',
-              value: 'application/json'
-            }],
-            onSuccess: (response) => {
-              const successMessage = `The partners "${response.id}" - "${response.name}" has been uploaded correctly`;
+          this.service.saveData({
+            id: id || '',
+            type: (id) ? 'PATCH' : 'POST',
+            body: omit(this.state.form, ['authorization'])
+          })
+            .then((data) => {
+              const successMessage = `The partners "${data.id}" - "${data.name}" has been uploaded correctly`;
               alert(successMessage);
 
-              this.props.onSubmit && this.props.onSubmit();
-            },
-            onError: (error) => {
+              if (this.props.onSubmit) this.props.onSubmit();
+            })
+            .catch((err) => {
               this.setState({ submitting: false });
-              console.error(error);
-            }
-          });
+              console.error(err);
+            });
         } else {
           this.setState({
             step: this.state.step + 1
@@ -145,7 +135,7 @@ class PartnersForm extends React.Component {
           <Step1
             onChange={value => this.onChange(value)}
             form={this.state.form}
-            partners={this.state.partners}
+            id={this.state.id}
           />
         }
 
@@ -164,7 +154,7 @@ class PartnersForm extends React.Component {
 
 PartnersForm.propTypes = {
   authorization: PropTypes.string,
-  partner: PropTypes.string,
+  id: PropTypes.string,
   onSubmit: PropTypes.func
 };
 

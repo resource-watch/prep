@@ -17,7 +17,7 @@ class Step1 extends React.Component {
     super(props);
 
     this.state = {
-      partner: props.partner,
+      id: props.id,
       form: props.form
     };
   }
@@ -245,7 +245,7 @@ class Step1 extends React.Component {
 }
 
 Step1.propTypes = {
-  partner: PropTypes.string,
+  id: PropTypes.string,
   form: PropTypes.object,
   onChange: PropTypes.func
 };

@@ -1,4 +1,5 @@
 import 'isomorphic-fetch';
+import PartnersService from 'services/PartnersService';
 
 /**
  * CONSTANTS
@@ -22,6 +23,7 @@ const initialState = {
   }
 };
 
+const service = new PartnersService();
 /**
  * REDUCER
  * @export
@@ -78,18 +80,13 @@ export function getPartners() {
   return (dispatch) => {
     dispatch({ type: GET_PARTNERS_LOADING });
 
-    // TODO: remove the date now
-    // ⬆️ Copied from redations/explore.js, no idea what
-    // the date is used for
-    fetch(new Request(`${process.env.BACKOFFICE_API_URL}/api/partners?published=all`))
-      .then((response) => {
-        if (response.ok) return response.json();
-        throw new Error(response.statusText);
-      })
+    service.fetchAllData()
       .then((data) => {
         dispatch({ type: GET_PARTNERS_SUCCESS, payload: data });
       })
-      .catch(err => dispatch({ type: GET_PARTNERS_ERROR, payload: err.message }));
+      .catch((err) => {
+        dispatch({ type: GET_PARTNERS_ERROR, payload: err.message });
+      });
   };
 }
 

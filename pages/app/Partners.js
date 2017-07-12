@@ -138,8 +138,8 @@ const mapStateToProps = state => ({
   list: state.partners.list
 });
 
-const mapDispatchToProps = dispatch => ({
-  getPartners: () => { dispatch(getPartners()); }
+const mapDispatchToProps = () => ({
+  getPartners
 });
 
-export default withRedux(initStore, mapStateToProps, mapDispatchToProps)(Partners)
+export default withRedux(initStore, mapStateToProps, mapDispatchToProps)(Partners);

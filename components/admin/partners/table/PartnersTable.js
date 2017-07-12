@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 // Redux
 import withRedux from 'next-redux-wrapper';
 import { initStore } from 'store';
-import { getPartners } from 'redactions/admin/partners';
+import { getPartners, setFilters } from 'redactions/admin/partners';
 
 // Selectors
 import getFilteredPartners from 'selectors/admin/partners';
@@ -25,6 +25,7 @@ import FeaturedTD from './td/FeaturedTD';
 class PartnersTable extends React.Component {
 
   componentDidMount() {
+    this.props.setFilters([]);
     this.props.getPartners();
   }
 
@@ -90,7 +91,10 @@ PartnersTable.propTypes = {
   loading: PropTypes.bool.isRequired,
   partners: PropTypes.array.isRequired,
   error: PropTypes.string,
-  getPartners: PropTypes.func.isRequired
+
+  // Actions
+  getPartners: PropTypes.func.isRequired,
+  setFilters: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -99,7 +103,8 @@ const mapStateToProps = state => ({
   error: state.partners.partners.error
 });
 const mapDispatchToProps = dispatch => ({
-  getPartners: () => dispatch(getPartners())
+  getPartners: () => dispatch(getPartners()),
+  setFilters: filters => dispatch(setFilters(filters))
 });
 
 export default withRedux(initStore, mapStateToProps, mapDispatchToProps)(PartnersTable);

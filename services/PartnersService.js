@@ -11,7 +11,7 @@ export default class PartnersService {
   fetchAllData() {
     return new Promise((resolve, reject) => {
       get({
-        url: `${process.env.BACKOFFICE_API_URL}/api/partners/`,
+        url: `${process.env.BACKOFFICE_API_URL}/api/partners/?published=all`,
         headers: [{
           key: 'Content-Type',
           value: 'application/json'

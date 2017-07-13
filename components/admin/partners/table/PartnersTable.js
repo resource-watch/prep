@@ -67,6 +67,9 @@ class PartnersTable extends React.Component {
         )}
 
         <TableHeaderSearch
+          input={{
+            placeholder: 'Search partner'
+          }}
           link={{
             label: 'New partner',
             route: 'admin_partners_detail',

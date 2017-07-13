@@ -19,7 +19,7 @@ class TableHeaderSearch extends React.Component {
   }
 
   render() {
-    const { link } = this.props;
+    const { link, input } = this.props;
 
     return (
       <div className="c-table-header-search">
@@ -27,7 +27,7 @@ class TableHeaderSearch extends React.Component {
           <input
             className="-fluid"
             onKeyUp={this.onSearch}
-            placeholder="Search partner"
+            placeholder={input.placeholder}
           />
           <Icon name="icon-search" className="-small" />
         </div>
@@ -40,11 +40,13 @@ class TableHeaderSearch extends React.Component {
 }
 
 TableHeaderSearch.propTypes = {
+  input: PropTypes.object.isRequired,
   link: PropTypes.object.isRequired,
   onSearch: PropTypes.func.isRequired
 };
 
 TableHeaderSearch.defaultProps = {
+  input: {},
   link: {}
 };
 

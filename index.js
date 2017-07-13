@@ -25,13 +25,13 @@ const server = express();
 function isAuthenticated(req, res, nextAction) {
   if (req.isAuthenticated()) return nextAction();
   // if they aren't redirect them to the home page
-  return res.redirect('/');
+  return res.redirect('/login');
 }
 
 function isAdmin(req, res, nextAction) {
   if (req.user.role === 'ADMIN') return nextAction();
   // if they aren't redirect them to the home page
-  return res.redirect('/');
+  return res.redirect('/login');
 }
 
 // Use the Control Tower Strategy within Passport.
@@ -74,10 +74,11 @@ app.prepare()
   .then(() => {
     // Public/landing page
     server.get('/', function (req, res) {
-      return app.render(req, res, '/app/Home');
+      // return app.render(req, res, '/app/Home');
+      res.redirect('/admin');
     });
 
-    server.get('/auth', passport.authenticate('control-tower', { failureRedirect: '/' }), function (req, res) {
+    server.get('/auth', passport.authenticate('control-tower', { failureRedirect: '/login' }), function (req, res) {
       // On success, redirecting to My RW
       res.redirect('/admin');
     });

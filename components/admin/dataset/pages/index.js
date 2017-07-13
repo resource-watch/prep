@@ -43,7 +43,7 @@ class DatasetIndex extends React.Component {
     const { user } = this.props;
     return (
       <div className="c-datasets-index">
-        <div className="actions">
+        <div className="c-table-header-search">
           <CustomSelect
             options={this.getSelectOptions()}
             onKeyPressed={this.onSearch}

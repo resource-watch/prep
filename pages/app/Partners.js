@@ -3,7 +3,7 @@ import React from 'react';
 // Redux
 import withRedux from 'next-redux-wrapper';
 import { initStore } from 'store';
-import { getPartners } from 'redactions/partners';
+import { getPartners } from 'redactions/admin/partners';
 
 // Components
 import Page from 'components/app/layout/Page';
@@ -138,8 +138,8 @@ const mapStateToProps = state => ({
   list: state.partners.list
 });
 
-const mapDispatchToProps = dispatch => ({
-  getPartners: () => { dispatch(getPartners()); }
+const mapDispatchToProps = () => ({
+  getPartners
 });
 
-export default withRedux(initStore, mapStateToProps, mapDispatchToProps)(Partners)
+export default withRedux(initStore, mapStateToProps, mapDispatchToProps)(Partners);

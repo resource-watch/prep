@@ -6,25 +6,20 @@ import Layout from 'components/admin/layout/Layout';
 import Tabs from 'components/ui/Tabs';
 
 // Tabs
-import PageTab from 'components/admin/pages/PageTab';
+import PartnersTab from 'components/admin/partners/PartnersTab';
 
 // Components
 import Title from 'components/ui/Title';
 
 // Contants
 const DATA_TABS = [{
-  label: 'Pages',
-  value: 'pages',
-  route: 'admin_pages',
-  params: { tab: 'pages' }
-}, {
   label: 'Partners',
   value: 'partners',
-  route: 'admin_pages',
+  route: 'admin_partners',
   params: { tab: 'partners' }
 }];
 
-class Pages extends Page {
+class Partners extends Page {
 
   constructor(props) {
     super(props);
@@ -32,7 +27,7 @@ class Pages extends Page {
     const { url } = props;
 
     this.state = {
-      tab: url.query.tab || 'pages',
+      tab: url.query.tab || 'partners',
       id: url.query.id,
       subtab: url.query.subtab
     };
@@ -42,7 +37,7 @@ class Pages extends Page {
     const { url } = nextProps;
 
     this.setState({
-      tab: url.query.tab || 'pages',
+      tab: url.query.tab || 'partners',
       id: url.query.id,
       subtab: url.query.subtab
     });
@@ -54,8 +49,8 @@ class Pages extends Page {
 
     return (
       <Layout
-        title="Pages"
-        description="Pages description..."
+        title="Partners"
+        description="Partners description..."
         user={user}
         url={url}
       >
@@ -64,7 +59,7 @@ class Pages extends Page {
           <div className="l-container">
             <div className="page-header-content -padding-b-0">
               <Title className="-primary -huge page-header-title" >
-                Pages
+                Partners
               </Title>
               <Tabs
                 options={DATA_TABS}
@@ -76,8 +71,8 @@ class Pages extends Page {
         </div>
         <div className="c-page-section">
           <div className="l-container">
-            {tab === 'pages' &&
-              <PageTab tab={tab} subtab={subtab} id={id} />
+            {tab === 'partners' &&
+              <PartnersTab tab={tab} subtab={subtab} id={id} />
             }
           </div>
         </div>
@@ -86,10 +81,10 @@ class Pages extends Page {
   }
 }
 
-Pages.propTypes = {
+Partners.propTypes = {
   user: React.PropTypes.object,
   url: React.PropTypes.object
 };
 
 
-export default Pages;
+export default Partners;

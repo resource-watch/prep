@@ -1,26 +1,24 @@
 import React from 'react';
 import { singular } from 'pluralize';
 
+// Services
+import PartnersService from 'services/PartnersService';
+
 // Utils
 import { capitalizeFirstLetter } from 'utils/utils';
-
-// Services
-import DatasetService from 'services/DatasetService';
-import WidgetService from 'services/WidgetService';
 
 // Layout
 import Page from 'components/admin/layout/Page';
 import Layout from 'components/admin/layout/Layout';
 
 // Tabs
-import DatasetTab from 'components/admin/dataset/DatasetTab';
-import WidgetTab from 'components/admin/widget/WidgetTab';
+import PartnersTab from 'components/admin/partners/PartnersTab';
 import Breadcrumbs from 'components/ui/Breadcrumbs';
 
 // Components
 import Title from 'components/ui/Title';
 
-class Data extends Page {
+class Partners extends Page {
 
   constructor(props) {
     super(props);
@@ -34,25 +32,17 @@ class Data extends Page {
       data: {}
     };
 
+
     this.service = null;
 
     switch (tab) {
-      case 'datasets':
+      case 'partners':
         if (id !== 'new') {
-          this.service = new DatasetService(id, {
-            apiURL: process.env.WRI_API_URL
+          this.service = new PartnersService({
+            authorization: props.user.token
           });
         }
         break;
-
-      case 'widgets':
-        if (id !== 'new') {
-          this.service = new WidgetService(id, {
-            apiURL: process.env.WRI_API_URL
-          });
-        }
-        break;
-
       // TODO: do the same service for widgets and layers
       default:
 
@@ -60,12 +50,13 @@ class Data extends Page {
   }
 
   componentWillMount() {
+    const { id } = this.state;
+
     if (this.service) {
-      // Fetch the dataset / layer / widget depending on the tab
-      this.service.fetchData()
+      this.service.fetchData(id)
         .then((data) => {
           this.setState({
-            data: { ...data.attributes, id: data.id }
+            data: data || {}
           });
         })
         .catch((err) => {
@@ -106,7 +97,7 @@ class Data extends Page {
     return (
       <Layout
         title={this.getName()}
-        description="Data detail..."
+        description="Partners detail..."
         user={user}
         url={url}
       >
@@ -115,7 +106,7 @@ class Data extends Page {
           <div className="l-container">
             <div className="page-header-content">
               <Breadcrumbs
-                items={[{ name: capitalizeFirstLetter(tab), route: 'admin_pages', params: { tab } }]}
+                items={[{ name: capitalizeFirstLetter(tab), route: 'admin_partners', params: { tab } }]}
               />
               <Title className="-primary -huge page-header-title" >
                 {this.getName()}
@@ -125,6 +116,9 @@ class Data extends Page {
         </div>
         <div className="c-page-section">
           <div className="l-container">
+            {tab === 'partners' &&
+              <PartnersTab tab={tab} subtab={subtab} id={id} />
+            }
           </div>
         </div>
       </Layout>
@@ -132,10 +126,10 @@ class Data extends Page {
   }
 }
 
-Data.propTypes = {
+Partners.propTypes = {
   user: React.PropTypes.object,
   url: React.PropTypes.object
 };
 
 
-export default Data;
+export default Partners;

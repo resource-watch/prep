@@ -19,7 +19,7 @@ const DATA_TABS = [{
   route: 'admin_data',
   params: { tab: 'datasets' }
 }, {
-  label: 'Widgets',
+  label: 'Widgets (API)',
   value: 'widgets',
   route: 'admin_data',
   params: { tab: 'widgets' }
@@ -34,10 +34,10 @@ const DATA_TABS = [{
   route: 'admin_data',
   params: { tab: 'dashboards' }
 }, {
-  label: 'Vocabularies',
-  value: 'vocabularies',
+  label: 'Insights',
+  value: 'insights',
   route: 'admin_data',
-  params: { tab: 'vocabularies' }
+  params: { tab: 'insights' }
 }];
 
 class Data extends Page {
@@ -108,8 +108,8 @@ class Data extends Page {
               <h2>Dashboards</h2>
             }
 
-            {tab === 'vocabularies' &&
-              <h2>Vocabularies</h2>
+            {tab === 'insights' &&
+              <h2>Insights</h2>
             }
           </div>
         </div>

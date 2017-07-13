@@ -15,18 +15,15 @@ class EditAction extends React.Component {
   }
 
   render() {
-    const { data, action } = this.props;
+    const { action } = this.props;
+
     return (
-      <span>
-        {(data.status === 'saved') &&
-          <Link
-            route={action.route}
-            params={this.getParsedParams(action.params)}
-          >
-            <a>Edit</a>
-          </Link>
-        }
-      </span>
+      <Link
+        route={action.route}
+        params={this.getParsedParams(action.params)}
+      >
+        <a>Edit</a>
+      </Link>
     );
   }
 }

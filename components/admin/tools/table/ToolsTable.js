@@ -92,7 +92,7 @@ class ToolsTable extends React.Component {
               ]
             }}
             sort={{
-              field: 'name',
+              field: 'title',
               value: 1
             }}
             filters={false}

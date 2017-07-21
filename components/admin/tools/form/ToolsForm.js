@@ -124,12 +124,21 @@ class ToolsForm extends React.Component {
 
   // HELPERS
   setFormFromParams(params) {
-    const form = Object.keys(this.state.form);
     const newForm = {};
 
-    form.forEach((f) => {
-      if (params[f] || this.state.form[f]) {
-        newForm[f] = params[f] || this.state.form[f];
+    Object.keys(params).forEach((f) => {
+      switch (f) {
+        case 'partner': {
+          if (params[f]) {
+            newForm.partner_id = params[f].id;
+          }
+          break;
+        }
+        default: {
+          if (params[f] || this.state.form[f]) {
+            newForm[f] = params[f] || this.state.form[f];
+          }
+        }
       }
     });
 

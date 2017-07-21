@@ -88,7 +88,7 @@ class Step1 extends React.Component {
           properties={{
             name: 'partner_id',
             label: 'Partner',
-            default: this.state.form.partner_id || this.state.form.partner.id,
+            default: this.state.form.partner_id,
             value: this.state.form.partner_id,
             instanceId: 'selectToolType'
           }}

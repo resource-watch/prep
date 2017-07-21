@@ -5,7 +5,6 @@ export const STATE_DEFAULT = {
   loading: false,
   dataset: {},
   form: {
-    authorization: '',
     // STEP 1
     name: '',
     partner_type: null,

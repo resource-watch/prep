@@ -5,7 +5,6 @@ export const STATE_DEFAULT = {
   loading: false,
   partners: [],
   form: {
-    authorization: '',
     // STEP 1
     title: '',
     summary: '',

@@ -10,4 +10,5 @@ export { default as widgetEditor } from './widgetEditor';
 export { default as user } from './user';
 // Admin
 export { default as datasets } from './admin/datasets';
+export { default as layers } from './admin/layers';
 export { default as partners } from './admin/partners';

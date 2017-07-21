@@ -8,6 +8,7 @@ import Tabs from 'components/ui/Tabs';
 // Tabs
 import DatasetTab from 'components/admin/dataset/DatasetTab';
 import WidgetTab from 'components/admin/widget/WidgetTab';
+import LayersTab from 'components/admin/layers/LayersTab';
 
 // Components
 import Title from 'components/ui/Title';
@@ -19,7 +20,7 @@ const DATA_TABS = [{
   route: 'admin_data',
   params: { tab: 'datasets' }
 }, {
-  label: 'Widgets (API)',
+  label: 'Widgets',
   value: 'widgets',
   route: 'admin_data',
   params: { tab: 'widgets' }
@@ -34,10 +35,10 @@ const DATA_TABS = [{
   route: 'admin_data',
   params: { tab: 'dashboards' }
 }, {
-  label: 'Insights',
-  value: 'insights',
+  label: 'Vocabularies',
+  value: 'vocabularies',
   route: 'admin_data',
-  params: { tab: 'insights' }
+  params: { tab: 'vocabularies' }
 }];
 
 class Data extends Page {
@@ -101,15 +102,15 @@ class Data extends Page {
             }
 
             {tab === 'layers' &&
-              <h2>Layers</h2>
+              <LayersTab tab={tab} subtab={subtab} id={id} />
             }
 
             {tab === 'dashboards' &&
               <h2>Dashboards</h2>
             }
 
-            {tab === 'insights' &&
-              <h2>Insights</h2>
+            {tab === 'vocabularies' &&
+              <h2>Vocabularies</h2>
             }
           </div>
         </div>

@@ -1,67 +1,81 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import omit from 'lodash/omit';
 
-// Service
+// Services
 import DatasetsService from 'services/DatasetsService';
+import LayersService from 'services/LayersService';
 
-import { STATE_DEFAULT, FORM_ELEMENTS } from 'components/admin/dataset/form/constants';
+// Constants
+import { STATE_DEFAULT, FORM_ELEMENTS } from 'components/admin/layers/form/constants';
 
+// Components
+import Step1 from 'components/admin/layers/form/steps/Step1';
 import Navigation from 'components/form/Navigation';
-import Step1 from 'components/admin/dataset/form/steps/Step1';
-import Step2 from 'components/admin/dataset/form/steps/Step2';
 import Spinner from 'components/ui/Spinner';
 
-class DatasetForm extends React.Component {
+class LayersForm extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = Object.assign({}, STATE_DEFAULT, {
-      loading: !!props.dataset,
-      columns: [],
+      id: props.id,
+      dataset: props.dataset,
+      datasets: [],
       form: Object.assign({}, STATE_DEFAULT.form, {
-        application: props.application,
-        authorization: props.authorization
-      })
+        application: props.application
+      }),
+      loading: !!props.id
     });
 
-    this.service = new DatasetsService({
+    // Service
+    this.datasetsService = new DatasetsService({
+      authorization: props.authorization
+    });
+
+    this.service = new LayersService({
       authorization: props.authorization
     });
 
     // BINDINGS
     this.onSubmit = this.onSubmit.bind(this);
     this.onChange = this.onChange.bind(this);
+    this.onChangeDataset = this.onChangeDataset.bind(this);
     this.onStepChange = this.onStepChange.bind(this);
   }
 
-  componentDidMount() {
-    // Get the dataset and fill the
-    // state with its params if it exists
+  componentWillMount() {
+    const { id } = this.state;
 
-    if (this.props.dataset) {
-      this.service.fetchData({ id: this.props.dataset })
+    if (!id) {
+      this.datasetsService.fetchAllData({
+        applications: this.props.application,
+        includes: ''
+      })
         .then((data) => {
           this.setState({
+            datasets: data.sort((a, b) => {
+              const nameA = a.name.toLowerCase();
+              const nameB = b.name.toLowerCase();
+
+              if (nameA < nameB) return -1;
+              if (nameA > nameB) return 1;
+              return 0;  //no sorting
+            })
+          });
+        })
+        .catch(err => console.error(err));
+    }
+
+    if (id) {
+      this.service.fetchData({ id })
+        .then((data) => {
+          this.setState({
+            dataset: data.attributes.dataset,
             form: this.setFormFromParams(data.attributes),
             // Stop the loading
             loading: false
           });
         })
-        .catch((err) => {
-          this.setState({ loading: false });
-          console.error(err);
-        });
-
-      this.service.fetchFields({ id: this.props.dataset })
-        .then((data) => {
-          this.setState({
-            columns: data
-          });
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+        .catch(err => console.error(err));
     }
   }
 
@@ -69,6 +83,7 @@ class DatasetForm extends React.Component {
    * UI EVENTS
    * - onSubmit
    * - onChange
+   * - onChangeDataset
   */
   onSubmit(event) {
     event.preventDefault();
@@ -84,28 +99,22 @@ class DatasetForm extends React.Component {
       if (valid) {
         // if we are in the last step we will submit the form
         if (this.state.step === this.state.stepLength && !this.state.submitting) {
-          const dataset = this.props.dataset;
+          const { id, dataset } = this.state;
 
           // Start the submitting
           this.setState({ submitting: true });
 
-          // Set the request
-          const requestOptions = {
-            type: (dataset) ? 'PATCH' : 'POST',
-            omit: (dataset) ? ['connectorUrlHint', 'authorization', 'connectorType', 'provider'] : ['connectorUrlHint', 'authorization']
-          };
-
-          // Save the data
           this.service.saveData({
-            type: requestOptions.type,
-            id: dataset,
-            body: omit(this.state.form, requestOptions.omit)
+            dataset,
+            id: id || '',
+            type: (id) ? 'PATCH' : 'POST',
+            body: { layer: this.state.form }
           })
             .then((data) => {
-              const successMessage = `The dataset "${data.id}" - "${data.attributes.name}" has been uploaded correctly`;
+              const successMessage = `The layer "${data.id}" - "${data.attributes.name}" has been uploaded correctly`;
               alert(successMessage);
 
-              this.props.onSubmit && this.props.onSubmit();
+              if (this.props.onSubmit) this.props.onSubmit();
             })
             .catch((err) => {
               this.setState({ submitting: false });
@@ -123,6 +132,10 @@ class DatasetForm extends React.Component {
   onChange(obj) {
     const form = Object.assign({}, this.state.form, obj);
     this.setState({ form }, () => console.info(this.state.form));
+  }
+
+  onChangeDataset(dataset) {
+    this.setState({ dataset });
   }
 
   onStepChange(step) {
@@ -150,18 +163,13 @@ class DatasetForm extends React.Component {
 
         {(this.state.step === 1 && !this.state.loading) &&
           <Step1
-            onChange={value => this.onChange(value)}
+            ref={(c) => { this.step = c; }}
             form={this.state.form}
-            dataset={this.props.dataset}
-            columns={this.state.columns}
-          />
-        }
-
-        {(this.state.step === 2 && !this.state.loading) &&
-          <Step2
+            id={this.state.id}
+            dataset={this.state.dataset}
+            datasets={this.state.datasets}
             onChange={value => this.onChange(value)}
-            form={this.state.form}
-            dataset={this.props.dataset}
+            onChangeDataset={value => this.onChangeDataset(value)}
           />
         }
 
@@ -178,11 +186,12 @@ class DatasetForm extends React.Component {
   }
 }
 
-DatasetForm.propTypes = {
-  application: PropTypes.array,
-  authorization: PropTypes.string,
-  dataset: PropTypes.string,
-  onSubmit: PropTypes.func
+LayersForm.propTypes = {
+  id: React.PropTypes.string,
+  dataset: React.PropTypes.string,
+  authorization: React.PropTypes.string,
+  application: React.PropTypes.array,
+  onSubmit: React.PropTypes.func
 };
 
-export default DatasetForm;
+export default LayersForm;

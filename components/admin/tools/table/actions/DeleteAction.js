@@ -20,7 +20,7 @@ class DeleteAction extends React.Component {
 
     const { data } = this.props;
 
-    if (confirm(`Are you sure that you want to delete: "${data.name}" `)) {
+    if (confirm(`Are you sure that you want to delete: "${data.title}" `)) {
       this.service.deleteData(data.id)
         .then(() => {
           this.props.onRowDelete(data.id);

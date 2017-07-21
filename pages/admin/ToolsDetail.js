@@ -83,8 +83,8 @@ class Tools extends Page {
       return `New ${singular(tab)}`;
     }
 
-    if (data.name) {
-      return data.name;
+    if (data.name || data.title) {
+      return data.name || data.title;
     }
 
     return '-';

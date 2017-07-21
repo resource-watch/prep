@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 // Services
 import ToolsService from 'services/ToolsService';
+import PartnersService from 'services/PartnersService';
 
 import { STATE_DEFAULT, FORM_ELEMENTS } from 'components/admin/tools/form/constants';
 
@@ -28,25 +29,39 @@ class ToolsForm extends React.Component {
     this.service = new ToolsService({
       authorization: props.authorization
     });
+    this.partnersService = new PartnersService({
+      authorization: props.authorization
+    });
   }
 
   componentDidMount() {
     const { id } = this.state;
-    // Get the tools and fill the
-    // state form with its params if the id exists
-    if (id) {
-      this.service.fetchData(id)
-        .then((data) => {
-          this.setState({
-            form: this.setFormFromParams(data),
-            // Stop the loading
-            loading: false
-          });
-        })
-        .catch((err) => {
-          console.error(err);
+
+    this.partnersService.fetchAllData()
+      .then((partners) => {
+        this.setState({
+          partners: partners.map(p => ({ label: p.name, value: p.id }))
         });
-    }
+
+        if (id) {
+          // Get the tools and fill the
+          // state form with its params if the id exists
+          this.service.fetchData(id)
+            .then((data) => {
+              this.setState({
+                form: this.setFormFromParams(data),
+                // Stop the loading
+                loading: false
+              });
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 
   /**
@@ -80,7 +95,7 @@ class ToolsForm extends React.Component {
             body: this.state.form
           })
             .then((data) => {
-              const successMessage = `The tools "${data.id}" - "${data.name}" has been uploaded correctly`;
+              const successMessage = `The tools "${data.id}" - "${data.title}" has been uploaded correctly`;
               alert(successMessage);
 
               if (this.props.onSubmit) this.props.onSubmit();
@@ -128,9 +143,10 @@ class ToolsForm extends React.Component {
 
         {(this.state.step === 1 && !this.state.loading) &&
           <Step1
-            onChange={value => this.onChange(value)}
-            form={this.state.form}
             id={this.state.id}
+            form={this.state.form}
+            partners={this.state.partners}
+            onChange={value => this.onChange(value)}
           />
         }
 

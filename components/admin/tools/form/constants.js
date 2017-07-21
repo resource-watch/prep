@@ -3,21 +3,15 @@ export const STATE_DEFAULT = {
   stepLength: 1,
   submitting: false,
   loading: false,
-  dataset: {},
+  partners: [],
   form: {
     authorization: '',
     // STEP 1
-    name: '',
-    tool_type: null,
-    description: '',
-    content: '',
+    title: '',
+    summary: '',
     url: '',
-    contact_name: '',
-    contact_email: '',
-    thumbnail: '',
-    logo: '',
-    white_logo: '',
-    featured: false,
+    partner: {},
+    partner_id: null,
     published: false
   }
 };
@@ -41,11 +35,3 @@ export const FORM_ELEMENTS = {
     return valid;
   }
 };
-
-export const PARTNER_TYPES = [{
-  label: 'Tool',
-  value: 'tool'
-}, {
-  label: 'Founding tool',
-  value: 'founding tool'
-}];

@@ -2,13 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 // Constants
-import { FORM_ELEMENTS, PARTNER_TYPES } from 'components/admin/tools/form/constants';
+import { FORM_ELEMENTS } from 'components/admin/tools/form/constants';
 
 // Components
 import Field from 'components/form/Field';
 import Input from 'components/form/Input';
 import TextArea from 'components/form/TextArea';
-import FileImage from 'components/form/FileImage';
 import Select from 'components/form/SelectInput';
 import Checkbox from 'components/form/Checkbox';
 
@@ -34,65 +33,30 @@ class Step1 extends React.Component {
       <fieldset className="c-field-container">
         {/* NAME */}
         <Field
-          ref={(c) => { if (c) FORM_ELEMENTS.elements.name = c; }}
-          onChange={value => this.props.onChange({ name: value })}
+          ref={(c) => { if (c) FORM_ELEMENTS.elements.title = c; }}
+          onChange={value => this.props.onChange({ title: value })}
           validations={['required']}
           className="-fluid"
           properties={{
-            name: 'name',
-            label: 'Name',
+            name: 'title',
+            label: 'Title',
             type: 'text',
             required: true,
-            default: this.state.form.name
+            default: this.state.form.title
           }}
         >
           {Input}
         </Field>
 
-        {/* TYPE */}
+        {/* SUMMARY */}
         <Field
-          ref={(c) => { if (c) FORM_ELEMENTS.elements.tool_type = c; }}
-          onChange={value => this.props.onChange({
-            tool_type: value
-          })}
-          validations={['required']}
-          className="-fluid"
-          options={PARTNER_TYPES}
-          properties={{
-            name: 'tool_type',
-            label: 'Tool Type',
-            default: this.state.form.tool_type,
-            value: this.state.form.tool_type,
-            required: true,
-            instanceId: 'selectToolType'
-          }}
-        >
-          {Select}
-        </Field>
-
-        {/* DESCRIPTION */}
-        <Field
-          ref={(c) => { if (c) FORM_ELEMENTS.elements.description = c; }}
-          onChange={value => this.props.onChange({ description: value })}
+          ref={(c) => { if (c) FORM_ELEMENTS.elements.summary = c; }}
+          onChange={value => this.props.onChange({ summary: value })}
           className="-fluid"
           properties={{
-            name: 'description',
-            label: 'Decription',
-            default: this.state.form.description
-          }}
-        >
-          {TextArea}
-        </Field>
-
-        {/* CONTENT */}
-        <Field
-          ref={(c) => { if (c) FORM_ELEMENTS.elements.content = c; }}
-          onChange={value => this.props.onChange({ content: value })}
-          className="-fluid"
-          properties={{
-            name: 'content',
-            label: 'Content',
-            default: this.state.form.content
+            name: 'summary',
+            label: 'Summary',
+            default: this.state.form.summary
           }}
         >
           {TextArea}
@@ -113,114 +77,23 @@ class Step1 extends React.Component {
           {Input}
         </Field>
 
-        {/* CONTACT NAME */}
+        {/* PARTNER */}
         <Field
-          ref={(c) => { if (c) FORM_ELEMENTS.elements.contact_name = c; }}
-          onChange={value => this.props.onChange({ contact_name: value })}
+          ref={(c) => { if (c) FORM_ELEMENTS.elements.partner_id = c; }}
+          onChange={value => this.props.onChange({
+            partner_id: value
+          })}
           className="-fluid"
+          options={this.props.partners}
           properties={{
-            name: 'contact_name',
-            label: 'Contact name',
-            default: this.state.form.contact_name
+            name: 'partner_id',
+            label: 'Partner',
+            default: this.state.form.partner_id || this.state.form.partner.id,
+            value: this.state.form.partner_id,
+            instanceId: 'selectToolType'
           }}
         >
-          {Input}
-        </Field>
-
-        {/* CONTACT EMAIL */}
-        <Field
-          ref={(c) => { if (c) FORM_ELEMENTS.elements.contact_email = c; }}
-          onChange={value => this.props.onChange({ contact_email: value })}
-          validations={['email']}
-          className="-fluid"
-          properties={{
-            name: 'contact_email',
-            label: 'Contact email',
-            default: this.state.form.contact_email
-          }}
-        >
-          {Input}
-        </Field>
-
-        {/* THUMBNAIL */}
-        <div className="c-field-row">
-          <div className="row l-row">
-            <div className="column small-12 medium-4">
-              <Field
-                ref={(c) => { if (c) FORM_ELEMENTS.elements.thumbnail = c; }}
-                onChange={(value) => {
-                  this.props.onChange({ thumbnail: value });
-                }}
-                validations={['required']}
-                className="-fluid"
-                properties={{
-                  name: 'thumbnail',
-                  label: 'Thumbnail',
-                  placeholder: 'Browse file',
-                  default: this.state.form.thumbnail,
-                  required: true
-                }}
-              >
-                {FileImage}
-              </Field>
-            </div>
-
-            <div className="column small-12 medium-4">
-              <Field
-                ref={(c) => { if (c) FORM_ELEMENTS.elements.logo = c; }}
-                onChange={(value) => {
-                  this.props.onChange({ logo: value });
-                }}
-                validations={['required']}
-                className="-fluid"
-                properties={{
-                  name: 'logo',
-                  label: 'Logo',
-                  placeholder: 'Browse file',
-                  default: this.state.form.logo,
-                  required: true
-                }}
-              >
-                {FileImage}
-              </Field>
-            </div>
-
-            <div className="column small-12 medium-4">
-              <Field
-                ref={(c) => { if (c) FORM_ELEMENTS.elements.white_logo = c; }}
-                onChange={(value) => {
-                  this.props.onChange({ white_logo: value });
-                }}
-                validations={['required']}
-                className="-fluid"
-                properties={{
-                  name: 'white_logo',
-                  label: 'White logo',
-                  placeholder: 'Browse file',
-                  default: this.state.form.white_logo,
-                  required: true
-                }}
-              >
-                {FileImage}
-              </Field>
-            </div>
-          </div>
-        </div>
-
-        {/* FEATURED */}
-        <Field
-          ref={(c) => { if (c) FORM_ELEMENTS.elements.featured = c; }}
-          onChange={value => this.props.onChange({ featured: value.checked })}
-          properties={{
-            name: 'featured',
-            label: 'Do you want to set this tool as featured?',
-            value: 'featured',
-            title: 'Featured',
-            defaultChecked: this.props.form.featured,
-            checked: this.props.form.featured
-          }}
-        >
-          {Checkbox}
+          {Select}
         </Field>
 
         {/* PUBLISHED */}
@@ -247,6 +120,7 @@ class Step1 extends React.Component {
 Step1.propTypes = {
   id: PropTypes.string,
   form: PropTypes.object,
+  partners: PropTypes.array,
   onChange: PropTypes.func
 };
 

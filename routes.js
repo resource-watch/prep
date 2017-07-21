@@ -10,6 +10,10 @@ routes.add('admin_data', '/admin/data/:tab?', 'admin/Data');
 // PARTNERS
 routes.add('admin_partners_detail', '/admin/partners/:tab/:id/:subtab?', 'admin/PartnersDetail');
 routes.add('admin_partners', '/admin/partners/:tab?/:subtab?', 'admin/Partners');
+// TOOLS
+routes.add('admin_tools_detail', '/admin/tools/:tab/:id/:subtab?', 'admin/ToolsDetail');
+routes.add('admin_tools', '/admin/tools/:tab?/:subtab?', 'admin/Tools');
+
 // USERS
 routes.add('admin_users', '/admin/users/:tab?/:subtab?', 'admin/users');
 

@@ -4,6 +4,7 @@ import { singular } from 'pluralize';
 // Services
 import DashboardsService from 'services/DashboardsService';
 import ToolsService from 'services/ToolsService';
+import IndicatorsService from 'services/IndicatorsService';
 
 // Utils
 import { capitalizeFirstLetter } from 'utils/utils';
@@ -15,6 +16,7 @@ import Layout from 'components/admin/layout/Layout';
 // Tabs
 import DashboardsTab from 'components/admin/dashboards/DashboardsTab';
 import ToolsTab from 'components/admin/tools/ToolsTab';
+import IndicatorsTab from 'components/admin/indicators/IndicatorsTab';
 
 // Components
 import Title from 'components/ui/Title';
@@ -34,7 +36,6 @@ class Dashboards extends Page {
       data: {}
     };
 
-
     this.service = null;
 
     switch (tab) {
@@ -49,6 +50,14 @@ class Dashboards extends Page {
       case 'tools':
         if (id !== 'new') {
           this.service = new ToolsService({
+            authorization: props.user.token
+          });
+        }
+        break;
+
+      case 'indicators':
+        if (id !== 'new') {
+          this.service = new IndicatorsService({
             authorization: props.user.token
           });
         }
@@ -132,6 +141,10 @@ class Dashboards extends Page {
 
             {tab === 'tools' &&
               <ToolsTab tab={tab} subtab={subtab} id={id} />
+            }
+
+            {tab === 'indicators' &&
+              <IndicatorsTab tab={tab} subtab={subtab} id={id} />
             }
           </div>
         </div>

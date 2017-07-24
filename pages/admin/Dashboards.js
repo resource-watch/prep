@@ -8,6 +8,7 @@ import Tabs from 'components/ui/Tabs';
 // Tabs
 import DashboardsTab from 'components/admin/dashboards/DashboardsTab';
 import ToolsTab from 'components/admin/tools/ToolsTab';
+import IndicatorsTab from 'components/admin/indicators/IndicatorsTab';
 
 // Components
 import Title from 'components/ui/Title';
@@ -23,6 +24,11 @@ const DATA_TABS = [{
   value: 'tools',
   route: 'admin_dashboards',
   params: { tab: 'tools' }
+}, {
+  label: 'Indicators',
+  value: 'indicators',
+  route: 'admin_dashboards',
+  params: { tab: 'indicators' }
 }];
 
 class Dashboards extends Page {
@@ -83,6 +89,10 @@ class Dashboards extends Page {
 
             {tab === 'tools' &&
               <ToolsTab tab={tab} subtab={subtab} id={id} />
+            }
+
+            {tab === 'indicators' &&
+              <IndicatorsTab tab={tab} subtab={subtab} id={id} />
             }
           </div>
         </div>

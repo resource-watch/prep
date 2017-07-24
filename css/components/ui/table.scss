@@ -9,6 +9,15 @@
       list-style: none;
     }
 
+    a {
+      color: rgba($color-text-1, .5);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
     thead {
       background-color: $color-white;
       border-bottom: 1px solid rgba($border-color-1, .3);

@@ -13,6 +13,10 @@ routes.add('admin_partners', '/admin/partners/:tab?/:subtab?', 'admin/Partners')
 // TOOLS
 routes.add('admin_tools_detail', '/admin/tools/:tab/:id/:subtab?', 'admin/ToolsDetail');
 routes.add('admin_tools', '/admin/tools/:tab?/:subtab?', 'admin/Tools');
+// DASHBOARDS
+routes.add('admin_dashboards_detail', '/admin/dashboards/:tab/:id/:subtab?', 'admin/DashboardsDetail');
+routes.add('admin_dashboards', '/admin/dashboards/:tab?/:subtab?', 'admin/Dashboards');
+
 
 // USERS
 routes.add('admin_users', '/admin/users/:tab?/:subtab?', 'admin/users');

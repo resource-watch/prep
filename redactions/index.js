@@ -18,3 +18,4 @@ export { default as insights } from './admin/insights';
 export { default as layers } from './admin/layers';
 export { default as partners } from './admin/partners';
 export { default as tools } from './admin/tools';
+export { default as widgets } from './admin/widgets';

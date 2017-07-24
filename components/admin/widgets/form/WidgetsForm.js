@@ -2,30 +2,28 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 // Services
-import DashboardsService from 'services/DashboardsService';
-import PartnersService from 'services/PartnersService';
-import InsightsService from 'services/InsightsService';
-import ToolsService from 'services/ToolsService';
-import IndicatorsService from 'services/IndicatorsService';
+import WidgetsService from 'services/WidgetsService';
 import DatasetsService from 'services/DatasetsService';
+import PartnersService from 'services/PartnersService';
+
 
 import { toastr } from 'react-redux-toastr';
 
 // Constants
-import { STATE_DEFAULT, FORM_ELEMENTS } from 'components/admin/dashboards/form/constants';
+import { STATE_DEFAULT, FORM_ELEMENTS } from 'components/admin/widgets/form/constants';
 
 // Components
 import Navigation from 'components/form/Navigation';
-import Step1 from 'components/admin/dashboards/form/steps/Step1';
+import Step1 from 'components/admin/widgets/form/steps/Step1';
 import Spinner from 'components/ui/Spinner';
 
-class DashboardsForm extends React.Component {
+class WidgetsForm extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = Object.assign({}, STATE_DEFAULT, {
       id: props.id,
-      loading: true,
+      loading: !!props.id,
       form: STATE_DEFAULT.form
     });
 
@@ -34,14 +32,16 @@ class DashboardsForm extends React.Component {
     this.onChange = this.onChange.bind(this);
     this.onStepChange = this.onStepChange.bind(this);
 
-    // SERVICES
-    this.service = new DashboardsService({ authorization: props.authorization });
+    this.service = new WidgetsService({
+      authorization: props.authorization
+    });
 
-    this.partnersService = new PartnersService({ authorization: props.authorization });
-    this.insightsService = new InsightsService({ authorization: props.authorization });
-    this.toolsService = new ToolsService({ authorization: props.authorization });
-    this.indicatorsService = new IndicatorsService({ authorization: props.authorization });
-    this.datasetsService = new DatasetsService({ authorization: props.authorization });
+    this.datasetsService = new DatasetsService({
+      authorization: props.authorization
+    });
+    this.partnersService = new PartnersService({
+      authorization: props.authorization
+    });
   }
 
   componentDidMount() {
@@ -49,10 +49,6 @@ class DashboardsForm extends React.Component {
 
     const promises = [
       this.partnersService.fetchAllData(),
-      this.insightsService.fetchAllData(),
-      this.toolsService.fetchAllData(),
-      this.indicatorsService.fetchAllData(),
-      this.service.fetchAllData(),
       this.datasetsService.fetchAllData({})
     ];
 
@@ -64,12 +60,8 @@ class DashboardsForm extends React.Component {
     Promise.all(promises)
       .then((response) => {
         const partners = response[0];
-        const insights = response[1];
-        const tools = response[2];
-        const indicators = response[3];
-        const dashboards = response[4];
-        const datasets = response[5];
-        const current = response[6];
+        const datasets = response[1];
+        const current = response[2];
 
         this.setState({
           // CURRENT DASHBOARD
@@ -77,10 +69,6 @@ class DashboardsForm extends React.Component {
           loading: false,
           // OPTIONS
           partners: partners.map(p => ({ label: p.name, value: p.id })),
-          insights: insights.map(p => ({ label: p.title, value: p.id })),
-          tools: tools.map(p => ({ label: p.title, value: p.id })),
-          indicators: indicators.map(p => ({ label: p.title, value: p.id })),
-          dashboards: dashboards.map(p => ({ label: p.title, value: p.id })),
           datasets: datasets.map(p => ({ label: p.name, value: p.id }))
         });
       })
@@ -120,7 +108,7 @@ class DashboardsForm extends React.Component {
             body: this.state.form
           })
             .then((data) => {
-              toastr.success('Success', `The dashboard "${data.id}" - "${data.title}" has been uploaded correctly`);
+              toastr.success('Success', `The widget "${data.id}" - "${data.title}" has been uploaded correctly`);
 
               if (this.props.onSubmit) this.props.onSubmit();
             })
@@ -191,10 +179,6 @@ class DashboardsForm extends React.Component {
             id={this.state.id}
             form={this.state.form}
             partners={this.state.partners}
-            insights={this.state.insights}
-            indicators={this.state.indicators}
-            tools={this.state.tools}
-            dashboards={this.state.dashboards}
             datasets={this.state.datasets}
             onChange={value => this.onChange(value)}
           />
@@ -213,10 +197,10 @@ class DashboardsForm extends React.Component {
   }
 }
 
-DashboardsForm.propTypes = {
+WidgetsForm.propTypes = {
   authorization: PropTypes.string,
   id: PropTypes.string,
   onSubmit: PropTypes.func
 };
 
-export default DashboardsForm;
+export default WidgetsForm;

@@ -20,6 +20,10 @@ routes.add('admin_insights', '/admin/insights/:tab?/:subtab?', 'admin/Insights')
 routes.add('admin_resources_detail', '/admin/resources/:tab/:id/:subtab?', 'admin/ResourcesDetail');
 routes.add('admin_resources', '/admin/resources/:tab?/:subtab?', 'admin/Resources');
 
+// RESOURCES
+routes.add('admin_widgets_detail', '/admin/widgets/:tab/:id/:subtab?', 'admin/WidgetsDetail');
+routes.add('admin_widgets', '/admin/widgets/:tab?/:subtab?', 'admin/Widgets');
+
 // USERS
 routes.add('admin_users', '/admin/users/:tab?/:subtab?', 'admin/users');
 

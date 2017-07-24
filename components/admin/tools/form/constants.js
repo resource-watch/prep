@@ -3,20 +3,14 @@ export const STATE_DEFAULT = {
   stepLength: 1,
   submitting: false,
   loading: false,
-  dataset: {},
+  partners: [],
   form: {
     // STEP 1
-    name: '',
-    partner_type: null,
-    description: '',
-    content: '',
+    title: '',
+    summary: '',
     url: '',
-    contact_name: '',
-    contact_email: '',
-    thumbnail: '',
-    logo: '',
-    white_logo: '',
-    featured: false,
+    partner: {},
+    partner_id: null,
     published: false
   }
 };
@@ -40,11 +34,3 @@ export const FORM_ELEMENTS = {
     return valid;
   }
 };
-
-export const PARTNER_TYPES = [{
-  label: 'Partner',
-  value: 'partner'
-}, {
-  label: 'Founding partner',
-  value: 'founding partner'
-}];

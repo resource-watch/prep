@@ -12,3 +12,4 @@ export { default as user } from './user';
 export { default as datasets } from './admin/datasets';
 export { default as layers } from './admin/layers';
 export { default as partners } from './admin/partners';
+export { default as tools } from './admin/tools';

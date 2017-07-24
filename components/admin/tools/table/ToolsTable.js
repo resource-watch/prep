@@ -5,10 +5,10 @@ import { Autobind } from 'es-decorators';
 // Redux
 import withRedux from 'next-redux-wrapper';
 import { initStore } from 'store';
-import { getPartners, setFilters } from 'redactions/admin/partners';
+import { getTools, setFilters } from 'redactions/admin/tools';
 
 // Selectors
-import getFilteredPartners from 'selectors/admin/partners';
+import getFilteredTools from 'selectors/admin/tools';
 
 // Components
 import Spinner from 'components/ui/Spinner';
@@ -20,15 +20,14 @@ import EditAction from './actions/EditAction';
 import DeleteAction from './actions/DeleteAction';
 
 // TDs
-import NameTD from './td/NameTD';
+import TitleTD from './td/TitleTD';
 import PublishedTD from './td/PublishedTD';
-import FeaturedTD from './td/FeaturedTD';
 
-class PartnersTable extends React.Component {
+class ToolsTable extends React.Component {
 
   componentDidMount() {
     this.props.setFilters([]);
-    this.props.getPartners();
+    this.props.getTools();
   }
 
   /**
@@ -40,26 +39,26 @@ class PartnersTable extends React.Component {
     if (!value.length) {
       this.props.setFilters([]);
     } else {
-      this.props.setFilters([{ key: 'name', value }]);
+      this.props.setFilters([{ key: 'title', value }]);
     }
   }
 
   /**
    * HELPERS
-   * - getPartners
-   * - getFilteredPartners
+   * - getTools
+   * - getFilteredTools
   */
-  getPartners() {
-    return this.props.partners;
+  getTools() {
+    return this.props.tools;
   }
 
-  getFilteredPartners() {
-    return this.props.filteredPartners;
+  getFilteredTools() {
+    return this.props.filteredTools;
   }
 
   render() {
     return (
-      <div className="c-partners-table">
+      <div className="c-tools-table">
         <Spinner className="-light" isLoading={this.props.loading} />
 
         {this.props.error && (
@@ -68,12 +67,12 @@ class PartnersTable extends React.Component {
 
         <SearchInput
           input={{
-            placeholder: 'Search partner'
+            placeholder: 'Search tool'
           }}
           link={{
-            label: 'New partner',
-            route: 'admin_partners_detail',
-            params: { tab: 'partners', id: 'new' }
+            label: 'New tool',
+            route: 'admin_tools_detail',
+            params: { tab: 'tools', id: 'new' }
           }}
           onSearch={this.onSearch}
         />
@@ -81,24 +80,23 @@ class PartnersTable extends React.Component {
         {!this.props.error && (
           <CustomTable
             columns={[
-              { label: 'Name', value: 'name', td: NameTD },
-              { label: 'Partner type', value: 'partner_type' },
-              { label: 'Featured', value: 'featured', td: FeaturedTD },
+              { label: 'Title', value: 'title', td: TitleTD },
+              { label: 'Attribution', value: 'attribution' },
               { label: 'Published', value: 'published', td: PublishedTD }
             ]}
             actions={{
               show: true,
               list: [
-                { name: 'Edit', route: 'admin_partners_detail', params: { tab: 'partners', subtab: 'edit', id: '{{id}}' }, show: true, component: EditAction },
-                { name: 'Remove', route: 'admin_partners_detail', params: { tab: 'partners', subtab: 'remove', id: '{{id}}' }, component: DeleteAction, componentProps: { authorization: this.props.authorization } }
+                { name: 'Edit', route: 'admin_tools_detail', params: { tab: 'tools', subtab: 'edit', id: '{{id}}' }, show: true, component: EditAction },
+                { name: 'Remove', route: 'admin_tools_detail', params: { tab: 'tools', subtab: 'remove', id: '{{id}}' }, component: DeleteAction, componentProps: { authorization: this.props.authorization } }
               ]
             }}
             sort={{
-              field: 'name',
+              field: 'title',
               value: 1
             }}
             filters={false}
-            data={this.getFilteredPartners()}
+            data={this.getFilteredTools()}
             pageSize={20}
             pagination={{
               enabled: true,
@@ -114,36 +112,36 @@ class PartnersTable extends React.Component {
   }
 }
 
-PartnersTable.defaultProps = {
+ToolsTable.defaultProps = {
   columns: [],
   actions: {},
   // Store
-  partners: [],
-  filteredPartners: []
+  tools: [],
+  filteredTools: []
 };
 
-PartnersTable.propTypes = {
+ToolsTable.propTypes = {
   authorization: PropTypes.string,
   // Store
   loading: PropTypes.bool.isRequired,
-  partners: PropTypes.array.isRequired,
-  filteredPartners: PropTypes.array.isRequired,
+  tools: PropTypes.array.isRequired,
+  filteredTools: PropTypes.array.isRequired,
   error: PropTypes.string,
 
   // Actions
-  getPartners: PropTypes.func.isRequired,
+  getTools: PropTypes.func.isRequired,
   setFilters: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
-  loading: state.partners.partners.loading,
-  partners: state.partners.partners.list,
-  filteredPartners: getFilteredPartners(state),
-  error: state.partners.partners.error
+  loading: state.tools.tools.loading,
+  tools: state.tools.tools.list,
+  filteredTools: getFilteredTools(state),
+  error: state.tools.tools.error
 });
 const mapDispatchToProps = dispatch => ({
-  getPartners: () => dispatch(getPartners()),
+  getTools: () => dispatch(getTools()),
   setFilters: filters => dispatch(setFilters(filters))
 });
 
-export default withRedux(initStore, mapStateToProps, mapDispatchToProps)(PartnersTable);
+export default withRedux(initStore, mapStateToProps, mapDispatchToProps)(ToolsTable);

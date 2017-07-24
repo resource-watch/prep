@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+
 // Services
 import PartnersService from 'services/PartnersService';
+import { toastr } from 'react-redux-toastr';
 
 import { STATE_DEFAULT, FORM_ELEMENTS } from 'components/admin/partners/form/constants';
 
@@ -80,13 +82,13 @@ class PartnersForm extends React.Component {
             body: this.state.form
           })
             .then((data) => {
-              const successMessage = `The partners "${data.id}" - "${data.name}" has been uploaded correctly`;
-              alert(successMessage);
+              toastr.success('Success', `The partner "${data.id}" - "${data.name}" has been uploaded correctly`);
 
               if (this.props.onSubmit) this.props.onSubmit();
             })
             .catch((err) => {
               this.setState({ submitting: false });
+              toastr.error('Error', `Oops! There was an error, try again`);
               console.error(err);
             });
         } else {
@@ -94,6 +96,8 @@ class PartnersForm extends React.Component {
             step: this.state.step + 1
           }, () => console.info(this.state));
         }
+      } else {
+        toastr.error('Error', 'Fill all the required fields');
       }
     }, 0);
   }

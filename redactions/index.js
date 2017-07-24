@@ -8,6 +8,8 @@ export { default as staticPages } from './static_pages';
 export { default as modal } from './modal';
 export { default as widgetEditor } from './widgetEditor';
 export { default as user } from './user';
+export { reducer as toastr } from 'react-redux-toastr';
+
 // Admin
 export { default as datasets } from './admin/datasets';
 export { default as layers } from './admin/layers';

@@ -116,8 +116,33 @@ class PartnersForm extends React.Component {
     const newForm = {};
 
     Object.keys(params).forEach((f) => {
-      if (params[f] || this.state.form[f]) {
-        newForm[f] = params[f] || this.state.form[f];
+      switch (f) {
+        // TODO: if the API doesn't send it we won't need to handle it
+        case 'thumbnail': {
+          if (params[f] && params[f] !== '/thumbnails/original/missing.png') {
+            newForm[f] = params[f];
+          }
+          break;
+        }
+        case 'logo': {
+          if (params[f] && params[f] !== '/logos/original/missing.png') {
+            newForm[f] = params[f];
+          }
+          break;
+        }
+        case 'white_logo': {
+          if (params[f] && params[f] !== '/white_logos/original/missing.png') {
+            newForm[f] = params[f];
+          }
+          break;
+        }
+
+        default: {
+          if ((typeof params[f] !== 'undefined' || params[f] !== null) ||
+              (typeof this.state.form[f] !== 'undefined' || this.state.form[f] !== null)) {
+            newForm[f] = params[f] || this.state.form[f];
+          }
+        }
       }
     });
 

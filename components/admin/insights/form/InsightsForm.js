@@ -139,6 +139,14 @@ class InsightsForm extends React.Component {
           }
           break;
         }
+        case 'image': {
+          // TODO: if the API doesn't send it we won't need to handle it
+          if (params[f] && params[f] !== '/images/original/missing.png') {
+            newForm[f] = params[f];
+          }
+          break;
+        }
+
         default: {
           if ((typeof params[f] !== 'undefined' || params[f] !== null) ||
               (typeof this.state.form[f] !== 'undefined' || this.state.form[f] !== null)) {

@@ -6,20 +6,20 @@ import Layout from 'components/admin/layout/Layout';
 import Tabs from 'components/ui/Tabs';
 
 // Tabs
-import PartnersTab from 'components/admin/partners/PartnersTab';
+import InsightsTab from 'components/admin/insights/InsightsTab';
 
 // Components
 import Title from 'components/ui/Title';
 
 // Contants
 const DATA_TABS = [{
-  label: 'Partners',
-  value: 'partners',
-  route: 'admin_resources',
-  params: { tab: 'partners' }
+  label: 'Insights',
+  value: 'insights',
+  route: 'admin_insights',
+  params: { tab: 'insights' }
 }];
 
-class Resources extends Page {
+class Insights extends Page {
 
   constructor(props) {
     super(props);
@@ -27,7 +27,7 @@ class Resources extends Page {
     const { url } = props;
 
     this.state = {
-      tab: url.query.tab || 'partners',
+      tab: url.query.tab || 'insights',
       id: url.query.id,
       subtab: url.query.subtab
     };
@@ -37,7 +37,7 @@ class Resources extends Page {
     const { url } = nextProps;
 
     this.setState({
-      tab: url.query.tab || 'partners',
+      tab: url.query.tab || 'insights',
       id: url.query.id,
       subtab: url.query.subtab
     });
@@ -49,8 +49,8 @@ class Resources extends Page {
 
     return (
       <Layout
-        title="Resources"
-        description="Resources description..."
+        title="Insights"
+        description="Insights description..."
         user={user}
         url={url}
       >
@@ -59,7 +59,7 @@ class Resources extends Page {
           <div className="l-container">
             <div className="page-header-content -padding-b-0">
               <Title className="-primary -huge page-header-title" >
-                Resources
+                Insights
               </Title>
               <Tabs
                 options={DATA_TABS}
@@ -71,8 +71,8 @@ class Resources extends Page {
         </div>
         <div className="c-page-section">
           <div className="l-container">
-            {tab === 'partners' &&
-              <PartnersTab tab={tab} subtab={subtab} id={id} />
+            {tab === 'insights' &&
+              <InsightsTab tab={tab} subtab={subtab} id={id} />
             }
           </div>
         </div>
@@ -81,10 +81,10 @@ class Resources extends Page {
   }
 }
 
-Resources.propTypes = {
+Insights.propTypes = {
   user: React.PropTypes.object,
   url: React.PropTypes.object
 };
 
 
-export default Resources;
+export default Insights;

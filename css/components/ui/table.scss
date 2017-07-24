@@ -132,6 +132,30 @@
     }
   }
 
+  // Boolean
+  td.boolean {
+    span {
+      text-decoration: none;
+      color: $color-text-1;
+      fill: $color-text-1;
+      padding: $space-1 / 2 6px;
+      border-radius: 4px;
+      font-size: $font-size-default;
+
+      &.-true {
+        color: $color-white;
+        fill: $color-white;
+        background: $color-primary;
+      }
+
+      &.-false {
+        color: $color-white;
+        fill: $color-white;
+        background: $color-dark-grey;
+      }
+    }
+  }
+
   // Related content
   td.related-content {
     > ul {

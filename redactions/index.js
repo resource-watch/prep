@@ -14,6 +14,7 @@ export { reducer as toastr } from 'react-redux-toastr';
 export { default as dashboards } from './admin/dashboards';
 export { default as datasets } from './admin/datasets';
 export { default as indicators } from './admin/indicators';
+export { default as insights } from './admin/insights';
 export { default as layers } from './admin/layers';
 export { default as partners } from './admin/partners';
 export { default as tools } from './admin/tools';

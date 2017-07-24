@@ -4,9 +4,12 @@ import PropTypes from 'prop-types';
 // Services
 import ToolsService from 'services/ToolsService';
 import PartnersService from 'services/PartnersService';
+import { toastr } from 'react-redux-toastr';
 
+// Constants
 import { STATE_DEFAULT, FORM_ELEMENTS } from 'components/admin/tools/form/constants';
 
+// Components
 import Navigation from 'components/form/Navigation';
 import Step1 from 'components/admin/tools/form/steps/Step1';
 import Spinner from 'components/ui/Spinner';
@@ -95,13 +98,13 @@ class ToolsForm extends React.Component {
             body: this.state.form
           })
             .then((data) => {
-              const successMessage = `The tools "${data.id}" - "${data.title}" has been uploaded correctly`;
-              alert(successMessage);
+              toastr.success('Success', `The tool "${data.id}" - "${data.title}" has been uploaded correctly`);
 
               if (this.props.onSubmit) this.props.onSubmit();
             })
             .catch((err) => {
               this.setState({ submitting: false });
+              toastr.error('Error', `Oops! There was an error, try again`);
               console.error(err);
             });
         } else {
@@ -109,6 +112,8 @@ class ToolsForm extends React.Component {
             step: this.state.step + 1
           }, () => console.info(this.state));
         }
+      } else {
+        toastr.error('Error', 'Fill all the required fields');
       }
     }, 0);
   }

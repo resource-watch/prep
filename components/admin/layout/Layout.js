@@ -12,6 +12,7 @@ import Header from 'components/admin/layout/Header';
 import Head from 'components/admin/layout/head';
 import Icons from 'components/admin/layout/icons';
 import Tooltip from 'components/ui/Tooltip';
+import Toastr from 'react-redux-toastr';
 
 class Layout extends React.Component {
 
@@ -37,6 +38,11 @@ class Layout extends React.Component {
         </div>
 
         <Tooltip />
+
+        <Toastr
+          transitionIn="fadeIn"
+          transitionOut="fadeOut"
+        />
       </div>
     );
   }

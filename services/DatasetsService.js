@@ -97,7 +97,7 @@ export default class DatasetsService {
     });
   }
 
-  deleteData({ id }) {
+  deleteData(id) {
     return new Promise((resolve, reject) => {
       remove({
         url: `${process.env.WRI_API_URL}/dataset/${id}`,

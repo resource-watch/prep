@@ -7,6 +7,7 @@ import Tabs from 'components/ui/Tabs';
 
 // Tabs
 import DashboardsTab from 'components/admin/dashboards/DashboardsTab';
+import ToolsTab from 'components/admin/tools/ToolsTab';
 
 // Components
 import Title from 'components/ui/Title';
@@ -17,6 +18,11 @@ const DATA_TABS = [{
   value: 'dashboards',
   route: 'admin_dashboards',
   params: { tab: 'dashboards' }
+}, {
+  label: 'Tools',
+  value: 'tools',
+  route: 'admin_dashboards',
+  params: { tab: 'tools' }
 }];
 
 class Dashboards extends Page {
@@ -73,6 +79,10 @@ class Dashboards extends Page {
           <div className="l-container">
             {tab === 'dashboards' &&
               <DashboardsTab tab={tab} subtab={subtab} id={id} />
+            }
+
+            {tab === 'tools' &&
+              <ToolsTab tab={tab} subtab={subtab} id={id} />
             }
           </div>
         </div>

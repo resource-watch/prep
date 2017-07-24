@@ -7,12 +7,11 @@ routes.add('admin_home', '/admin', 'admin/Data');
 // DATA
 routes.add('admin_data_detail', '/admin/data/:tab/:id/:subtab?', 'admin/DataDetail');
 routes.add('admin_data', '/admin/data/:tab?', 'admin/Data');
+
 // PARTNERS
 routes.add('admin_partners_detail', '/admin/partners/:tab/:id/:subtab?', 'admin/PartnersDetail');
 routes.add('admin_partners', '/admin/partners/:tab?/:subtab?', 'admin/Partners');
-// TOOLS
-routes.add('admin_tools_detail', '/admin/tools/:tab/:id/:subtab?', 'admin/ToolsDetail');
-routes.add('admin_tools', '/admin/tools/:tab?/:subtab?', 'admin/Tools');
+
 // DASHBOARDS
 routes.add('admin_dashboards_detail', '/admin/dashboards/:tab/:id/:subtab?', 'admin/DashboardsDetail');
 routes.add('admin_dashboards', '/admin/dashboards/:tab?/:subtab?', 'admin/Dashboards');

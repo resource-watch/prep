@@ -16,7 +16,7 @@ function PartnerTD(props) {
 }
 
 PartnerTD.propTypes = {
-  value: React.PropTypes.string,
+  value: React.PropTypes.object,
   index: React.PropTypes.string
 };
 

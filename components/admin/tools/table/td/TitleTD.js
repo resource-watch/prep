@@ -8,7 +8,7 @@ function NameTD(props) {
 
   return (
     <td key={index} className="main">
-      <Link route="admin_tools_detail" params={{ tab: 'tools', id: row.id }}>
+      <Link route="admin_dashboards_detail" params={{ tab: 'tools', id: row.id }}>
         <a>{value}</a>
       </Link>
     </td>

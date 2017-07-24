@@ -71,7 +71,7 @@ class ToolsTable extends React.Component {
           }}
           link={{
             label: 'New tool',
-            route: 'admin_tools_detail',
+            route: 'admin_dashboards_detail',
             params: { tab: 'tools', id: 'new' }
           }}
           onSearch={this.onSearch}
@@ -87,8 +87,8 @@ class ToolsTable extends React.Component {
             actions={{
               show: true,
               list: [
-                { name: 'Edit', route: 'admin_tools_detail', params: { tab: 'tools', subtab: 'edit', id: '{{id}}' }, show: true, component: EditAction },
-                { name: 'Remove', route: 'admin_tools_detail', params: { tab: 'tools', subtab: 'remove', id: '{{id}}' }, component: DeleteAction, componentProps: { authorization: this.props.authorization } }
+                { name: 'Edit', route: 'admin_dashboards_detail', params: { tab: 'tools', subtab: 'edit', id: '{{id}}' }, show: true, component: EditAction },
+                { name: 'Remove', route: 'admin_dashboards_detail', params: { tab: 'tools', subtab: 'remove', id: '{{id}}' }, component: DeleteAction, componentProps: { authorization: this.props.authorization } }
               ]
             }}
             sort={{

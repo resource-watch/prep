@@ -3,6 +3,7 @@ import { singular } from 'pluralize';
 
 // Services
 import DashboardsService from 'services/DashboardsService';
+import ToolsService from 'services/ToolsService';
 
 // Utils
 import { capitalizeFirstLetter } from 'utils/utils';
@@ -13,10 +14,11 @@ import Layout from 'components/admin/layout/Layout';
 
 // Tabs
 import DashboardsTab from 'components/admin/dashboards/DashboardsTab';
-import Breadcrumbs from 'components/ui/Breadcrumbs';
+import ToolsTab from 'components/admin/tools/ToolsTab';
 
 // Components
 import Title from 'components/ui/Title';
+import Breadcrumbs from 'components/ui/Breadcrumbs';
 
 class Dashboards extends Page {
 
@@ -43,7 +45,15 @@ class Dashboards extends Page {
           });
         }
         break;
-      // TODO: do the same service for widgets and layers
+
+      case 'tools':
+        if (id !== 'new') {
+          this.service = new ToolsService({
+            authorization: props.user.token
+          });
+        }
+        break;
+
       default:
 
     }
@@ -118,6 +128,10 @@ class Dashboards extends Page {
           <div className="l-container">
             {tab === 'dashboards' &&
               <DashboardsTab tab={tab} subtab={subtab} id={id} />
+            }
+
+            {tab === 'tools' &&
+              <ToolsTab tab={tab} subtab={subtab} id={id} />
             }
           </div>
         </div>

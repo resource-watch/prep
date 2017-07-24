@@ -7,9 +7,15 @@ export const STATE_DEFAULT = {
   form: {
     // STEP 1
     title: '',
+    slug: '',
     summary: '',
-    url: '',
-    partner: {},
+    content: '',
+    image: '',
+    indicator_id: null,
+    insight_ids: [],
+    tool_ids: [],
+    dashboard_ids: [],
+    related_datasets: [],
     partner_id: null,
     published: false
   }

@@ -4,6 +4,11 @@ import PropTypes from 'prop-types';
 // Services
 import DashboardsService from 'services/DashboardsService';
 import PartnersService from 'services/PartnersService';
+import InsightsService from 'services/InsightsService';
+import ToolsService from 'services/ToolsService';
+import IndicatorsService from 'services/IndicatorsService';
+import DatasetsService from 'services/DatasetsService';
+
 import { toastr } from 'react-redux-toastr';
 
 // Constants
@@ -20,7 +25,7 @@ class DashboardsForm extends React.Component {
 
     this.state = Object.assign({}, STATE_DEFAULT, {
       id: props.id,
-      loading: !!props.id,
+      loading: true,
       form: STATE_DEFAULT.form
     });
 
@@ -29,38 +34,57 @@ class DashboardsForm extends React.Component {
     this.onChange = this.onChange.bind(this);
     this.onStepChange = this.onStepChange.bind(this);
 
-    this.service = new DashboardsService({
-      authorization: props.authorization
-    });
-    this.partnersService = new PartnersService({
-      authorization: props.authorization
-    });
+    // SERVICES
+    this.service = new DashboardsService({ authorization: props.authorization });
+
+    this.partnersService = new PartnersService({ authorization: props.authorization });
+    this.insightsService = new InsightsService({ authorization: props.authorization });
+    this.toolsService = new ToolsService({ authorization: props.authorization });
+    this.indicatorsService = new IndicatorsService({ authorization: props.authorization });
+    this.datasetsService = new DatasetsService({ authorization: props.authorization });
   }
 
   componentDidMount() {
     const { id } = this.state;
 
-    this.partnersService.fetchAllData()
-      .then((partners) => {
-        this.setState({
-          partners: partners.map(p => ({ label: p.name, value: p.id }))
-        });
+    const promises = [
+      this.partnersService.fetchAllData(),
+      this.insightsService.fetchAllData(),
+      this.toolsService.fetchAllData(),
+      this.indicatorsService.fetchAllData(),
+      this.service.fetchAllData(),
+      this.datasetsService.fetchAllData({})
+    ];
 
-        if (id) {
-          // Get the dashboards and fill the
-          // state form with its params if the id exists
-          this.service.fetchData(id)
-            .then((data) => {
-              this.setState({
-                form: this.setFormFromParams(data),
-                // Stop the loading
-                loading: false
-              });
-            })
-            .catch((err) => {
-              console.error(err);
-            });
-        }
+    // Add the dashboard promise if the id exists
+    if (id) {
+      promises.push(this.service.fetchData(id));
+    }
+
+    Promise.all(promises)
+      .then((response) => {
+        const partners = response[0];
+        const insights = response[1];
+        const tools = response[2];
+        const indicators = response[3];
+        const dashboards = response[4];
+        const datasets = response[5];
+        const current = response[6];
+
+        console.log(datasets);
+
+        this.setState({
+          // CURRENT DASHBOARD
+          form: (id) ? this.setFormFromParams(current) : this.state.form,
+          loading: false,
+          // OPTIONS
+          partners: partners.map(p => ({ label: p.name, value: p.id })),
+          insights: insights.map(p => ({ label: p.title, value: p.id })),
+          tools: tools.map(p => ({ label: p.title, value: p.id })),
+          indicators: indicators.map(p => ({ label: p.title, value: p.id })),
+          dashboards: dashboards.map(p => ({ label: p.title, value: p.id })),
+          datasets: datasets.map(p => ({ label: p.name, value: p.id }))
+        });
       })
       .catch((err) => {
         console.error(err);
@@ -139,8 +163,17 @@ class DashboardsForm extends React.Component {
           }
           break;
         }
+        case 'image': {
+          // TODO: if the API doesn't send it we won't need to handle it
+          if (params[f] && params[f] !== '/images/original/missing.png') {
+            newForm[f] = params[f];
+          }
+          break;
+        }
+
         default: {
-          if (params[f] || this.state.form[f]) {
+          if ((typeof params[f] !== 'undefined' || params[f] !== null) ||
+              (typeof this.state.form[f] !== 'undefined' || this.state.form[f] !== null)) {
             newForm[f] = params[f] || this.state.form[f];
           }
         }
@@ -160,6 +193,11 @@ class DashboardsForm extends React.Component {
             id={this.state.id}
             form={this.state.form}
             partners={this.state.partners}
+            insights={this.state.insights}
+            indicators={this.state.indicators}
+            tools={this.state.tools}
+            dashboards={this.state.dashboards}
+            datasets={this.state.datasets}
             onChange={value => this.onChange(value)}
           />
         }

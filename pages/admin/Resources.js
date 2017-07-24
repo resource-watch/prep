@@ -15,7 +15,7 @@ import Title from 'components/ui/Title';
 const DATA_TABS = [{
   label: 'Partners',
   value: 'partners',
-  route: 'admin_partners',
+  route: 'admin_resources',
   params: { tab: 'partners' }
 }];
 
@@ -49,8 +49,8 @@ class Partners extends Page {
 
     return (
       <Layout
-        title="Partners"
-        description="Partners description..."
+        title="Resources"
+        description="Resources description..."
         user={user}
         url={url}
       >
@@ -59,7 +59,7 @@ class Partners extends Page {
           <div className="l-container">
             <div className="page-header-content -padding-b-0">
               <Title className="-primary -huge page-header-title" >
-                Partners
+                Resources
               </Title>
               <Tabs
                 options={DATA_TABS}

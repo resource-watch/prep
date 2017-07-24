@@ -97,7 +97,7 @@ class Partners extends Page {
     return (
       <Layout
         title={this.getName()}
-        description="Partners detail..."
+        description="Resources detail..."
         user={user}
         url={url}
       >
@@ -106,7 +106,7 @@ class Partners extends Page {
           <div className="l-container">
             <div className="page-header-content">
               <Breadcrumbs
-                items={[{ name: capitalizeFirstLetter(tab), route: 'admin_partners', params: { tab } }]}
+                items={[{ name: capitalizeFirstLetter(tab), route: 'admin_resources', params: { tab } }]}
               />
               <Title className="-primary -huge page-header-title" >
                 {this.getName()}

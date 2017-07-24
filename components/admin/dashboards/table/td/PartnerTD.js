@@ -8,7 +8,7 @@ function PartnerTD(props) {
 
   return (
     <td key={index}>
-      <Link route="admin_partners_detail" params={{ tab: 'partners', id: value.id }}>
+      <Link route="admin_resources_detail" params={{ tab: 'partners', id: value.id }}>
         <a>{value.name}</a>
       </Link>
     </td>

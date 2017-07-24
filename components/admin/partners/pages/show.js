@@ -17,7 +17,7 @@ function PartnersShow(props) {
       <PartnersForm
         id={id}
         authorization={user.token}
-        onSubmit={() => Router.pushRoute('admin_partners', { tab: 'partners' })}
+        onSubmit={() => Router.pushRoute('admin_resources', { tab: 'partners' })}
       />
     </div>
   );

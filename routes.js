@@ -9,8 +9,8 @@ routes.add('admin_data_detail', '/admin/data/:tab/:id/:subtab?', 'admin/DataDeta
 routes.add('admin_data', '/admin/data/:tab?', 'admin/Data');
 
 // PARTNERS
-routes.add('admin_partners_detail', '/admin/partners/:tab/:id/:subtab?', 'admin/PartnersDetail');
-routes.add('admin_partners', '/admin/partners/:tab?/:subtab?', 'admin/Partners');
+routes.add('admin_resources_detail', '/admin/resources/:tab/:id/:subtab?', 'admin/ResourcesDetail');
+routes.add('admin_resources', '/admin/resources/:tab?/:subtab?', 'admin/Resources');
 
 // DASHBOARDS
 routes.add('admin_dashboards_detail', '/admin/dashboards/:tab/:id/:subtab?', 'admin/DashboardsDetail');

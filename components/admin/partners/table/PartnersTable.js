@@ -72,7 +72,7 @@ class PartnersTable extends React.Component {
           }}
           link={{
             label: 'New partner',
-            route: 'admin_partners_detail',
+            route: 'admin_resources_detail',
             params: { tab: 'partners', id: 'new' }
           }}
           onSearch={this.onSearch}
@@ -89,8 +89,8 @@ class PartnersTable extends React.Component {
             actions={{
               show: true,
               list: [
-                { name: 'Edit', route: 'admin_partners_detail', params: { tab: 'partners', subtab: 'edit', id: '{{id}}' }, show: true, component: EditAction },
-                { name: 'Remove', route: 'admin_partners_detail', params: { tab: 'partners', subtab: 'remove', id: '{{id}}' }, component: DeleteAction, componentProps: { authorization: this.props.authorization } }
+                { name: 'Edit', route: 'admin_resources_detail', params: { tab: 'partners', subtab: 'edit', id: '{{id}}' }, show: true, component: EditAction },
+                { name: 'Remove', route: 'admin_resources_detail', params: { tab: 'partners', subtab: 'remove', id: '{{id}}' }, component: DeleteAction, componentProps: { authorization: this.props.authorization } }
               ]
             }}
             sort={{

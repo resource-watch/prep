@@ -10,6 +10,7 @@ import Input from 'components/form/Input';
 import TextArea from 'components/form/TextArea';
 import Select from 'components/form/SelectInput';
 import Checkbox from 'components/form/Checkbox';
+import FileImage from 'components/form/FileImage';
 
 class Step1 extends React.Component {
   constructor(props) {
@@ -113,6 +114,29 @@ class Step1 extends React.Component {
         >
           {TextArea}
         </Field>
+
+        {/* IMAGE */}
+        <div className="c-field-row">
+          <div className="row l-row">
+            <div className="column small-12 medium-4">
+              <Field
+                ref={(c) => { if (c) FORM_ELEMENTS.elements.image = c; }}
+                onChange={(value) => {
+                  this.props.onChange({ image: value });
+                }}
+                className="-fluid"
+                properties={{
+                  name: 'image',
+                  label: 'Image',
+                  placeholder: 'Browse file',
+                  default: this.state.form.image
+                }}
+              >
+                {FileImage}
+              </Field>
+            </div>
+          </div>
+        </div>
 
         {/* CONTENT URL */}
         <Field

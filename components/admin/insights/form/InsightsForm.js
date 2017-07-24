@@ -140,7 +140,8 @@ class InsightsForm extends React.Component {
           break;
         }
         default: {
-          if (params[f] || this.state.form[f]) {
+          if ((typeof params[f] !== 'undefined' || params[f] !== null) ||
+              (typeof this.state.form[f] !== 'undefined' || this.state.form[f] !== null)) {
             newForm[f] = params[f] || this.state.form[f];
           }
         }

@@ -59,7 +59,7 @@ class ToolsForm extends React.Component {
           form: (id) ? this.setFormFromParams(current) : this.state.form,
           loading: false,
           // OPTIONS
-          partners: partners.map(p => ({ label: p.title, value: p.id }))
+          partners: partners.map(p => ({ label: p.name, value: p.id }))
         });
       })
       .catch((err) => {

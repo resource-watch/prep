@@ -37,9 +37,13 @@ function post({ type, url, body, headers = [], onSuccess, onError, multipart }) 
 
   request.onreadystatechange = () => {
     if (request.readyState === 4) {
-      if (request.status === 200 || request.status === 201) {
-        const data = JSON.parse(request.responseText);
-        onSuccess(data);
+      if (request.status === 200 || request.status === 201 || request.status === 204) {
+        try {
+          const data = JSON.parse(request.responseText);
+          onSuccess(data);
+        } catch (e) {
+          onSuccess(request.responseText);
+        }
       } else {
         try {
           const data = JSON.parse(request.responseText);

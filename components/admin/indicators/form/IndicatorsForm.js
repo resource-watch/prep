@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 // Services
 import IndicatorsService from 'services/IndicatorsService';
-import PartnersService from 'services/PartnersService';
+import WidgetsService from 'services/WidgetsService';
 import { toastr } from 'react-redux-toastr';
 
 // Constants
@@ -29,38 +29,34 @@ class IndicatorsForm extends React.Component {
     this.onChange = this.onChange.bind(this);
     this.onStepChange = this.onStepChange.bind(this);
 
-    this.service = new IndicatorsService({
-      authorization: props.authorization
-    });
-    this.partnersService = new PartnersService({
-      authorization: props.authorization
-    });
+    this.service = new IndicatorsService({ authorization: props.authorization });
+    this.widgetsService = new WidgetsService({ authorization: props.authorization });
   }
 
   componentDidMount() {
     const { id } = this.state;
 
-    this.partnersService.fetchAllData()
-      .then((partners) => {
-        this.setState({
-          partners: partners.map(p => ({ label: p.name, value: p.id }))
-        });
+    const promises = [
+      this.widgetsService.fetchAllData()
+    ];
 
-        if (id) {
-          // Get the indicators and fill the
-          // state form with its params if the id exists
-          this.service.fetchData(id)
-            .then((data) => {
-              this.setState({
-                form: this.setFormFromParams(data),
-                // Stop the loading
-                loading: false
-              });
-            })
-            .catch((err) => {
-              console.error(err);
-            });
-        }
+    // Add the dashboard promise if the id exists
+    if (id) {
+      promises.push(this.service.fetchData(id));
+    }
+
+    Promise.all(promises)
+      .then((response) => {
+        const widgets = response[0];
+        const current = response[1];
+
+        this.setState({
+          // CURRENT DASHBOARD
+          form: (id) ? this.setFormFromParams(current) : this.state.form,
+          loading: false,
+          // OPTIONS
+          widgets: widgets.map(p => ({ label: p.title, value: p.id }))
+        });
       })
       .catch((err) => {
         console.error(err);
@@ -133,9 +129,9 @@ class IndicatorsForm extends React.Component {
 
     Object.keys(params).forEach((f) => {
       switch (f) {
-        case 'partner': {
+        case 'widgets': {
           if (params[f]) {
-            newForm.partner_id = params[f].id;
+            newForm.widget_ids = params[f].map(w => w.id);
           }
           break;
         }
@@ -159,7 +155,7 @@ class IndicatorsForm extends React.Component {
           <Step1
             id={this.state.id}
             form={this.state.form}
-            partners={this.state.partners}
+            widgets={this.state.widgets}
             onChange={value => this.onChange(value)}
           />
         }

@@ -1,4 +1,5 @@
 import 'isomorphic-fetch';
+import sortBy from 'lodash/sortBy';
 import { get, post, remove } from 'utils/request';
 
 export default class WidgetsService {
@@ -20,7 +21,7 @@ export default class WidgetsService {
           value: this.opts.authorization
         }],
         onSuccess: (response) => {
-          resolve(response);
+          resolve(sortBy(response, 'title'));
         },
         onError: (error) => {
           reject(error);

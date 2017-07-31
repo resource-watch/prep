@@ -76,11 +76,11 @@ class Step1 extends React.Component {
           {TextArea}
         </Field>
 
-        {/* PARTNER */}
+        {/* WIDGETS */}
         <Field
           ref={(c) => { if (c) FORM_ELEMENTS.elements.widget_ids = c; }}
           onChange={value => this.props.onChange({
-            partner_id: value
+            widget_ids: value
           })}
           className="-fluid"
           options={this.props.widgets}
@@ -90,7 +90,7 @@ class Step1 extends React.Component {
             multi: true,
             default: this.state.form.widget_ids,
             value: this.state.form.widget_ids,
-            instanceId: 'selectIndicatorType'
+            instanceId: 'selectWidgets'
           }}
         >
           {Select}

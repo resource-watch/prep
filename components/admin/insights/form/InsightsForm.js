@@ -40,27 +40,27 @@ class InsightsForm extends React.Component {
   componentDidMount() {
     const { id } = this.state;
 
-    this.partnersService.fetchAllData()
-      .then((partners) => {
-        this.setState({
-          partners: partners.map(p => ({ label: p.name, value: p.id }))
-        });
+    const promises = [
+      this.partnersService.fetchAllData()
+    ];
 
-        if (id) {
-          // Get the insights and fill the
-          // state form with its params if the id exists
-          this.service.fetchData(id)
-            .then((data) => {
-              this.setState({
-                form: this.setFormFromParams(data),
-                // Stop the loading
-                loading: false
-              });
-            })
-            .catch((err) => {
-              console.error(err);
-            });
-        }
+    // Add the dashboard promise if the id exists
+    if (id) {
+      promises.push(this.service.fetchData(id));
+    }
+
+    Promise.all(promises)
+      .then((response) => {
+        const partners = response[0];
+        const current = response[1];
+
+        this.setState({
+          // CURRENT DASHBOARD
+          form: (id) ? this.setFormFromParams(current) : this.state.form,
+          loading: false,
+          // OPTIONS
+          partners: partners.map(p => ({ label: p.title, value: p.id }))
+        });
       })
       .catch((err) => {
         console.error(err);

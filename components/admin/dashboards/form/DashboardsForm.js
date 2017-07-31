@@ -161,6 +161,24 @@ class DashboardsForm extends React.Component {
           }
           break;
         }
+        case 'indicator': {
+          if (params[f]) {
+            newForm.indicator_id = params[f].id;
+          }
+          break;
+        }
+        case 'tools': {
+          if (params[f]) {
+            newForm.tool_ids = params[f].map(d => d.id);
+          }
+          break;
+        }
+        case 'dashboards': {
+          if (params[f]) {
+            newForm.dashboard_ids = params[f].map(d => d.id);
+          }
+          break;
+        }
         case 'image': {
           // TODO: if the API doesn't send it we won't need to handle it
           if (params[f] && params[f] !== '/images/original/missing.png') {

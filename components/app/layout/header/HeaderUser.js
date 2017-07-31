@@ -6,30 +6,28 @@ import { Link } from 'routes';
 // Utils
 import { get } from 'utils/request';
 
+// Services
+import UsersService from 'services/UsersService';
+
 // Components
 import TetherComponent from 'react-tether';
 
 class HeaderUser extends React.Component {
+
+  constructor(props) {
+    super(props);
+
+    this.usersService = new UsersService({});
+  }
+
   /**
    * UI EVENTS
    * - logout
   */
   logout(e) {
     e && e.preventDefault();
-
-    // Get to logout
-    get({
-      url: `${process.env.CONTROL_TOWER_URL}/auth/logout`,
-      withCredentials: true,
-      onSuccess: () => {
-        window.location.href = `/logout?callbackUrl=${window.location.href}`;
-      },
-      onError: (err) => {
-        console.error(err);
-      }
-    });
+    this.usersService.logout();
   }
-
 
   render() {
     const { user } = this.props;

@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Services
-import UserService from 'services/UserService';
+import UsersService from 'services/UsersService';
 
 // Components
 import Button from 'components/ui/Button';
@@ -39,16 +39,6 @@ class MyRWEditProfile extends React.Component {
     this.state = {
       user: {}
     };
-
-    this.userService = new UserService({ apiURL: process.env.CONTROL_TOWER_URL });
-  }
-
-  componentWillMount() {
-    this.userService.getLoggedUser().then((response) => {
-      console.log('get logged user: ', response);
-    }).catch((err) => {
-      console.log(err);
-    });
   }
 
   triggerSaveProfile() {

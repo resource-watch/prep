@@ -3,30 +3,25 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
 // Utils
-import { get } from 'utils/request';
+import UsersService from 'services/UsersService';
 
 // Next components
 import { Link } from 'routes';
 
 export default class Header extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.usersService = new UsersService({});
+  }
+
   /**
    * UI EVENTS
    * - logout
   */
   logout(e) {
     e && e.preventDefault();
-
-    // Get to logout
-    get({
-      url: `${process.env.CONTROL_TOWER_URL}/auth/logout`,
-      withCredentials: true,
-      onSuccess: () => {
-        window.location.href = `/logout?callbackUrl=${window.location.href}`;
-      },
-      onError: (err) => {
-        console.error(err);
-      }
-    });
+    this.usersService.logout();
   }
 
   render() {

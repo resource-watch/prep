@@ -14,32 +14,38 @@ import LayersTab from 'components/admin/layers/LayersTab';
 import Title from 'components/ui/Title';
 
 // Contants
-const DATA_TABS = [{
-  label: 'Datasets',
-  value: 'datasets',
-  route: 'admin_data',
-  params: { tab: 'datasets' }
-}, {
-  label: 'Widgets',
-  value: 'widgets',
-  route: 'admin_data',
-  params: { tab: 'widgets' }
-}, {
-  label: 'Layers',
-  value: 'layers',
-  route: 'admin_data',
-  params: { tab: 'layers' }
-}, {
-  label: 'Dashboards',
-  value: 'dashboards',
-  route: 'admin_data',
-  params: { tab: 'dashboards' }
-}, {
-  label: 'Vocabularies',
-  value: 'vocabularies',
-  route: 'admin_data',
-  params: { tab: 'vocabularies' }
-}];
+const DATA_TABS = [
+  {
+    label: 'Datasets',
+    value: 'datasets',
+    route: 'admin_data',
+    params: { tab: 'datasets' }
+  },
+  {
+    label: 'Widgets',
+    value: 'widgets',
+    route: 'admin_data',
+    params: { tab: 'widgets' }
+  },
+  {
+    label: 'Layers',
+    value: 'layers',
+    route: 'admin_data',
+    params: { tab: 'layers' }
+  }
+  // {
+  //   label: 'Dashboards',
+  //   value: 'dashboards',
+  //   route: 'admin_data',
+  //   params: { tab: 'dashboards' }
+  // },
+  // {
+  //   label: 'Vocabularies',
+  //   value: 'vocabularies',
+  //   route: 'admin_data',
+  //   params: { tab: 'vocabularies' }
+  // }
+];
 
 class Data extends Page {
 

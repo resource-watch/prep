@@ -6,6 +6,7 @@ const session = require('express-session');
 const ControlTowerStrategy = require('passport-control-tower');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+global.XMLHttpRequest = require('xhr2');
 const { parse } = require('url');
 const routes = require('./routes');
 

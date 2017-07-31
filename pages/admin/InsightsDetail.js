@@ -2,7 +2,7 @@ import React from 'react';
 import { singular } from 'pluralize';
 
 // Services
-import ToolsService from 'services/ToolsService';
+import InsightsService from 'services/InsightsService';
 
 // Utils
 import { capitalizeFirstLetter } from 'utils/utils';
@@ -12,13 +12,13 @@ import Page from 'components/admin/layout/Page';
 import Layout from 'components/admin/layout/Layout';
 
 // Tabs
-import ToolsTab from 'components/admin/tools/ToolsTab';
-import Breadcrumbs from 'components/ui/Breadcrumbs';
+import InsightsTab from 'components/admin/insights/InsightsTab';
 
 // Components
 import Title from 'components/ui/Title';
+import Breadcrumbs from 'components/ui/Breadcrumbs';
 
-class Tools extends Page {
+class Insights extends Page {
 
   constructor(props) {
     super(props);
@@ -36,9 +36,9 @@ class Tools extends Page {
     this.service = null;
 
     switch (tab) {
-      case 'tools':
+      case 'insights':
         if (id !== 'new') {
-          this.service = new ToolsService({
+          this.service = new InsightsService({
             authorization: props.user.token
           });
         }
@@ -97,7 +97,7 @@ class Tools extends Page {
     return (
       <Layout
         title={this.getName()}
-        description="Tools detail..."
+        description="Insights detail..."
         user={user}
         url={url}
       >
@@ -106,7 +106,7 @@ class Tools extends Page {
           <div className="l-container">
             <div className="page-header-content">
               <Breadcrumbs
-                items={[{ name: capitalizeFirstLetter(tab), route: 'admin_tools', params: { tab } }]}
+                items={[{ name: capitalizeFirstLetter(tab), route: 'admin_insights', params: { tab } }]}
               />
               <Title className="-primary -huge page-header-title" >
                 {this.getName()}
@@ -116,8 +116,8 @@ class Tools extends Page {
         </div>
         <div className="c-page-section">
           <div className="l-container">
-            {tab === 'tools' &&
-              <ToolsTab tab={tab} subtab={subtab} id={id} />
+            {tab === 'insights' &&
+              <InsightsTab tab={tab} subtab={subtab} id={id} />
             }
           </div>
         </div>
@@ -126,10 +126,10 @@ class Tools extends Page {
   }
 }
 
-Tools.propTypes = {
+Insights.propTypes = {
   user: React.PropTypes.object,
   url: React.PropTypes.object
 };
 
 
-export default Tools;
+export default Insights;

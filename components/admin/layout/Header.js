@@ -3,30 +3,25 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
 // Utils
-import { get } from 'utils/request';
+import UsersService from 'services/UsersService';
 
 // Next components
 import { Link } from 'routes';
 
 export default class Header extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.usersService = new UsersService({});
+  }
+
   /**
    * UI EVENTS
    * - logout
   */
   logout(e) {
     e && e.preventDefault();
-
-    // Get to logout
-    get({
-      url: `${process.env.CONTROL_TOWER_URL}/auth/logout`,
-      withCredentials: true,
-      onSuccess: () => {
-        window.location.href = `/logout?callbackUrl=${window.location.href}`;
-      },
-      onError: (err) => {
-        console.error(err);
-      }
-    });
+    this.usersService.logout();
   }
 
   render() {
@@ -39,14 +34,24 @@ export default class Header extends React.Component {
         component: <Link route="admin_data"><a>Data</a></Link>
       },
       {
-        name: 'Partners',
-        pathnames: ['/admin/Partners', '/admin/PartnersDetail'],
-        component: <Link route="admin_partners"><a>Partners</a></Link>
+        name: 'Dashboards',
+        pathnames: ['/admin/Dashboards', '/admin/DashboardsDetail'],
+        component: <Link route="admin_dashboards"><a>Dashboards</a></Link>
       },
       {
-        name: 'Tools',
-        pathnames: ['/admin/Tools', '/admin/ToolsDetail'],
-        component: <Link route="admin_tools"><a>Tools</a></Link>
+        name: 'Insights',
+        pathnames: ['/admin/Insights', '/admin/InsightsDetail'],
+        component: <Link route="admin_insights"><a>Insights</a></Link>
+      },
+      {
+        name: 'Resources',
+        pathnames: ['/admin/Resources', '/admin/ResourcesDetail'],
+        component: <Link route="admin_resources"><a>Resources</a></Link>
+      },
+      {
+        name: 'Widgets',
+        pathnames: ['/admin/Widgets', '/admin/WidgetsDetail'],
+        component: <Link route="admin_widgets"><a>Widgets</a></Link>
       },
       {
         name: 'Logout',

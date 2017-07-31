@@ -16,7 +16,7 @@ function PartnersNew(props) {
     <div className="c-partners-new">
       <PartnersForm
         authorization={user.token}
-        onSubmit={() => Router.pushRoute('admin_partners', { tab: 'partners' })}
+        onSubmit={() => Router.pushRoute('admin_resources', { tab: 'partners' })}
       />
     </div>
   );

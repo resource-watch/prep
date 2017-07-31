@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Services
-import UserService from 'services/UserService';
+import UsersService from 'services/UsersService';
 
 // Components
 import Page from 'components/app/layout/Page';
@@ -55,18 +55,6 @@ class MyRW extends Page {
       tab: url.query.tab || 'profile',
       subtab: url.query.subtab
     };
-
-    this.userService = new UserService({
-      apiURL: process.env.CONTROL_TOWER_URL
-    });
-  }
-
-  componentWillMount() {
-    this.userService.getLoggedUser().then((response) => {
-      console.info('get logged user: ', response);
-    }).catch((err) => {
-      console.info(err);
-    });
   }
 
   componentWillReceiveProps(nextProps) {

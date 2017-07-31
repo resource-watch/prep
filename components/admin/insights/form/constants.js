@@ -1,9 +1,25 @@
-export const LANGUAGE_OPTIONS = [
-  { label: 'English', value: 'en' },
-  { label: 'Español', value: 'es' },
-  { label: 'Français', value: 'fr' },
-  { label: 'Português', value: 'pt' }
-];
+export const STATE_DEFAULT = {
+  step: 1,
+  stepLength: 1,
+  submitting: false,
+  loading: false,
+  partners: [],
+  form: {
+    // STEP 1
+    title: '',
+    slug: '',
+    template_type: 0,
+    summary: '',
+    content: '',
+    image: '',
+    content_url: '',
+    partner: {},
+    partner_id: null,
+    attribution: false,
+    published: false,
+    embeddable: false
+  }
+};
 
 export const FORM_ELEMENTS = {
   elements: {
@@ -24,3 +40,9 @@ export const FORM_ELEMENTS = {
     return valid;
   }
 };
+
+export const TEMPLATE_TYPES = [
+  { label: 'Custom', value: 0 },
+  { label: 'Template 1', value: 1 },
+  { label: 'Template 2', value: 2 }
+];

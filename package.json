@@ -86,7 +86,8 @@
     "url-loader": "^0.5.8",
     "uuid": "^3.0.1",
     "vega": "^2.6.0",
-    "whatwg-fetch": "^2.0.2"
+    "whatwg-fetch": "^2.0.2",
+    "xhr2": "^0.1.4"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",

@@ -6,20 +6,20 @@ import Layout from 'components/admin/layout/Layout';
 import Tabs from 'components/ui/Tabs';
 
 // Tabs
-import ToolsTab from 'components/admin/tools/ToolsTab';
+import PartnersTab from 'components/admin/partners/PartnersTab';
 
 // Components
 import Title from 'components/ui/Title';
 
 // Contants
 const DATA_TABS = [{
-  label: 'Tools',
-  value: 'tools',
-  route: 'admin_tools',
-  params: { tab: 'tools' }
+  label: 'Partners',
+  value: 'partners',
+  route: 'admin_resources',
+  params: { tab: 'partners' }
 }];
 
-class Tools extends Page {
+class Resources extends Page {
 
   constructor(props) {
     super(props);
@@ -27,7 +27,7 @@ class Tools extends Page {
     const { url } = props;
 
     this.state = {
-      tab: url.query.tab || 'tools',
+      tab: url.query.tab || 'partners',
       id: url.query.id,
       subtab: url.query.subtab
     };
@@ -37,7 +37,7 @@ class Tools extends Page {
     const { url } = nextProps;
 
     this.setState({
-      tab: url.query.tab || 'tools',
+      tab: url.query.tab || 'partners',
       id: url.query.id,
       subtab: url.query.subtab
     });
@@ -49,8 +49,8 @@ class Tools extends Page {
 
     return (
       <Layout
-        title="Tools"
-        description="Tools description..."
+        title="Resources"
+        description="Resources description..."
         user={user}
         url={url}
       >
@@ -59,7 +59,7 @@ class Tools extends Page {
           <div className="l-container">
             <div className="page-header-content -padding-b-0">
               <Title className="-primary -huge page-header-title" >
-                Tools
+                Resources
               </Title>
               <Tabs
                 options={DATA_TABS}
@@ -71,8 +71,8 @@ class Tools extends Page {
         </div>
         <div className="c-page-section">
           <div className="l-container">
-            {tab === 'tools' &&
-              <ToolsTab tab={tab} subtab={subtab} id={id} />
+            {tab === 'partners' &&
+              <PartnersTab tab={tab} subtab={subtab} id={id} />
             }
           </div>
         </div>
@@ -81,10 +81,10 @@ class Tools extends Page {
   }
 }
 
-Tools.propTypes = {
+Resources.propTypes = {
   user: React.PropTypes.object,
   url: React.PropTypes.object
 };
 
 
-export default Tools;
+export default Resources;

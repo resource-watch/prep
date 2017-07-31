@@ -39,10 +39,10 @@ export default class TableContent extends React.Component {
         const rowBField = rowB[sort.field];
 
         const rowACondition = (rowAField && rowAField.toString) ?
-          rowAField.toString().toLowerCase() :
+          rowAField.toString().toLowerCase().trim() :
           rowAField;
         const rowBCondition = (rowAField && rowBField.toString) ?
-          rowBField.toString().toLowerCase() :
+          rowBField.toString().toLowerCase().trim() :
           rowBField;
 
         return (rowACondition > rowBCondition) ?

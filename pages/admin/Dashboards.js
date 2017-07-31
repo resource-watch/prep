@@ -6,20 +6,32 @@ import Layout from 'components/admin/layout/Layout';
 import Tabs from 'components/ui/Tabs';
 
 // Tabs
-import PartnersTab from 'components/admin/partners/PartnersTab';
+import DashboardsTab from 'components/admin/dashboards/DashboardsTab';
+import ToolsTab from 'components/admin/tools/ToolsTab';
+import IndicatorsTab from 'components/admin/indicators/IndicatorsTab';
 
 // Components
 import Title from 'components/ui/Title';
 
 // Contants
 const DATA_TABS = [{
-  label: 'Partners',
-  value: 'partners',
-  route: 'admin_partners',
-  params: { tab: 'partners' }
+  label: 'Dashboards',
+  value: 'dashboards',
+  route: 'admin_dashboards',
+  params: { tab: 'dashboards' }
+}, {
+  label: 'Tools',
+  value: 'tools',
+  route: 'admin_dashboards',
+  params: { tab: 'tools' }
+}, {
+  label: 'Indicators',
+  value: 'indicators',
+  route: 'admin_dashboards',
+  params: { tab: 'indicators' }
 }];
 
-class Partners extends Page {
+class Dashboards extends Page {
 
   constructor(props) {
     super(props);
@@ -27,7 +39,7 @@ class Partners extends Page {
     const { url } = props;
 
     this.state = {
-      tab: url.query.tab || 'partners',
+      tab: url.query.tab || 'dashboards',
       id: url.query.id,
       subtab: url.query.subtab
     };
@@ -37,7 +49,7 @@ class Partners extends Page {
     const { url } = nextProps;
 
     this.setState({
-      tab: url.query.tab || 'partners',
+      tab: url.query.tab || 'dashboards',
       id: url.query.id,
       subtab: url.query.subtab
     });
@@ -49,8 +61,8 @@ class Partners extends Page {
 
     return (
       <Layout
-        title="Partners"
-        description="Partners description..."
+        title="Dashboards"
+        description="Dashboards description..."
         user={user}
         url={url}
       >
@@ -59,7 +71,7 @@ class Partners extends Page {
           <div className="l-container">
             <div className="page-header-content -padding-b-0">
               <Title className="-primary -huge page-header-title" >
-                Partners
+                Dashboards
               </Title>
               <Tabs
                 options={DATA_TABS}
@@ -71,8 +83,16 @@ class Partners extends Page {
         </div>
         <div className="c-page-section">
           <div className="l-container">
-            {tab === 'partners' &&
-              <PartnersTab tab={tab} subtab={subtab} id={id} />
+            {tab === 'dashboards' &&
+              <DashboardsTab tab={tab} subtab={subtab} id={id} />
+            }
+
+            {tab === 'tools' &&
+              <ToolsTab tab={tab} subtab={subtab} id={id} />
+            }
+
+            {tab === 'indicators' &&
+              <IndicatorsTab tab={tab} subtab={subtab} id={id} />
             }
           </div>
         </div>
@@ -81,10 +101,10 @@ class Partners extends Page {
   }
 }
 
-Partners.propTypes = {
+Dashboards.propTypes = {
   user: React.PropTypes.object,
   url: React.PropTypes.object
 };
 
 
-export default Partners;
+export default Dashboards;

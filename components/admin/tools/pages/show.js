@@ -17,7 +17,7 @@ function ToolsShow(props) {
       <ToolsForm
         id={id}
         authorization={user.token}
-        onSubmit={() => Router.pushRoute('admin_tools', { tab: 'tools' })}
+        onSubmit={() => Router.pushRoute('admin_dashboards', { tab: 'tools' })}
       />
     </div>
   );

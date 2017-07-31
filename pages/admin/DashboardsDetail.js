@@ -2,7 +2,9 @@ import React from 'react';
 import { singular } from 'pluralize';
 
 // Services
-import PartnersService from 'services/PartnersService';
+import DashboardsService from 'services/DashboardsService';
+import ToolsService from 'services/ToolsService';
+import IndicatorsService from 'services/IndicatorsService';
 
 // Utils
 import { capitalizeFirstLetter } from 'utils/utils';
@@ -12,13 +14,15 @@ import Page from 'components/admin/layout/Page';
 import Layout from 'components/admin/layout/Layout';
 
 // Tabs
-import PartnersTab from 'components/admin/partners/PartnersTab';
-import Breadcrumbs from 'components/ui/Breadcrumbs';
+import DashboardsTab from 'components/admin/dashboards/DashboardsTab';
+import ToolsTab from 'components/admin/tools/ToolsTab';
+import IndicatorsTab from 'components/admin/indicators/IndicatorsTab';
 
 // Components
 import Title from 'components/ui/Title';
+import Breadcrumbs from 'components/ui/Breadcrumbs';
 
-class Partners extends Page {
+class Dashboards extends Page {
 
   constructor(props) {
     super(props);
@@ -32,18 +36,33 @@ class Partners extends Page {
       data: {}
     };
 
-
     this.service = null;
 
     switch (tab) {
-      case 'partners':
+      case 'dashboards':
         if (id !== 'new') {
-          this.service = new PartnersService({
+          this.service = new DashboardsService({
             authorization: props.user.token
           });
         }
         break;
-      // TODO: do the same service for widgets and layers
+
+      case 'tools':
+        if (id !== 'new') {
+          this.service = new ToolsService({
+            authorization: props.user.token
+          });
+        }
+        break;
+
+      case 'indicators':
+        if (id !== 'new') {
+          this.service = new IndicatorsService({
+            authorization: props.user.token
+          });
+        }
+        break;
+
       default:
 
     }
@@ -83,8 +102,8 @@ class Partners extends Page {
       return `New ${singular(tab)}`;
     }
 
-    if (data.name) {
-      return data.name;
+    if (data.name || data.title) {
+      return data.name || data.title;
     }
 
     return '-';
@@ -97,7 +116,7 @@ class Partners extends Page {
     return (
       <Layout
         title={this.getName()}
-        description="Partners detail..."
+        description="Dashboards detail..."
         user={user}
         url={url}
       >
@@ -106,7 +125,7 @@ class Partners extends Page {
           <div className="l-container">
             <div className="page-header-content">
               <Breadcrumbs
-                items={[{ name: capitalizeFirstLetter(tab), route: 'admin_partners', params: { tab } }]}
+                items={[{ name: capitalizeFirstLetter(tab), route: 'admin_dashboards', params: { tab } }]}
               />
               <Title className="-primary -huge page-header-title" >
                 {this.getName()}
@@ -116,8 +135,16 @@ class Partners extends Page {
         </div>
         <div className="c-page-section">
           <div className="l-container">
-            {tab === 'partners' &&
-              <PartnersTab tab={tab} subtab={subtab} id={id} />
+            {tab === 'dashboards' &&
+              <DashboardsTab tab={tab} subtab={subtab} id={id} />
+            }
+
+            {tab === 'tools' &&
+              <ToolsTab tab={tab} subtab={subtab} id={id} />
+            }
+
+            {tab === 'indicators' &&
+              <IndicatorsTab tab={tab} subtab={subtab} id={id} />
             }
           </div>
         </div>
@@ -126,10 +153,10 @@ class Partners extends Page {
   }
 }
 
-Partners.propTypes = {
+Dashboards.propTypes = {
   user: React.PropTypes.object,
   url: React.PropTypes.object
 };
 
 
-export default Partners;
+export default Dashboards;

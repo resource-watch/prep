@@ -5,7 +5,8 @@ class Validator {
       required: {
         validate(value) {
           const regex = /.*\S.*/;
-          return regex.test(value || '');
+          const val = (typeof value !== 'undefined' && value !== null) ? value : '';
+          return regex.test(val);
         },
         message() {
           return 'The field is required';

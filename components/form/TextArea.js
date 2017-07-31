@@ -3,6 +3,9 @@ import React from 'react';
 import FormElement from './FormElement';
 
 class TextArea extends FormElement {
+  defaultProperties = {
+    rows: 6
+  }
   /**
    * UI EVENTS
    * - triggerChange
@@ -19,9 +22,14 @@ class TextArea extends FormElement {
   render() {
     const { properties } = this.props;
 
+    const inputProperties = {
+      ...this.defaultProperties,
+      ...properties
+    };
+
     return (
       <textarea
-        {...properties}
+        {...inputProperties}
         value={this.state.value}
         id={`input-${properties.name}`}
         onChange={this.triggerChange}

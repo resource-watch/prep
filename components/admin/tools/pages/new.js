@@ -16,7 +16,7 @@ function ToolsNew(props) {
     <div className="c-tools-new">
       <ToolsForm
         authorization={user.token}
-        onSubmit={() => Router.pushRoute('admin_tools', { tab: 'tools' })}
+        onSubmit={() => Router.pushRoute('admin_dashboards', { tab: 'tools' })}
       />
     </div>
   );

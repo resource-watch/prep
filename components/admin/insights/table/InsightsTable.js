@@ -1,92 +1,150 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import { Autobind } from 'es-decorators';
+
+// Redux
+import withRedux from 'next-redux-wrapper';
+import { initStore } from 'store';
+import { getInsights, setFilters } from 'redactions/admin/insights';
+
+// Selectors
+import getFilteredInsights from 'selectors/admin/insights';
+
+// Components
 import Spinner from 'components/ui/Spinner';
 import CustomTable from 'components/ui/customtable/CustomTable';
-import DeleteAction from 'components/ui/customtable/actions/DeleteAction';
-import EditAction from 'components/ui/customtable/actions/EditAction';
-import { get } from 'utils/request';
+import SearchInput from 'components/ui/SearchInput';
+
+// Table components
+import EditAction from './actions/EditAction';
+import DeleteAction from './actions/DeleteAction';
+
+// TDs
+import TitleTD from './td/TitleTD';
+import PublishedTD from './td/PublishedTD';
+import EmbeddableTD from './td/EmbeddableTD';
+
 
 class InsightsTable extends React.Component {
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      insights: [],
-      loading: true
-    };
+  componentDidMount() {
+    this.props.setFilters([]);
+    this.props.getInsights();
   }
 
-  componentDidMount() {
-    this.getInsights();
+  /**
+   * Event handler executed when the user search for a dataset
+   * @param {string} { value } Search keywords
+   */
+  @Autobind
+  onSearch(value) {
+    if (!value.length) {
+      this.props.setFilters([]);
+    } else {
+      this.props.setFilters([{ key: 'title', value }]);
+    }
   }
 
   /**
    * HELPERS
    * - getInsights
+   * - getFilteredInsights
   */
   getInsights() {
-    get(
-      {
-        url: `${process.env.BACKOFFICE_API_URL}/api/insights`,
-        headers: [
-          { key: 'Content-Type', value: 'application/json' },
-          { key: 'Authorization', value: this.props.authorization }
-        ],
-        onSuccess: (response) => {
-          console.log('success!');
-          console.log(response);
-          const insights = response.data.map(insight =>
-            Object.assign({}, insight.attributes, {
-              id: insight.id
-            })
-          );
-          this.setState({ insights, loading: false });
-        },
-        onError: (error) => {
-          this.setState({ message: `Error loading insights: ${error}`, loading: false });
-        }
-      }
-    );
+    return this.props.insights;
+  }
+
+  getFilteredInsights() {
+    return this.props.filteredInsights;
   }
 
   render() {
     return (
       <div className="c-insights-table">
-        <Spinner className="-light" isLoading={this.state.loading} />
-        <CustomTable
-          columns={[
-            { label: 'name', value: 'name' },
-            { label: 'featured', value: 'featured' },
-            { label: 'published', value: 'published' }
-          ]}
-          actions={{
-            show: true,
-            list: [
-              { name: 'Edit', path: '/admin/insights/:id/edit', show: true, component: EditAction },
-              { name: 'Remove', path: '/admin/insights/:id/remove', show: true, component: DeleteAction }
-            ]
+        <Spinner className="-light" isLoading={this.props.loading} />
+
+        {this.props.error && (
+          <p>Error: {this.props.error}</p>
+        )}
+
+        <SearchInput
+          input={{
+            placeholder: 'Search insight'
           }}
-          data={this.state.insights}
-          pageSize={20}
-          pagination={{
-            enabled: true,
-            pageSize: 20,
-            page: 0
+          link={{
+            label: 'New insight',
+            route: 'admin_insights_detail',
+            params: { tab: 'insights', id: 'new' }
           }}
+          onSearch={this.onSearch}
         />
+
+        {!this.props.error && (
+          <CustomTable
+            columns={[
+              { label: 'Title', value: 'title', td: TitleTD },
+              { label: 'Attribution', value: 'attribution' },
+              { label: 'Published', value: 'published', td: PublishedTD },
+              { label: 'Embeddable', value: 'embeddable', td: EmbeddableTD }
+            ]}
+            actions={{
+              show: true,
+              list: [
+                { name: 'Edit', route: 'admin_insights_detail', params: { tab: 'insights', subtab: 'edit', id: '{{id}}' }, show: true, component: EditAction },
+                { name: 'Remove', route: 'admin_insights_detail', params: { tab: 'insights', subtab: 'remove', id: '{{id}}' }, component: DeleteAction, componentProps: { authorization: this.props.authorization } }
+              ]
+            }}
+            sort={{
+              field: 'title',
+              value: 1
+            }}
+            filters={false}
+            data={this.getFilteredInsights()}
+            pageSize={20}
+            pagination={{
+              enabled: true,
+              pageSize: 20,
+              page: 0
+            }}
+            onToggleSelectedRow={(ids) => { console.info(ids); }}
+            onRowDelete={(id) => { console.info(id); }}
+          />
+        )}
       </div>
     );
   }
 }
 
 InsightsTable.defaultProps = {
-  application: [],
   columns: [],
-  actions: {}
+  actions: {},
+  // Store
+  insights: [],
+  filteredInsights: []
 };
 
 InsightsTable.propTypes = {
-  authorization: React.PropTypes.string
+  authorization: PropTypes.string,
+  // Store
+  loading: PropTypes.bool.isRequired,
+  insights: PropTypes.array.isRequired,
+  filteredInsights: PropTypes.array.isRequired,
+  error: PropTypes.string,
+
+  // Actions
+  getInsights: PropTypes.func.isRequired,
+  setFilters: PropTypes.func.isRequired
 };
 
-export default InsightsTable;
+const mapStateToProps = state => ({
+  loading: state.insights.insights.loading,
+  insights: state.insights.insights.list,
+  filteredInsights: getFilteredInsights(state),
+  error: state.insights.insights.error
+});
+const mapDispatchToProps = dispatch => ({
+  getInsights: () => dispatch(getInsights()),
+  setFilters: filters => dispatch(setFilters(filters))
+});
+
+export default withRedux(initStore, mapStateToProps, mapDispatchToProps)(InsightsTable);

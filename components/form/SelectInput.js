@@ -7,9 +7,10 @@ class SelectInput extends FormElement {
 
   constructor(props) {
     super(props);
+    const defaultValue = props.properties.default;
 
     this.state = {
-      value: props.properties.default || null
+      value: (typeof defaultValue !== 'undefined' || defaultValue !== null) ? defaultValue : null
     };
   }
 

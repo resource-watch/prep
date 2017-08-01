@@ -1,6 +1,7 @@
 .c-columnbox {
   display: inline-flex;
   align-items: center;
+  min-height: 22px;
   background-color: $color-blue-turquoise;
   font-size: $font-size-small-medium;
   font-weight: $font-weight-bold;
@@ -21,7 +22,7 @@
   }
 
   .aggregate-function {
-    margin-left: 10px;
+    margin-left: 6px;
     color: $color-grey;
   }
 

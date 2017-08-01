@@ -6,14 +6,15 @@ export const STATE_DEFAULT = {
   partners: [],
   form: {
     // STEP 1
-    title: '',
-    slug: '',
-    summary: '',
-    content: '',
-    content_url: '',
-    attribution: '',
-    published: false,
-    partner_id: null
+    name: '',
+    queryUrl: '',
+    description: '',
+    source: '',
+    sourceUrl: '',
+    authors: '',
+    widgetConfig: {},
+    default: false,
+    published: false
   }
 };
 

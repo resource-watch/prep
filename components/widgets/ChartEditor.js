@@ -18,9 +18,18 @@ import SortContainer from 'components/widgets/SortContainer';
 import LimitContainer from 'components/widgets/LimitContainer';
 import Select from 'components/form/SelectInput';
 import SaveWidgetModal from 'components/modal/SaveWidgetModal';
+import HowToWidgetEditorModal from 'components/modal/HowToWidgetEditorModal';
 
 @DragDropContext(HTML5Backend)
 class ChartEditor extends React.Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      areaOptions: []
+    };
+  }
 
   @Autobind
   handleChartTypeChange(val) {
@@ -40,11 +49,43 @@ class ChartEditor extends React.Component {
     this.props.setModalOptions(options);
   }
 
-  render() {
-    const { dataset, tableName, jiminy, widgetEditor, tableViewMode } = this.props;
-    const { chartType, fields, category, value } = widgetEditor;
+  @Autobind
+  handleUpdateWidget() {
+    this.props.onUpdateWidget();
+  }
 
-    const showSaveButton = chartType && category && value;
+  @Autobind
+  handleNeedHelp() {
+    const options = {
+      children: HowToWidgetEditorModal,
+      childrenProps: {}
+    };
+    this.props.toggleModal(true);
+    this.props.setModalOptions(options);
+  }
+
+  @Autobind
+  handleShareEmbed() {
+
+  }
+
+  render() {
+    const {
+      dataset,
+      tableName,
+      jiminy,
+      widgetEditor,
+      tableViewMode,
+      user,
+      mode,
+      showSaveButton
+     } = this.props;
+    const { chartType, fields, category, value, areaIntersection } = widgetEditor;
+    const { areaOptions } = this.state;
+
+    const showSaveButtonFlag =
+      chartType && category && value && user && user.token && showSaveButton;
+    const showUpdateButton = showSaveButtonFlag;
 
     const chartOptions = (
         jiminy
@@ -54,21 +95,38 @@ class ChartEditor extends React.Component {
 
     return (
       <div className="c-chart-editor">
-        {!tableViewMode &&
-          <div className="chart-type">
-            <h5>Chart type</h5>
+        <div className="selectors-container">
+          {!tableViewMode &&
+            <div className="chart-type">
+              <h5>Chart style</h5>
+              <Select
+                properties={{
+                  name: 'chart-type',
+                  value: chartType,
+                  default: chartType
+                }}
+                options={chartOptions}
+                onChange={this.handleChartTypeChange}
+              />
+            </div>
+          }
+          <div className="area-intersection">
+            <h5>Area intersection</h5>
             <Select
               properties={{
-                className: 'chart-type-selector',
-                name: 'chart-type',
-                value: chartType,
-                default: chartType
+                className: 'area-intersection-selector',
+                name: 'area-intersection',
+                value: areaIntersection,
+                default: areaIntersection
               }}
-              options={chartOptions}
-              onChange={this.handleChartTypeChange}
+              options={areaOptions}
+              onChange={this.handleAreaIntersectionChange}
             />
           </div>
-        }
+        </div>
+        <div className="text-container">
+          Drag and drop elements from the list to the boxes:
+        </div>
         <div className="actions-div">
           {fields &&
             <FieldsContainer
@@ -77,6 +135,9 @@ class ChartEditor extends React.Component {
               fields={fields}
             />
           }
+          <div className="arrow-container">
+            <img alt="" src="/static/images/components/widgets/Arrow.svg" />
+          </div>
           <div className="customization-container">
             <DimensionsContainer />
             <FilterContainer />
@@ -84,15 +145,41 @@ class ChartEditor extends React.Component {
             <LimitContainer />
           </div>
         </div>
-        {showSaveButton &&
-          <div className="save-widget-container">
-            <a
-              onClick={this.handleSaveWidget}
-            >
-              Save widget
-            </a>
-          </div>
-        }
+        <div className="save-widget-container">
+          <button
+            className="c-button -primary"
+            onClick={this.handleNeedHelp}
+          >
+            Need help?
+          </button>
+          {showSaveButtonFlag && mode === 'save' &&
+          <a
+            role="button"
+            tabIndex={-2}
+            onClick={this.handleSaveWidget}
+          >
+            Save widget
+          </a>
+          }
+          {mode === 'update' &&
+          <a
+            role="button"
+            tabIndex={-1}
+            onClick={this.handleShareEmbed}
+          >
+            Share/embed
+          </a>
+          }
+          {showUpdateButton && mode === 'update' &&
+          <a
+            role="button"
+            tabIndex={0}
+            onClick={this.handleUpdateWidget}
+          >
+            Save widget
+          </a>
+          }
+        </div>
       </div>
     );
   }
@@ -100,18 +187,23 @@ class ChartEditor extends React.Component {
 
 
 ChartEditor.propTypes = {
+  mode: PropTypes.string.isRequired, // save | update
   tableName: PropTypes.string.isRequired,
   jiminy: PropTypes.object,
   dataset: PropTypes.string.isRequired, // Dataset ID
   tableViewMode: PropTypes.bool.isRequired,
+  showSaveButton: PropTypes.bool.isRequired,
   // Store
   widgetEditor: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
   setChartType: PropTypes.func.isRequired,
   toggleModal: PropTypes.func.isRequired,
-  setModalOptions: PropTypes.func.isRequired
+  setModalOptions: PropTypes.func.isRequired,
+  // Callback
+  onUpdateWidget: PropTypes.func
 };
 
-const mapStateToProps = ({ widgetEditor }) => ({ widgetEditor });
+const mapStateToProps = ({ widgetEditor, user }) => ({ widgetEditor, user });
 const mapDispatchToProps = dispatch => ({
   setChartType: (type) => {
     dispatch(setChartType(type));

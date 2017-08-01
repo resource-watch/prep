@@ -28,29 +28,30 @@ class FilterContainer extends React.Component {
     };
   }
 
-  setFilter({ name, value }) {
-    this.props.setFilterValue(name, value);
+  setFilter({ name, value, notNull }) {
+    this.props.setFilterValue(name, value, notNull);
   }
 
 
   render() {
-    const { canDrop, isOver, connectDropTarget, widgetEditor } = this.props;
-    const isActive = canDrop && isOver;
+    const { canDrop, connectDropTarget, widgetEditor } = this.props;
     const filters = widgetEditor.filters;
 
     const containerDivClass = classNames({
       'filter-box': true,
-      '-release': isActive
+      '-release': canDrop
     });
-
-    const boxText = isActive ? 'Release to drop' : 'Drag a column here';
 
     return connectDropTarget(
       <div className="c-filter-container">
-        <h5>Filters</h5>
+        <span className="text">
+          Filters
+        </span>
         <div className={containerDivClass}>
-          { (!filters || filters.length === 0) &&
-            boxText
+          {(!filters || filters.length === 0) &&
+          <span className="placeholder">
+            Drop here
+          </span>
           }
           {filters && filters.length > 0 && filters.map(val => (
             <ColumnBox
@@ -73,7 +74,6 @@ class FilterContainer extends React.Component {
 
 FilterContainer.propTypes = {
   connectDropTarget: PropTypes.func,
-  isOver: PropTypes.bool,
   canDrop: PropTypes.bool,
   widgetEditor: PropTypes.object,
   // Redux
@@ -88,8 +88,8 @@ const mapDispatchToProps = dispatch => ({
   addFilter: (filter) => {
     dispatch(addFilter(filter));
   },
-  setFilterValue: (name, value) => {
-    dispatch(setFilterValue(name, value));
+  setFilterValue: (name, value, notNull) => {
+    dispatch(setFilterValue(name, value, notNull));
   }
 });
 

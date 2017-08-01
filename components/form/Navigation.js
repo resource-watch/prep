@@ -32,49 +32,51 @@ class Navigation extends React.Component {
     });
 
     return (
-      <ul className="c-field-buttons">
-        {step !== 1 &&
-          <li>
-            <Button
-              properties={{
-                type: 'button',
-                name: 'commit',
-                className: '-primary -expanded'
-              }}
-              onClick={this.onStepChange}
-            >
-              Back
-            </Button>
-          </li>
-        }
-        {step !== stepLength &&
-          <li>
-            <Button
-              properties={{
-                type: 'submit',
-                name: 'commit',
-                className: '-secondary -expanded'
-              }}
-            >
-              Next
-            </Button>
-          </li>
-        }
-        {step === stepLength &&
-          <li>
-            <Button
-              properties={{
-                type: 'submit',
-                name: 'commit',
-                disabled: submitting,
-                className: `-secondary -expanded ${submittingClassName}`
-              }}
-            >
-              Save
-            </Button>
-          </li>
-        }
-      </ul>
+      <fieldset className="c-field-container -padding">
+        <ul className="c-field-buttons">
+          {step !== 1 &&
+            <li>
+              <Button
+                properties={{
+                  type: 'button',
+                  name: 'commit',
+                  className: '-primary -expanded'
+                }}
+                onClick={this.onStepChange}
+              >
+                Back
+              </Button>
+            </li>
+          }
+          {step !== stepLength &&
+            <li>
+              <Button
+                properties={{
+                  type: 'submit',
+                  name: 'commit',
+                  className: '-secondary -expanded'
+                }}
+              >
+                Next
+              </Button>
+            </li>
+          }
+          {step === stepLength &&
+            <li>
+              <Button
+                properties={{
+                  type: 'submit',
+                  name: 'commit',
+                  disabled: submitting,
+                  className: `-secondary -expanded ${submittingClassName}`
+                }}
+              >
+                Save
+              </Button>
+            </li>
+          }
+        </ul>
+      </fieldset>
     );
   }
 }

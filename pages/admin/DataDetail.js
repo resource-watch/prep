@@ -6,7 +6,7 @@ import { capitalizeFirstLetter } from 'utils/utils';
 
 // Services
 import DatasetService from 'services/DatasetService';
-import WidgetService from 'services/WidgetService';
+import WidgetsService from 'services/WidgetsService';
 import LayersService from 'services/LayersService';
 
 // Layout
@@ -49,9 +49,8 @@ class Data extends Page {
 
       case 'widgets':
         if (id !== 'new') {
-          this.service = new WidgetService(id, {
-            apiURL: process.env.WRI_API_URL
-          });
+          console.log(id);
+          this.service = new WidgetsService();
         }
         break;
 

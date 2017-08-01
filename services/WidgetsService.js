@@ -1,6 +1,8 @@
 import 'isomorphic-fetch';
+import flatten from 'lodash/flatten';
 import sortBy from 'lodash/sortBy';
 import { get, post, remove } from 'utils/request';
+
 
 export default class WidgetsService {
 
@@ -9,10 +11,10 @@ export default class WidgetsService {
   }
 
   // GET ALL DATA
-  fetchAllData() {
+  fetchAllData({ applications = [process.env.APPLICATIONS], dataset = '' }) {
     return new Promise((resolve, reject) => {
       get({
-        url: `${process.env.BACKOFFICE_API_URL}/api/widgets/?published=all`,
+        url: `${process.env.WRI_API_URL}/dataset/${dataset}?application=${applications.join(',')}&includes=widget&page[size]=${Date.now() / 100000}`,
         headers: [{
           key: 'Content-Type',
           value: 'application/json'
@@ -20,8 +22,19 @@ export default class WidgetsService {
           key: 'Authorization',
           value: this.opts.authorization
         }],
-        onSuccess: (response) => {
-          resolve(sortBy(response, 'title'));
+        onSuccess: ({ data }) => {
+          if (Array.isArray(data)) {
+            const widgets = flatten(data.map(d => d.attributes.widget.map(widget => ({
+              ...widget.attributes,
+              id: widget.id
+            }))));
+            resolve(sortBy(widgets, 'name'));
+          } else {
+            resolve({
+              ...data.attributes.widget.attributes,
+              id: data.attributes.widget.id
+            });
+          }
         },
         onError: (error) => {
           reject(error);
@@ -30,10 +43,10 @@ export default class WidgetsService {
     });
   }
 
-  fetchData(id) {
+  fetchData({ id }) {
     return new Promise((resolve, reject) => {
       get({
-        url: `${process.env.BACKOFFICE_API_URL}/api/widgets/${id}`,
+        url: `${process.env.WRI_API_URL}/widget/${id}`,
         headers: [{
           key: 'Content-Type',
           value: 'application/json'
@@ -42,7 +55,7 @@ export default class WidgetsService {
           value: this.opts.authorization
         }],
         onSuccess: (response) => {
-          resolve(response);
+          resolve(response.data);
         },
         onError: (error) => {
           reject(error);
@@ -51,10 +64,10 @@ export default class WidgetsService {
     });
   }
 
-  saveData({ type, body, id }) {
+  saveData({ type, body, id, dataset }) {
     return new Promise((resolve, reject) => {
       post({
-        url: `${process.env.BACKOFFICE_API_URL}/api/widgets/${id}`,
+        url: `${process.env.WRI_API_URL}/dataset/${dataset}/widget/${id}`,
         type,
         body,
         headers: [{
@@ -65,7 +78,7 @@ export default class WidgetsService {
           value: this.opts.authorization
         }],
         onSuccess: (response) => {
-          resolve(response);
+          resolve(response.data);
         },
         onError: (error) => {
           reject(error);
@@ -74,16 +87,16 @@ export default class WidgetsService {
     });
   }
 
-  deleteData(id) {
+  deleteData({ id, dataset }) {
     return new Promise((resolve, reject) => {
       remove({
-        url: `${process.env.BACKOFFICE_API_URL}/api/widgets/${id}`,
+        url: `${process.env.WRI_API_URL}/dataset/${dataset}/widget/${id}`,
         headers: [{
           key: 'Authorization',
           value: this.opts.authorization
         }],
         onSuccess: (response) => {
-          resolve(response);
+          resolve(response.data);
         },
         onError: (error) => {
           reject(error);

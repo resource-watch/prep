@@ -7,7 +7,7 @@ import Tabs from 'components/ui/Tabs';
 
 // Tabs
 import DatasetTab from 'components/admin/dataset/DatasetTab';
-import WidgetTab from 'components/admin/widget/WidgetTab';
+import WidgetTab from 'components/admin/widgets/WidgetsTab';
 import LayersTab from 'components/admin/layers/LayersTab';
 
 // Components

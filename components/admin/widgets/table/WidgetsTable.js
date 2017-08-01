@@ -41,7 +41,7 @@ class WidgetsTable extends React.Component {
     if (!value.length) {
       this.props.setFilters([]);
     } else {
-      this.props.setFilters([{ key: 'title', value }]);
+      this.props.setFilters([{ key: 'name', value }]);
     }
   }
 
@@ -73,7 +73,7 @@ class WidgetsTable extends React.Component {
           }}
           link={{
             label: 'New widget',
-            route: 'admin_widgets_detail',
+            route: 'admin_data_detail',
             params: { tab: 'widgets', id: 'new' }
           }}
           onSearch={this.onSearch}
@@ -82,19 +82,19 @@ class WidgetsTable extends React.Component {
         {!this.props.error && (
           <CustomTable
             columns={[
-              { label: 'Title', value: 'title', td: TitleTD },
+              { label: 'Title', value: 'name', td: TitleTD },
               // { label: 'Dataset', value: 'dataset', td: DatasetTD },
               { label: 'Published', value: 'published', td: PublishedTD }
             ]}
             actions={{
               show: true,
               list: [
-                { name: 'Edit', route: 'admin_widgets_detail', params: { tab: 'widgets', subtab: 'edit', id: '{{id}}' }, show: true, component: EditAction },
-                { name: 'Remove', route: 'admin_widgets_detail', params: { tab: 'widgets', subtab: 'remove', id: '{{id}}' }, component: DeleteAction, componentProps: { authorization: this.props.authorization } }
+                { name: 'Edit', route: 'admin_data_detail', params: { tab: 'widgets', subtab: 'edit', id: '{{id}}' }, show: true, component: EditAction },
+                { name: 'Remove', route: 'admin_data_detail', params: { tab: 'widgets', subtab: 'remove', id: '{{id}}' }, component: DeleteAction, componentProps: { authorization: this.props.authorization } }
               ]
             }}
             sort={{
-              field: 'title',
+              field: 'name',
               value: 1
             }}
             filters={false}

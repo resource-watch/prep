@@ -151,49 +151,49 @@ class Step1 extends React.Component {
 
         </fieldset>
 
-        {this.state.form.dataset &&
-          <fieldset className="c-field-container -fluid">
-            {/* <div className="l-row row align-right">
-              <div className="column shrink">
-                <SwitchOptions
-                  selected={this.state.mode}
-                  options={[{
-                    value: 'advanced',
-                    label: 'Advanced'
-                  }, {
-                    value: 'editor',
-                    label: 'Editor'
-                  }]}
-                  onChange={selected => this.triggerChangeMode(selected.value)}
-                />
-              </div>
-            </div> */}
-
-            {this.state.mode === 'editor' &&
-              <WidgetEditor
-                dataset={this.state.form.dataset}
-                mode="dataset"
-                showSaveButton={false}
-                onChange={(value) => { this.props.onChange({ widgetConfig: value }); }}
+        {/* {this.state.form.dataset && */}
+        <fieldset className="c-field-container">
+          {/* <div className="l-row row align-right">
+            <div className="column shrink">
+              <SwitchOptions
+                selected={this.state.mode}
+                options={[{
+                  value: 'advanced',
+                  label: 'Advanced'
+                }, {
+                  value: 'editor',
+                  label: 'Editor'
+                }]}
+                onChange={selected => this.triggerChangeMode(selected.value)}
               />
-            }
+            </div>
+          </div> */}
 
-            {this.state.mode === 'advanced' &&
-              <Field
-                ref={(c) => { if (c) FORM_ELEMENTS.elements.widgetConfig = c; }}
-                onChange={value => this.props.onChange({ widgetConfig: value })}
-                properties={{
-                  name: 'widgetConfig',
-                  label: 'Widget config',
-                  type: 'textarea',
-                  default: this.state.form.widgetConfig
-                }}
-              >
-                {Code}
-              </Field>
-            }
-          </fieldset>
-        }
+          {this.state.mode === 'editor' &&
+            <WidgetEditor
+              dataset={this.state.form.dataset}
+              mode="dataset"
+              showSaveButton={false}
+              onChange={(value) => { this.props.onChange({ widgetConfig: value }); }}
+            />
+          }
+
+          {this.state.mode === 'advanced' &&
+            <Field
+              ref={(c) => { if (c) FORM_ELEMENTS.elements.widgetConfig = c; }}
+              onChange={value => this.props.onChange({ widgetConfig: value })}
+              properties={{
+                name: 'widgetConfig',
+                label: 'Widget config',
+                type: 'textarea',
+                default: this.state.form.widgetConfig
+              }}
+            >
+              {Code}
+            </Field>
+          }
+        </fieldset>
+        {/* } */}
       </div>
     );
   }

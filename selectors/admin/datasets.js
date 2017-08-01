@@ -14,13 +14,13 @@ const getFilteredDatasets = (datasets, filters) => { // eslint-disable-line no-s
   return datasets.filter((dataset) => { // eslint-disable-line arrow-body-style
     return filters.every((filter) => {
       if (filter.key === 'id') return dataset.id === filter.value;
-      if (!dataset.attributes[filter.key]) return false;
+      if (!dataset[filter.key]) return false;
 
       if (typeof filter.value === 'string') {
-        return dataset.attributes[filter.key].toLowerCase().match(filter.value.toLowerCase());
+        return dataset[filter.key].toLowerCase().match(filter.value.toLowerCase());
       }
 
-      return dataset.attributes[filter.key] === filter.value;
+      return dataset[filter.key] === filter.value;
     });
   });
 };

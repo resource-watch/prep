@@ -9,6 +9,7 @@ import Field from 'components/form/Field';
 import Input from 'components/form/Input';
 import TextArea from 'components/form/TextArea';
 import Select from 'components/form/SelectInput';
+import Code from 'components/form/Code';
 import Checkbox from 'components/form/Checkbox';
 
 class Step1 extends React.Component {
@@ -26,43 +27,44 @@ class Step1 extends React.Component {
   }
 
   render() {
+    console.log(this.state.form);
     // Reset FORM_ELEMENTS
     FORM_ELEMENTS.elements = {};
 
     return (
       <fieldset className="c-field-container">
 
-        {/* DATASETS */}
+        {/* DATASET */}
         <Field
-          ref={(c) => { if (c) FORM_ELEMENTS.elements.dataset_id = c; }}
+          ref={(c) => { if (c) FORM_ELEMENTS.elements.dataset = c; }}
           onChange={value => this.props.onChange({
-            dataset_id: value
+            dataset: value
           })}
           className="-fluid"
           options={this.props.datasets}
           properties={{
-            name: 'dataset_id',
+            name: 'dataset',
             label: 'Dataset',
-            default: this.state.form.dataset_id,
-            value: this.state.form.dataset_id,
-            instanceId: 'selectDatasetId'
+            default: this.state.form.dataset,
+            value: this.state.form.dataset,
+            instanceId: 'selectDataset'
           }}
         >
           {Select}
         </Field>
 
-        {/* TITLE */}
+        {/* NAME */}
         <Field
-          ref={(c) => { if (c) FORM_ELEMENTS.elements.title = c; }}
-          onChange={value => this.props.onChange({ title: value })}
+          ref={(c) => { if (c) FORM_ELEMENTS.elements.name = c; }}
+          onChange={value => this.props.onChange({ name: value })}
           validations={['required']}
           className="-fluid"
           properties={{
-            name: 'title',
-            label: 'Title',
+            name: 'name',
+            label: 'Name',
             type: 'text',
             required: true,
-            default: this.state.form.title
+            default: this.state.form.name
           }}
         >
           {Input}
@@ -85,83 +87,48 @@ class Step1 extends React.Component {
           {Input}
         </Field>
 
-
-        {/* SUMMARY */}
+        {/* QUERY URL */}
         <Field
-          ref={(c) => { if (c) FORM_ELEMENTS.elements.summary = c; }}
-          onChange={value => this.props.onChange({ summary: value })}
-          className="-fluid"
-          properties={{
-            name: 'summary',
-            label: 'Summary',
-            default: this.state.form.summary
-          }}
-        >
-          {TextArea}
-        </Field>
-
-        {/* CONTENT */}
-        <Field
-          ref={(c) => { if (c) FORM_ELEMENTS.elements.content = c; }}
-          onChange={value => this.props.onChange({ content: value })}
-          className="-fluid"
-          properties={{
-            name: 'content',
-            label: 'Content',
-            default: this.state.form.content
-          }}
-        >
-          {TextArea}
-        </Field>
-
-        {/* ATTRIBUTION */}
-        <Field
-          ref={(c) => { if (c) FORM_ELEMENTS.elements.attribution = c; }}
-          onChange={value => this.props.onChange({ attribution: value })}
-          className="-fluid"
-          properties={{
-            name: 'attribution',
-            label: 'Attribution',
-            type: 'text',
-            default: this.state.form.attribution
-          }}
-        >
-          {Input}
-        </Field>
-
-
-        {/* CONTENT URL */}
-        <Field
-          ref={(c) => { if (c) FORM_ELEMENTS.elements.data_url = c; }}
-          onChange={value => this.props.onChange({ data_url: value })}
+          ref={(c) => { if (c) FORM_ELEMENTS.elements.queryUrl = c; }}
+          onChange={value => this.props.onChange({ queryUrl: value })}
           validations={['url']}
           className="-fluid"
           properties={{
-            name: 'data_url',
-            label: 'Data url',
-            default: this.state.form.data_url
+            name: 'queryUrl',
+            label: 'Query url',
+            type: 'text',
+            required: true,
+            default: this.state.form.queryUrl
           }}
         >
           {Input}
         </Field>
 
-        {/* PARTNER */}
+        {/* DESCRIPTION */}
         <Field
-          ref={(c) => { if (c) FORM_ELEMENTS.elements.partner_id = c; }}
-          onChange={value => this.props.onChange({
-            partner_id: value
-          })}
+          ref={(c) => { if (c) FORM_ELEMENTS.elements.description = c; }}
+          onChange={value => this.props.onChange({ description: value })}
           className="-fluid"
-          options={this.props.partners}
           properties={{
-            name: 'partner_id',
-            label: 'Partner',
-            default: this.state.form.partner_id,
-            value: this.state.form.partner_id,
-            instanceId: 'selectPartnerId'
+            name: 'description',
+            label: 'Description',
+            default: this.state.form.description
           }}
         >
-          {Select}
+          {TextArea}
+        </Field>
+
+        <Field
+          ref={(c) => { if (c) FORM_ELEMENTS.elements.widgetConfig = c; }}
+          onChange={value => this.props.onChange({ widgetConfig: value })}
+          properties={{
+            name: 'widgetConfig',
+            label: 'Widget config',
+            type: 'textarea',
+            default: this.state.form.widgetConfig
+          }}
+        >
+          {Code}
         </Field>
 
         {/* PUBLISHED */}

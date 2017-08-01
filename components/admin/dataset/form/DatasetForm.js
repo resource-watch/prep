@@ -44,7 +44,7 @@ class DatasetForm extends React.Component {
       this.service.fetchData({ id: this.props.dataset })
         .then((data) => {
           this.setState({
-            form: this.setFormFromParams(data.attributes),
+            form: this.setFormFromParams(data),
             // Stop the loading
             loading: false
           });
@@ -103,7 +103,7 @@ class DatasetForm extends React.Component {
             body: omit(this.state.form, requestOptions.omit)
           })
             .then((data) => {
-              toastr.success('Success', `The dataset "${data.id}" - "${data.attributes.name}" has been uploaded correctly`);
+              toastr.success('Success', `The dataset "${data.id}" - "${data.name}" has been uploaded correctly`);
               this.props.onSubmit && this.props.onSubmit();
             })
             .catch((err) => {

@@ -14,13 +14,13 @@ const getFilteredLayers = (layers, filters) => { // eslint-disable-line no-shado
   return layers.filter((layer) => { // eslint-disable-line arrow-body-style
     return filters.every((filter) => {
       if (filter.key === 'id') return layer.id === filter.value;
-      if (!layer.attributes[filter.key]) return false;
+      if (!layer[filter.key]) return false;
 
       if (typeof filter.value === 'string') {
-        return layer.attributes[filter.key].toLowerCase().match(filter.value.toLowerCase());
+        return layer[filter.key].toLowerCase().match(filter.value.toLowerCase());
       }
 
-      return layer.attributes[filter.key] === filter.value;
+      return layer[filter.key] === filter.value;
     });
   });
 };

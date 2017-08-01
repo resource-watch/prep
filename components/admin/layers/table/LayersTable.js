@@ -46,8 +46,7 @@ class LayersTable extends React.Component {
   }
 
   getLayers() {
-    return this.props.layers
-      .map(layer => Object.assign({}, layer.attributes, { id: layer.id }));
+    return this.props.layers;
   }
 
   render() {

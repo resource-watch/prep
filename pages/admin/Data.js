@@ -7,7 +7,7 @@ import Tabs from 'components/ui/Tabs';
 
 // Tabs
 import DatasetTab from 'components/admin/dataset/DatasetTab';
-import WidgetTab from 'components/admin/widgets/WidgetsTab';
+import WidgetsTab from 'components/admin/widgets/WidgetsTab';
 import LayersTab from 'components/admin/layers/LayersTab';
 
 // Components
@@ -104,7 +104,7 @@ class Data extends Page {
             }
 
             {tab === 'widgets' &&
-              <WidgetTab tab={tab} subtab={subtab} id={id} />
+              <WidgetsTab tab={tab} subtab={subtab} id={id} />
             }
 
             {tab === 'layers' &&

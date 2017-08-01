@@ -55,7 +55,10 @@ export default class WidgetsService {
           value: this.opts.authorization
         }],
         onSuccess: (response) => {
-          resolve(response.data);
+          resolve({
+            ...response.data.attributes,
+            id: response.data.id
+          });
         },
         onError: (error) => {
           reject(error);
@@ -78,7 +81,10 @@ export default class WidgetsService {
           value: this.opts.authorization
         }],
         onSuccess: (response) => {
-          resolve(response.data);
+          resolve({
+            ...response.data.attributes,
+            id: response.data.id
+          });
         },
         onError: (error) => {
           reject(error);
@@ -95,8 +101,8 @@ export default class WidgetsService {
           key: 'Authorization',
           value: this.opts.authorization
         }],
-        onSuccess: (response) => {
-          resolve(response.data);
+        onSuccess: () => {
+          resolve();
         },
         onError: (error) => {
           reject(error);

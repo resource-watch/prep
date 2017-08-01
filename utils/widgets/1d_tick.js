@@ -45,19 +45,28 @@ const defaultChart = {
 
 /**
  * Return the Vega chart configuration
- * 
+ *
  * @export
- * @param {any} { columns, data } 
+ * @param {any} { columns, data, url, embedData }
  */
-export default function ({ columns, data }) {
+export default function ({ columns, data, url, embedData }) {
   const config = deepClone(defaultChart);
 
-  // We set the URL of the dataset
-  config.data[0].url = data.url;
-  config.data[0].format = {
-    "type": "json",
-    "property": data.property
-  };
+  if (embedData) {
+    // We directly set the data
+    config.data[0].values = data;
+  } else {
+    // We set the URL of the dataset
+    config.data[0].url = url;
+    config.data[0].format = {
+      "type": "json",
+      "property": "data"
+    };
+  }
+
+  // We add the name of the axis
+  const xAxis = config.axes.find(a => a.type === 'x');
+  xAxis.name = columns.x.name;
 
   if (columns.color.present) {
     // We add the color scale

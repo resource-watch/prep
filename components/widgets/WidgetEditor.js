@@ -384,8 +384,14 @@ class WidgetEditor extends React.Component {
     this.setState({ chartConfigLoading: true });
 
     getChartConfig(widgetEditor, tableName, dataset, true)
-      .then(chartConfig => this.setState({ chartConfig, chartConfigError: null }))
-      .catch(({ message }) => this.setState({ chartConfig: null, chartConfigError: message }))
+      .then((chartConfig) => {
+        this.setState({ chartConfig, chartConfigError: null });
+        this.props.onChange && this.props.onChange(chartConfig);
+      })
+      .catch(({ message }) => {
+        this.setState({ chartConfig: null, chartConfigError: message });
+        this.props.onChange && this.props.onChange(null);
+      })
       .then(() => this.setState({ chartConfigLoading: false }));
   }
 
@@ -523,12 +529,13 @@ const mapDispatchToProps = dispatch => ({
 
 WidgetEditor.propTypes = {
   mode: PropTypes.oneOf(['dataset', 'widget']),
-  showSaveButton: PropTypes.bool.isRequired, // Show save button in chart editor or not
+  showSaveButton: PropTypes.bool, // Show save button in chart editor or not
   dataset: PropTypes.string, // Dataset ID
   widget: PropTypes.object, // Widget object
   availableVisualizations: PropTypes.arrayOf(
     PropTypes.oneOf(VISUALIZATION_TYPES.map(viz => viz.value))
   ),
+  onChange: PropTypes.func,
   onUpdateWidget: PropTypes.func,
   // Store
   user: PropTypes.object.isRequired,

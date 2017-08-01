@@ -59,39 +59,51 @@ class SaveWidgetModal extends React.Component {
     });
   }
 
-  @Autobind
-  handleCancel() {
-    this.props.toggleModal(false);
-  }
-
-  handleGoToMyRW() {
-    Router.pushRoute('myrw', { tab: 'widgets', subtab: 'my-widgets' });
-  }
 
   @Autobind
-  onSubmit(event) {
+  async onSubmit(event) {
     event.preventDefault();
 
     this.setState({
       loading: true
     });
     const { widgetEditor, tableName, dataset } = this.props;
-    const { limit, value, category, color, size, orderBy, aggregateFunction } = widgetEditor;
+    const { limit, value, category, color, size, orderBy, aggregateFunction,
+      chartType, filters } = widgetEditor;
 
-    const widgetConfig = { widgetConfig: Object.assign(
-      {},
-      { paramsConfig: {
-        limit,
-        value,
-        category,
-        color,
-        size,
-        orderBy,
-        aggregateFunction
-      }
-      },
-      getChartConfig(widgetEditor, tableName, dataset)
-    ) };
+    let chartConfig;
+    try {
+      chartConfig = await getChartConfig(widgetEditor, tableName, dataset);
+    } catch (err) {
+      this.setState({
+        saved: false,
+        error: true,
+        errorMessage: 'Unable to generate the configuration of the chart'
+      });
+
+      return;
+    }
+
+    const widgetConfig = {
+      widgetConfig: Object.assign(
+        {},
+        {
+          paramsConfig: {
+            limit,
+            value,
+            category,
+            color,
+            size,
+            orderBy,
+            aggregateFunction,
+            chartType,
+            filters
+          }
+        },
+        chartConfig
+      )
+    };
+
     const widgetObj = Object.assign({}, this.state.widget, widgetConfig);
 
     this.widgetService.saveUserWidget(widgetObj, this.props.dataset, this.props.user.token)
@@ -115,7 +127,19 @@ class SaveWidgetModal extends React.Component {
           saved: false,
           error: true
         });
+        console.log(err); // eslint-disable-line no-console
       });
+  }
+
+  @Autobind
+  handleCancel() {
+    this.props.toggleModal(false);
+  }
+
+  @Autobind
+  handleGoToMyRW() {
+    this.props.toggleModal(false);
+    Router.pushRoute('myrw', { tab: 'widgets', subtab: 'my-widgets' });
   }
 
   @Autobind
@@ -204,21 +228,17 @@ class SaveWidgetModal extends React.Component {
           </div>
           <div className="buttons-widget-saved">
             <Button
-              properties={{
-                className: '-primary'
-              }}
+              properties={{ className: '-primary' }}
               onClick={this.handleCancel}
             >
-                OK
-              </Button>
+              OK
+            </Button>
             <Button
-              properties={{
-                className: '-secondary'
-              }}
+              properties={{ className: '-secondary' }}
               onClick={this.handleGoToMyRW}
             >
-                Check my widgets
-              </Button>
+              Check my widgets
+            </Button>
           </div>
         </div>
         }
@@ -228,11 +248,8 @@ class SaveWidgetModal extends React.Component {
 }
 
 SaveWidgetModal.propTypes = {
-  dataset: PropTypes.string.isRequired,
-  tableName: PropTypes.string.isRequired,
   // Store
   user: PropTypes.object.isRequired,
-  widgetEditor: PropTypes.object.isRequired,
   toggleModal: PropTypes.func.isRequired
 };
 

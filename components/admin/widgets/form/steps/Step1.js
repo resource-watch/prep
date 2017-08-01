@@ -103,15 +103,14 @@ class Step1 extends React.Component {
             {Input}
           </Field>
 
-          {/* QUERY URL */}
+          {/* QUERY */}
           <Field
             ref={(c) => { if (c) FORM_ELEMENTS.elements.queryUrl = c; }}
             onChange={value => this.props.onChange({ queryUrl: value })}
-            validations={['url']}
             className="-fluid"
             properties={{
               name: 'queryUrl',
-              label: 'Query url',
+              label: 'Query',
               type: 'text',
               required: true,
               default: this.state.form.queryUrl
@@ -154,7 +153,7 @@ class Step1 extends React.Component {
 
         {this.state.form.dataset &&
           <fieldset className="c-field-container -fluid">
-            <div className="l-row row align-right">
+            {/* <div className="l-row row align-right">
               <div className="column shrink">
                 <SwitchOptions
                   selected={this.state.mode}
@@ -168,11 +167,14 @@ class Step1 extends React.Component {
                   onChange={selected => this.triggerChangeMode(selected.value)}
                 />
               </div>
-            </div>
+            </div> */}
 
             {this.state.mode === 'editor' &&
               <WidgetEditor
                 dataset={this.state.form.dataset}
+                mode="dataset"
+                showSaveButton={false}
+                onChange={(value) => { this.props.onChange({ widgetConfig: value }); }}
               />
             }
 

@@ -10,7 +10,7 @@ import ColumnBox from 'components/widgets/ColumnBox';
 const boxTarget = {
   drop(props, monitor) {
     props.setValue(monitor.getItem());
-    props.setAggregateFunction('none');
+    props.setAggregateFunction(null);
   }
 };
 
@@ -37,7 +37,7 @@ class DimensionYContainer extends React.Component {
 
     // If the column changes, we reset the aggregate function
     if (currentValue !== nextValue) {
-      this.props.setAggregateFunction('none');
+      this.props.setAggregateFunction(null);
     }
   }
 
@@ -46,28 +46,36 @@ class DimensionYContainer extends React.Component {
   }
 
   render() {
-    const { canDrop, isOver, connectDropTarget, widgetEditor } = this.props;
-    const isActive = canDrop && isOver;
+    const { canDrop, connectDropTarget, widgetEditor } = this.props;
     const value = widgetEditor.value;
 
     const containerDivClass = classNames({
-      'c-column-container': true,
-      '-release': isActive
+      '-release': canDrop,
+      'columnbox-container': true
     });
 
     return connectDropTarget(
-      <div className={containerDivClass}>
-        Value
-        {value &&
-          <ColumnBox
-            name={value.name}
-            type={value.type}
-            closable
-            configurable
-            onConfigure={aggregateFunction => this.setAggregateFunction(aggregateFunction)}
-            isA="value"
-          />
-        }
+      <div className="c-column-container">
+        <span className="text">
+          Value
+        </span>
+        <div className={containerDivClass}>
+          {!value &&
+          <span className="placeholder">
+            Drop here
+          </span>
+          }
+          {value &&
+            <ColumnBox
+              name={value.name}
+              type={value.type}
+              closable
+              configurable
+              onConfigure={aggregateFunction => this.setAggregateFunction(aggregateFunction)}
+              isA="value"
+            />
+          }
+        </div>
       </div>
     );
   }

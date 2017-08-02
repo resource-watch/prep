@@ -7,7 +7,7 @@ import classNames from 'classnames';
 // Store
 import withRedux from 'next-redux-wrapper';
 import { initStore } from 'store';
-import { removeFilter, removeColor, removeCategory, removeValue, removeSize, removeOrderBy } from 'redactions/widgetEditor';
+import { removeFilter, removeColor, removeCategory, removeValue, removeSize, removeOrderBy, setOrderBy } from 'redactions/widgetEditor';
 import { toggleTooltip } from 'redactions/tooltip';
 
 // Components
@@ -15,6 +15,11 @@ import Icon from 'components/ui/Icon';
 import FilterTooltip from 'components/widgets/FilterTooltip';
 import AggregateFunctionTooltip from 'components/widgets/AggregateFunctionTooltip';
 import OrderByTooltip from 'components/widgets/OrderByTooltip';
+
+// Utils
+import { isFieldAllowed } from 'utils/widgets/WidgetHelper';
+
+const NAME_MAX_LENGTH = 9;
 
 /**
  * Implements the drag source contract.
@@ -57,6 +62,22 @@ class ColumnBox extends React.Component {
     };
   }
 
+  /**
+   * Return the position of the center of the element within
+   * the page taking into account the scroll (relative to
+   * the page, not the viewport)
+   * @static
+   * @param {HTMLElement} node HTML node
+   * @returns  {{ x: number, y: number }}
+   */
+  static getElementPosition(node) {
+    const clientRect = node.getBoundingClientRect();
+    return {
+      x: window.scrollX + clientRect.left + (clientRect.width / 2),
+      y: window.scrollY + clientRect.top + (clientRect.height / 2)
+    };
+  }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -71,7 +92,16 @@ class ColumnBox extends React.Component {
     };
   }
 
+
   componentWillReceiveProps(nextProps) {
+    // Open the filter tooltip the when the columnbox has been dropped
+    if (this.props.isA && this.props.isA === 'filter' && !this.state.filterTooltipAlreadyOpened) {
+      this.openFilterTooltip();
+      this.setState({
+        filterTooltipAlreadyOpened: true
+      });
+    }
+
     // We add a dragging cursor to the column box if it's being dragged
     // We have to set the CSS property to the body otherwise it won't be
     // taken into account
@@ -81,19 +111,21 @@ class ColumnBox extends React.Component {
 
     this.setState({ aggregateFunction: nextProps.widgetEditor.aggregateFunction });
 
-    const sizeAggregateFunc = nextProps.widgetEditor.size && nextProps.widgetEditor.size.aggregateFunction;
+    const sizeAggregateFunc = nextProps.widgetEditor.size &&
+      nextProps.widgetEditor.size.aggregateFunction;
     this.setState({ aggregateFunctionSize: sizeAggregateFunc });
 
-    const colorAggregateFunc = nextProps.widgetEditor.color && nextProps.widgetEditor.color.aggregateFunction;
+    const colorAggregateFunc = nextProps.widgetEditor.color &&
+      nextProps.widgetEditor.color.aggregateFunction;
     this.setState({ aggregateFunctionColor: colorAggregateFunc });
   }
 
   @Autobind
-  onApplyFilter(filter) {
-    this.setState({ filter });
+  onApplyFilter(filter, notNullSelected) {
+    this.setState({ filter, notNullSelected });
 
     if (this.props.onConfigure) {
-      this.props.onConfigure({ name: this.props.name, value: filter });
+      this.props.onConfigure({ name: this.props.name, value: filter, notNull: notNullSelected });
     }
   }
 
@@ -101,8 +133,12 @@ class ColumnBox extends React.Component {
   onApplyAggregateFunction(aggregateFunction) {
     this.setState({ aggregateFunction });
 
+    // We don't want to save "none" in the store when in reality
+    // there isn't any aggregate function applied
+    const value = aggregateFunction === 'none' ? null : aggregateFunction;
+
     if (this.props.onConfigure) {
-      this.props.onConfigure({ name: this.props.name, value: aggregateFunction });
+      this.props.onConfigure({ name: this.props.name, value });
     }
   }
 
@@ -135,7 +171,8 @@ class ColumnBox extends React.Component {
 
   @Autobind
   triggerClose() {
-    const { isA } = this.props;
+    const { isA, widgetEditor } = this.props;
+    const { aggregateFunction, orderBy, value } = widgetEditor;
     switch (isA) {
       case 'color':
         this.props.removeColor({ name: this.props.name });
@@ -150,6 +187,16 @@ class ColumnBox extends React.Component {
         this.props.removeCategory();
         break;
       case 'value':
+        if (aggregateFunction && orderBy) {
+          let orderByNameNoAggFunc = orderBy.name;
+          orderByNameNoAggFunc = orderByNameNoAggFunc.replace(aggregateFunction, '');
+          orderByNameNoAggFunc = orderByNameNoAggFunc.replace('(', '').replace(')', '');
+          if (orderByNameNoAggFunc === value.name) {
+            const newOrderBy = orderBy;
+            newOrderBy.name = value.name;
+            this.props.setOrderBy(newOrderBy);
+          }
+        }
         this.props.removeValue();
         break;
       case 'orderBy':
@@ -159,9 +206,33 @@ class ColumnBox extends React.Component {
     }
   }
 
+  openFilterTooltip(event) {
+    const { filter, notNullSelected } = this.state;
+    const { name, type, datasetID, tableName } = this.props;
+
+    const position = event
+      ? ColumnBox.getClickPosition(event)
+      : ColumnBox.getElementPosition(this.settingsButton);
+
+    this.props.toggleTooltip(true, {
+      follow: false,
+      position,
+      children: FilterTooltip,
+      childrenProps: {
+        name,
+        type,
+        datasetID,
+        tableName,
+        filter,
+        onApply: this.onApplyFilter,
+        isA: 'filter',
+        notNullSelected
+      }
+    });
+  }
+
   @Autobind
   triggerConfigure(event) {
-    const { filter } = this.state;
     const { isA, name, type, datasetID, tableName, widgetEditor } = this.props;
     const { orderBy, aggregateFunction } = widgetEditor;
 
@@ -179,7 +250,7 @@ class ColumnBox extends React.Component {
             onApply: this.onApplyAggregateFunctionColor,
             aggregateFunction,
             onlyCount: type !== 'number',
-            isA
+            isA: 'color'
           }
         });
         break;
@@ -196,24 +267,12 @@ class ColumnBox extends React.Component {
             onApply: this.onApplyAggregateFunctionSize,
             aggregateFunction,
             onlyCount: type !== 'number',
-            isA
+            isA: 'size'
           }
         });
         break;
       case 'filter':
-        this.props.toggleTooltip(true, {
-          follow: false,
-          position: ColumnBox.getClickPosition(event),
-          children: FilterTooltip,
-          childrenProps: {
-            name,
-            type,
-            datasetID,
-            tableName,
-            filter,
-            onApply: this.onApplyFilter
-          }
-        });
+        this.openFilterTooltip(event);
         break;
       case 'category':
         break;
@@ -230,7 +289,7 @@ class ColumnBox extends React.Component {
             onApply: this.onApplyAggregateFunction,
             aggregateFunction,
             onlyCount: type !== 'number',
-            isA
+            isA: 'value'
           }
         });
         break;
@@ -243,7 +302,8 @@ class ColumnBox extends React.Component {
             name,
             type,
             onApply: this.onApplyOrderBy,
-            orderBy
+            orderBy,
+            isA: 'orderBy'
           }
         });
         break;
@@ -253,23 +313,40 @@ class ColumnBox extends React.Component {
 
   render() {
     const { aggregateFunction, aggregateFunctionSize, aggregateFunctionColor } = this.state;
-    const { isDragging, connectDragSource, name, type, closable, configurable, isA, widgetEditor } = this.props;
+    const { isDragging, connectDragSource, name, type, closable, configurable,
+    isA, widgetEditor } = this.props;
     const { orderBy } = widgetEditor;
 
     const orderType = orderBy ? orderBy.orderType : null;
-    const iconName = (type.toLowerCase() === 'string') ? 'icon-type' : 'icon-hash';
+    let iconName;
+    switch (isFieldAllowed({ columnType: type }).type) {
+      case 'number':
+        iconName = 'icon-item-number';
+        break;
+      case 'text':
+        iconName = 'icon-item-category';
+        break;
+      case 'date':
+        iconName = 'icon-item-date';
+        break;
+      default:
+        iconName = 'icon-item-unknown';
+    }
 
     const isConfigurable = (isA === 'filter') || (isA === 'value') ||
       (isA === 'orderBy') || (isA === 'color') || (isA === 'size');
 
     return connectDragSource(
-      <div className={classNames({ 'c-columnbox': true, '-dimmed': isDragging })}>
+      <div
+        className={classNames({ 'c-columnbox': true, '-dimmed': isDragging })}
+        title={name}
+      >
         <Icon
           name={iconName}
           className="-smaller"
         />
-        {name}
-        {isA === 'value' && aggregateFunction && aggregateFunction !== 'none' &&
+        { (name.length > NAME_MAX_LENGTH) ? `${name.substr(0, NAME_MAX_LENGTH - 1)}...` : name }
+        {isA === 'value' && aggregateFunction &&
           <div className="aggregate-function">
             {aggregateFunction}
           </div>
@@ -298,7 +375,7 @@ class ColumnBox extends React.Component {
           </button>
         }
         {configurable && isConfigurable &&
-          <button onClick={this.triggerConfigure}>
+          <button onClick={this.triggerConfigure} ref={(node) => { this.settingsButton = node; }}>
             <Icon
               name="icon-cog"
               className="-smaller configure-button"
@@ -334,6 +411,7 @@ ColumnBox.propTypes = {
   removeCategory: PropTypes.func.isRequired,
   removeValue: PropTypes.func.isRequired,
   removeOrderBy: PropTypes.func.isRequired,
+  setOrderBy: PropTypes.func.isRequired,
   toggleTooltip: PropTypes.func.isRequired
 };
 
@@ -359,6 +437,9 @@ const mapDispatchToProps = dispatch => ({
   },
   removeOrderBy: (value) => {
     dispatch(removeOrderBy(value));
+  },
+  setOrderBy: (value) => {
+    dispatch(setOrderBy(value));
   },
   toggleTooltip: (opened, opts) => {
     dispatch(toggleTooltip(opened, opts));

@@ -6,7 +6,7 @@ import { capitalizeFirstLetter } from 'utils/utils';
 
 // Services
 import DatasetService from 'services/DatasetService';
-import WidgetService from 'services/WidgetService';
+import WidgetsService from 'services/WidgetsService';
 import LayersService from 'services/LayersService';
 
 // Layout
@@ -16,7 +16,7 @@ import Breadcrumbs from 'components/ui/Breadcrumbs';
 
 // Tabs
 import DatasetTab from 'components/admin/dataset/DatasetTab';
-import WidgetTab from 'components/admin/widget/WidgetTab';
+import WidgetsTab from 'components/admin/widgets/WidgetsTab';
 import LayersTab from 'components/admin/layers/LayersTab';
 
 // Components
@@ -49,9 +49,8 @@ class Data extends Page {
 
       case 'widgets':
         if (id !== 'new') {
-          this.service = new WidgetService(id, {
-            apiURL: process.env.WRI_API_URL
-          });
+          console.log(id);
+          this.service = new WidgetsService();
         }
         break;
 
@@ -73,9 +72,7 @@ class Data extends Page {
       // Fetch the dataset / layer / widget depending on the tab
       this.service.fetchData({ id })
         .then((data) => {
-          this.setState({
-            data: { ...data.attributes, id: data.id }
-          });
+          this.setState({ data });
         })
         .catch((err) => {
           console.error(err);
@@ -139,7 +136,7 @@ class Data extends Page {
             }
 
             {tab === 'widgets' &&
-              <WidgetTab tab={tab} subtab={subtab} id={id} />
+              <WidgetsTab tab={tab} subtab={subtab} id={id} />
             }
 
             {tab === 'layers' &&

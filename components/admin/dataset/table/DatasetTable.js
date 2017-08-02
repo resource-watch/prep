@@ -47,8 +47,7 @@ class DatasetTable extends React.Component {
   }
 
   getDatasets() {
-    return this.props.datasets
-      .map(dataset => Object.assign({}, dataset.attributes, { id: dataset.id }));
+    return this.props.datasets;
   }
 
   render() {

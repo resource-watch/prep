@@ -54,7 +54,7 @@ class WidgetsForm extends React.Component {
 
     // Add the dashboard promise if the id exists
     if (id) {
-      promises.push(this.service.fetchData(id));
+      promises.push(this.service.fetchData({ id }));
     }
 
     Promise.all(promises)

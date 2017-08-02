@@ -29,6 +29,7 @@
 @import '../node_modules/react-redux-toastr/src/styles/index';
 @import "./components/ui/aside";
 @import "./components/ui/avatar";
+@import "./components/ui/breadcrumbs";
 @import "./components/ui/button";
 @import "./components/ui/button-container";
 @import "./components/ui/compound_menu";
@@ -38,8 +39,10 @@
 @import "./components/ui/legend";
 @import "./components/ui/modal";
 @import "./components/ui/paginator";
+@import "./components/ui/search-input";
 @import "./components/ui/spinner";
 @import "./components/ui/switch";
+@import "./components/ui/switch-options";
 @import "./components/ui/table";
 @import "./components/ui/table_header_actions";
 @import "./components/ui/table_tooltip";
@@ -48,8 +51,6 @@
 @import "./components/ui/tooltip";
 @import "./components/ui/tooltip-global";
 @import "./components/ui/zoom_control";
-@import "./components/ui/breadcrumbs";
-@import "./components/ui/search-input";
 
 // Modal
 @import "./components/modal/save_widget_modal";
@@ -86,7 +87,11 @@
 @import "./components/widgets/sort_container";
 @import "./components/widgets/table_view";
 @import "./components/widgets/limit_container";
-
+@import "./components/widgets/widget_list";
+@import "./components/widgets/widget_card";
+@import "./components/widgets/chart_tooltip";
+@import "./components/widgets/widget_actions_tooltip";
+@import "./components/widgets/vega_chart_legend";
 
 // ================== ADMIN ======================
 

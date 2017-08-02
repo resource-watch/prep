@@ -70,8 +70,8 @@ class LayersForm extends React.Component {
       this.service.fetchData({ id })
         .then((data) => {
           this.setState({
-            dataset: data.attributes.dataset,
-            form: this.setFormFromParams(data.attributes),
+            dataset: data.dataset,
+            form: this.setFormFromParams(data),
             // Stop the loading
             loading: false
           });
@@ -112,7 +112,7 @@ class LayersForm extends React.Component {
             body: { layer: this.state.form }
           })
             .then((data) => {
-              toastr.success('Success', `The layer "${data.id}" - "${data.attributes.name}" has been uploaded correctly`);
+              toastr.success('Success', `The layer "${data.id}" - "${data.name}" has been uploaded correctly`);
               if (this.props.onSubmit) this.props.onSubmit();
             })
             .catch((err) => {

@@ -1,13 +1,17 @@
 import deepClone from 'lodash/cloneDeep';
 
 const defaultTheme = {
-  height: 0,
-  padding: 'strict', // Do not set something different than 'strict'
-                     // or the autopadInset property because it will cause the
-                     // graph to increase its size each time it is rendered
-                     // again
+  height: 0, // Don't touch this without testing all the charts
+             // and particularly the bar chart with or without
+             // scrolling and its vertical alignment
+  padding: 'auto', // Do not set something different than 'auto'
+                   // because it will break several graphs
+                   // (primarly the bar and pie ones)
+  render: {
+    retina: true
+  },
   marks: {
-    color: '#3BB2D0'
+    color: '#1f77b4'
   },
   axis_x: {
     axisColor: '#A9ABAD',
@@ -19,7 +23,6 @@ const defaultTheme = {
     tickLabelFontSize: 13
   },
   axis_y: {
-    orient: 'right',
     axisWidth: 0,
     tickSize: 0,
     ticks: 5,
@@ -34,14 +37,27 @@ const defaultTheme = {
 
 /**
  * Return the theme of the vega chart
- * @param {{ chart: string }}
+ * @param {boolean} [thumbnail=false]
  * @return {object}
  */
-export default function () {
+export default function (thumbnail = false) {
   const theme = deepClone(defaultTheme);
 
-  // Change here the default theme if you need to
-  // The name of the chart get passed in the parameter
+  if (thumbnail) {
+    // We remove the configuration of each of
+    // the axes
+    delete theme.axis_x;
+    delete theme.axis_y;
+
+    // We hide the axes and their ticks and
+    // labels
+    theme.axis = {
+      ticks: 0,
+      tickSize: 0,
+      axisWidth: 0,
+      tickLabelFontSize: 0
+    };
+  }
 
   return theme;
 }

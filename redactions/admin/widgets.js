@@ -80,7 +80,7 @@ export function getWidgets() {
   return (dispatch) => {
     dispatch({ type: GET_WIDGETS_LOADING });
 
-    service.fetchAllData()
+    service.fetchAllData({})
       .then((data) => {
         dispatch({ type: GET_WIDGETS_SUCCESS, payload: data });
       })

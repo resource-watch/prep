@@ -1,5 +1,6 @@
 import 'isomorphic-fetch';
 import flatten from 'lodash/flatten';
+import sortBy from 'lodash/sortBy';
 import { get, post, remove } from 'utils/request';
 
 
@@ -23,8 +24,11 @@ export default class LayersService {
         }],
         onSuccess: ({ data }) => {
           if (Array.isArray(data)) {
-            const layers = flatten(data.map(d => d.attributes.layer.map(layer => layer)));
-            resolve(layers);
+            const layers = flatten(data.map(d => d.attributes.layer.map(layer => ({
+              ...layer.attributes,
+              id: layer.id
+            }))));
+            resolve(sortBy(layers, 'name'));
           } else {
             resolve(data.attributes.layer);
           }
@@ -48,7 +52,10 @@ export default class LayersService {
           value: this.opts.authorization
         }],
         onSuccess: (response) => {
-          resolve(response.data);
+          resolve({
+            ...response.data.attributes,
+            id: response.data.id
+          });
         },
         onError: (error) => {
           reject(error);
@@ -71,7 +78,10 @@ export default class LayersService {
           value: this.opts.authorization
         }],
         onSuccess: (response) => {
-          resolve(response.data);
+          resolve({
+            ...response.data.attributes,
+            id: response.data.id
+          });
         },
         onError: (error) => {
           reject(error);
@@ -88,8 +98,8 @@ export default class LayersService {
           key: 'Authorization',
           value: this.opts.authorization
         }],
-        onSuccess: (response) => {
-          resolve(response.data);
+        onSuccess: () => {
+          resolve();
         },
         onError: (error) => {
           reject(error);

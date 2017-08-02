@@ -5,10 +5,10 @@
 
   .customize-visualization {
     position: relative;
-    min-height: 630px;
-    max-height: 700px;
-    min-width: 430px;
-    max-width: 430px;
+    min-height: 580px;
+    max-height: 702px;
+    min-width: 522px;
+    max-width: 522px;
     margin-top: -20px;
     margin-bottom: -20px;
     flex-basis: 430px;
@@ -30,6 +30,10 @@
       font-size: $font-size-small-medium;
     }
 
+    .visualization-type-selector {
+      max-width: none;
+    }
+
   }
 
   .visualization {
@@ -37,19 +41,46 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 100%;
+    overflow-x: hidden;
+
+    &.-error {
+      text-align: center;
+
+      span {
+        display: block;
+        margin-top: 10px;
+        font-size: $font-size-small;
+        font-weight: $font-weight-bold;
+      }
+    }
 
     &.-chart {
       margin-left: 20px;
+      // This padding avoids the chart to touch the top and
+      // the bottom of the container
+      padding: 20px 0;
     }
 
     > .c-chart {
       display: flex;
       align-items: center;
       height: 100%;
+      padding-top: 20px; // Space for the legend
 
       .chart {
-        height: calc(100% - 100px);
+        // The height will be set either by VegaChart or Vega itself
+        height: auto;
+        overflow-x: auto;
+
+        .vega {
+          // We can't use display: flex; here otherwise
+          // the user won't be able to see all of the
+          // widgets with scrolling (especially the left
+          // hand side which will be cut)
+          text-align: center;
+        }
       }
     }
   }

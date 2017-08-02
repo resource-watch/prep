@@ -17,7 +17,7 @@ function WidgetsShow(props) {
       <WidgetsForm
         id={id}
         authorization={user.token}
-        onSubmit={() => Router.pushRoute('admin_widgets', { tab: 'widgets' })}
+        onSubmit={() => Router.pushRoute('admin_data', { tab: 'widgets' })}
       />
     </div>
   );

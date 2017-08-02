@@ -17,6 +17,7 @@ import DatasetService from 'services/DatasetService';
 import CheckboxGroup from 'components/form/CheckboxGroup';
 import Spinner from 'components/ui/Spinner';
 import Button from 'components/ui/Button';
+import Checkbox from 'components/form/Checkbox';
 
 
 class FilterTooltip extends React.Component {
@@ -34,6 +35,7 @@ class FilterTooltip extends React.Component {
       rangeValue: !this.isCategorical(props) && props.filter
         ? { min: props.filter[0], max: props.filter[1] }
         : null,
+      notNullSelected: props.notNullSelected,
       loading: true
     };
 
@@ -63,10 +65,9 @@ class FilterTooltip extends React.Component {
   }
 
   onApply() {
-    this.props.onApply(this.isCategorical()
-      ? this.state.selected
-      : [this.state.rangeValue.min, this.state.rangeValue.max]
-    );
+    const { selected, rangeValue, notNullSelected } = this.state;
+    const filter = this.isCategorical() ? selected : [rangeValue.min, rangeValue.max];
+    this.props.onApply(filter, notNullSelected);
 
     // We close the tooltip
     this.props.toggleTooltip(false);
@@ -119,6 +120,35 @@ class FilterTooltip extends React.Component {
   }
 
   @Autobind
+  handleMinChange(event) {
+    const newValue = event.target.value;
+    this.setState({
+      rangeValue: {
+        min: newValue,
+        max: this.state.rangeValue.max
+      }
+    });
+  }
+
+  @Autobind
+  handleMaxChange(event) {
+    const newValue = event.target.value;
+    this.setState({
+      rangeValue: {
+        min: this.state.rangeValue.min,
+        max: newValue
+      }
+    });
+  }
+
+  @Autobind
+  handleNotNullSelection(value) {
+    this.setState({
+      notNullSelected: value
+    });
+  }
+
+  @Autobind
   triggerMouseDown(e) {
     const el = document.querySelector('.c-tooltip');
     const clickOutside = el && el.contains && !el.contains(e.target);
@@ -156,8 +186,8 @@ class FilterTooltip extends React.Component {
     const step = Math.min(Math.floor((max - min) / 100), 1);
 
     // Min and max values of the selected range
-    const rangeMin = this.state.rangeValue.min;
-    const rangeMax = this.state.rangeValue.max;
+    const rangeMin = +this.state.rangeValue.min;
+    const rangeMax = +this.state.rangeValue.max;
 
     // We debounce the method to avoid having to update the state
     // to often (around 60 FPS)
@@ -177,7 +207,7 @@ class FilterTooltip extends React.Component {
   }
 
   render() {
-    const { loading } = this.state;
+    const { loading, rangeValue, notNullSelected } = this.state;
     const categoryValue = this.isCategorical();
     const classNameValue = classNames({
       'c-filter-tooltip': true
@@ -188,23 +218,43 @@ class FilterTooltip extends React.Component {
           className="-light"
           isLoading={loading}
         />
-
+        { !loading &&
+          <Checkbox
+            properties={{
+              title: 'Not null values',
+              checked: notNullSelected,
+              default: false
+            }}
+            onChange={elem => this.handleNotNullSelection(elem.checked)}
+          />
+        }
         { categoryValue && this.renderCheckboxes() }
         { !categoryValue && !loading && this.renderRange() }
+        { !categoryValue && !loading &&
+          <div className="text-inputs-container">
+            <input className="-first" type="number" value={rangeValue.min} onChange={this.handleMinChange} />
+            -
+            <input className="-last" type="number" value={rangeValue.max} onChange={this.handleMaxChange} />
+          </div>
+        }
 
         <div className="buttons">
-          <Button
-            properties={{ type: 'button', className: '-secondary' }}
-            onClick={() => this.onSelectAll()}
-          >
-            Select all
-          </Button>
-          <Button
-            properties={{ type: 'button', className: '-secondary' }}
-            onClick={() => this.onClearAll()}
-          >
-            Clear
-          </Button>
+          { categoryValue &&
+            <Button
+              properties={{ type: 'button', className: '-secondary' }}
+              onClick={() => this.onSelectAll()}
+            >
+              Select all
+            </Button>
+          }
+          { categoryValue &&
+            <Button
+              properties={{ type: 'button', className: '-secondary' }}
+              onClick={() => this.onClearAll()}
+            >
+              Clear
+            </Button>
+          }
           <Button
             properties={{ type: 'button', className: '-primary' }}
             onClick={() => this.onApply()}
@@ -223,6 +273,7 @@ FilterTooltip.propTypes = {
   name: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
   filter: PropTypes.any, // Current value of the filter
+  notNullSelected: PropTypes.bool,
   onResize: PropTypes.func, // Passed from the tooltip component
   onApply: PropTypes.func.isRequired,
   // store

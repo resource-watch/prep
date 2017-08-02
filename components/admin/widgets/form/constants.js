@@ -1,3 +1,8 @@
+import bar from 'utils/widgets/bar.json';
+import pie from 'utils/widgets/pie.json';
+import line from 'utils/widgets/line.json';
+
+
 export const STATE_DEFAULT = {
   step: 1,
   stepLength: 1,
@@ -37,3 +42,15 @@ export const FORM_ELEMENTS = {
     return valid;
   }
 };
+
+export const CONFIG_TEMPLATE = {
+  bar,
+  line,
+  pie
+};
+
+export const CONFIG_TEMPLATE_OPTIONS = [
+  { label: 'Bar', value: 'bar' },
+  { label: 'Line', value: 'line' },
+  { label: 'Pie', value: 'pie' }
+];

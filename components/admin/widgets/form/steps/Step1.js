@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 // Constants
-import { FORM_ELEMENTS } from 'components/admin/widgets/form/constants';
+import { FORM_ELEMENTS, CONFIG_TEMPLATE, CONFIG_TEMPLATE_OPTIONS } from 'components/admin/widgets/form/constants';
 
 // Components
 import Field from 'components/form/Field';
@@ -180,13 +180,28 @@ class Step1 extends React.Component {
 
           {this.state.mode === 'advanced' &&
             <Field
+              onChange={value => this.props.onChange({ widgetConfig: CONFIG_TEMPLATE[value] })}
+              options={CONFIG_TEMPLATE_OPTIONS}
+              properties={{
+                name: 'template',
+                label: 'Template',
+                instanceId: 'selectTemplate'
+              }}
+            >
+              {Select}
+            </Field>
+          }
+
+          {this.state.mode === 'advanced' &&
+            <Field
               ref={(c) => { if (c) FORM_ELEMENTS.elements.widgetConfig = c; }}
               onChange={value => this.props.onChange({ widgetConfig: value })}
               properties={{
                 name: 'widgetConfig',
                 label: 'Widget config',
                 type: 'textarea',
-                default: this.state.form.widgetConfig
+                default: this.state.form.widgetConfig,
+                value: this.state.form.widgetConfig
               }}
             >
               {Code}

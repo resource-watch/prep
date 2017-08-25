@@ -1,7 +1,7 @@
 /**
  * CONSTANTS
 */
-const SET_IS_LOADING = 'common/SET_IS_LOADING';
+const SET_IS_LOADING = 'page/SET_IS_LOADING';
 
 /**
  * REDUCER

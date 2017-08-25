@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 
-const datasets = state => state.datasets.datasets.list;
-const filters = state => state.datasets.datasets.filters;
+const datasets = state => state.datasets.list;
+const filters = state => state.datasets.filters;
 
 /**
  * Return the datasets that comply with the filters

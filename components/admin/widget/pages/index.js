@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
 // Redux
-import withRedux from 'next-redux-wrapper';
+import { connect } from 'react-redux';
 import { initStore } from 'store';
 
 // Components
@@ -49,4 +49,4 @@ WidgetIndex.defaultProps = {
   embed: false
 };
 
-export default withRedux(initStore, mapStateToProps, null)(WidgetIndex);
+export default connect(mapStateToProps, null)(WidgetIndex);

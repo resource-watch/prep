@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 // Redux
-import withRedux from 'next-redux-wrapper';
+import { connect } from 'react-redux';
 import { initStore } from 'store';
 import { toggleModal, setModalOptions } from 'redactions/modal';
 import { setUser } from 'redactions/user';
@@ -109,4 +109,4 @@ const mapDispatchToProps = dispatch => ({
   }
 });
 
-export default withRedux(initStore, mapStateToProps, mapDispatchToProps)(Layout);
+export default connect(mapStateToProps, mapDispatchToProps)(Layout);

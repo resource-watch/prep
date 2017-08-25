@@ -4,7 +4,7 @@ import { initStore } from 'store';
 
 class Home extends React.PureComponent {
   static async getInitialProps({ req, user, isServer }) {
-    return { req, user, isServer };
+    return { user };
   }
   render() {
     return (

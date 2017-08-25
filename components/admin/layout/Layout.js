@@ -28,15 +28,6 @@ class Layout extends React.PureComponent {
   render() {
     const { title, description, isLoading } = this.props;
 
-    if (isLoading) {
-      return (
-        <div className="c-page">
-          <Head title={title} description={description} />
-          <Spinner className="-light" isLoading={isLoading} />
-        </div>
-      );
-    }
-
     return (
       <div className="c-page">
         <Head
@@ -45,6 +36,8 @@ class Layout extends React.PureComponent {
         />
 
         <Icons />
+
+        {isLoading && <div style={{ height: '3px', width: '100%', backgroundColor: 'red' }} />}
 
         <Header />
 

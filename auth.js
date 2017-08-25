@@ -23,6 +23,6 @@ module.exports = (() => {
       server.use(passport.session());
     },
     authenticate: authOptions => passport.authenticate('control-tower', authOptions),
-    login: strategy.login
+    login: (req, res) => strategy.login(req, res)
   };
 })();

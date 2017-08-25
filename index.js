@@ -87,7 +87,7 @@ app.prepare()
       res.redirect('/admin');
     });
     server.get('/auth/user', (req, res) => res.json(req.user));
-    server.get('/login', (req, res) => auth.login(req, res));
+    server.get('/login', auth.login);
     server.get('/logout', (req, res) => {
       req.logout();
       res.redirect('/');

@@ -1,4 +1,4 @@
-export { default as common } from './common';
+export { default as page } from './page';
 export { default as tooltip } from './tooltip';
 export { default as staticPages } from './static_pages';
 export { default as modal } from './modal';

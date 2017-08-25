@@ -1,4 +1,11 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
+// Redux
+import withRedux from 'next-redux-wrapper';
+import { initStore } from 'store';
+import { setUser } from 'redactions/user';
+import { setRouter } from 'redactions/routes';
 
 // Layout
 import Page from 'components/admin/layout/Page';
@@ -33,54 +40,32 @@ const DATA_TABS = [
     route: 'admin_data',
     params: { tab: 'layers' }
   }
-  // {
-  //   label: 'Dashboards',
-  //   value: 'dashboards',
-  //   route: 'admin_data',
-  //   params: { tab: 'dashboards' }
-  // },
-  // {
-  //   label: 'Vocabularies',
-  //   value: 'vocabularies',
-  //   route: 'admin_data',
-  //   params: { tab: 'vocabularies' }
-  // }
 ];
 
 class Data extends Page {
+  static async getInitialProps({ asPath, pathname, req, store, query, isServer }) {
+    const tab = query.tab || 'datasets';
+    const { id, subtab } = query;
+    const routes = { asPath, pathname, id, subtab, tab };
+    const { user } = isServer ? req : store.getState();
 
-  constructor(props) {
-    super(props);
+    if (isServer) {
+      store.dispatch(setUser(user));
+      store.dispatch(setRouter(routes));
+    }
 
-    const { url } = props;
-
-    this.state = {
-      tab: url.query.tab || 'datasets',
-      id: url.query.id,
-      subtab: url.query.subtab
-    };
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const { url } = nextProps;
-
-    this.setState({
-      tab: url.query.tab || 'datasets',
-      id: url.query.id,
-      subtab: url.query.subtab
-    });
+    return { user, tab, id, subtab, isServer };
   }
 
   render() {
-    const { url, user } = this.props;
-    const { tab, subtab, id } = this.state;
+    const { user, tab, id, subtab } = this.props;
+
+    if (!user) return null;
 
     return (
       <Layout
         title="Data"
         description="Data description..."
-        user={user}
-        url={url}
       >
         {/* PAGE HEADER */}
         <div className="c-page-header -admin">
@@ -110,14 +95,6 @@ class Data extends Page {
             {tab === 'layers' &&
               <LayersTab tab={tab} subtab={subtab} id={id} />
             }
-
-            {tab === 'dashboards' &&
-              <h2>Dashboards</h2>
-            }
-
-            {tab === 'vocabularies' &&
-              <h2>Vocabularies</h2>
-            }
           </div>
         </div>
       </Layout>
@@ -126,9 +103,11 @@ class Data extends Page {
 }
 
 Data.propTypes = {
-  user: React.PropTypes.object,
-  url: React.PropTypes.object
+  user: PropTypes.object,
+  routes: PropTypes.object,
+  tab: PropTypes.string,
+  subtab: PropTypes.string,
+  id: PropTypes.string
 };
 
-
-export default Data;
+export default withRedux(initStore)(Data);

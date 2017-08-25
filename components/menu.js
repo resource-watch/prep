@@ -4,7 +4,6 @@ import React from 'react';
 import Session from './session';
 
 export default class extends React.Component {
-
   static propTypes() {
     return {
       session: React.PropTypes.object.isRequired
@@ -44,5 +43,4 @@ export default class extends React.Component {
       </div>
     );
   }
-
 }

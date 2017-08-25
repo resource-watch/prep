@@ -1,29 +1,10 @@
 import React from 'react';
-import User from 'components/user';
-import isEmpty from 'lodash/isEmpty';
+import { setUser } from 'redactions/user';
 
 export default class Page extends React.Component {
-
-  // Expose session to all pages
-  static async getInitialProps({ req }) {
-    this.user = new User({ req });
-
-    return {
-      user: await this.user.getUser()
-    };
-  }
-
-  componentDidMount() {
-    if (isEmpty(this.props.user)) {
-      try {
-        localStorage.removeItem('user');
-      } catch (err) {
-        console.info(err);
-      }
-    }
+  static async getInitialProps({ req, store, isServer }) {
+    const { user } = isServer ? req : store.getState();
+    if (isServer) store.dispatch(setUser(user));
+    return { user, isServer };
   }
 }
-
-Page.propTypes = {
-  user: React.PropTypes.object
-};

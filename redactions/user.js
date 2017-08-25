@@ -1,12 +1,7 @@
-/* global config */
-import 'isomorphic-fetch';
-import isEmpty from 'lodash/isEmpty';
-
 /**
  * CONSTANTS
 */
 const SET_USER = 'user/SET_USER';
-
 
 /**
  * REDUCER
@@ -23,7 +18,6 @@ export default function (state = initialState, action) {
     case SET_USER: {
       return Object.assign({}, state, action.payload);
     }
-
     default:
       return state;
   }
@@ -34,14 +28,12 @@ export default function (state = initialState, action) {
  * - setUser
 */
 export function setUser(user) {
-  let userObj = user;
+  const userObj = Object.assign({}, user);
 
-  // Add 'Bearer' to token
-  if (!isEmpty(user)) {
-    userObj = {
-      ...userObj,
-      token: `Bearer ${userObj.token}`
-    };
-  }
+  // Adding Bearer to user token
+  if (userObj.token &&
+    typeof userObj.token === 'string' &&
+    userObj.token.indexOf('Bearer') === -1) userObj.token = `Bearer ${userObj.token}`;
+
   return dispatch => dispatch({ type: SET_USER, payload: userObj });
 }

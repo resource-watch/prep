@@ -2,10 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 // Redux
-import withRedux from 'next-redux-wrapper';
-import { initStore } from 'store';
-import { toggleModal, setModalOptions } from 'redactions/modal';
-import { setUser } from 'redactions/user';
+// import { connect } from 'react-redux';
+// import { toggleModal, setModalOptions } from 'redactions/modal';
 
 // Components
 import Header from 'components/admin/layout/Header';
@@ -14,14 +12,9 @@ import Icons from 'components/admin/layout/icons';
 import Tooltip from 'components/ui/Tooltip';
 import Toastr from 'react-redux-toastr';
 
-class Layout extends React.Component {
-
-  componentDidMount() {
-    this.props.setUser(this.props.user);
-  }
-
+class Layout extends React.PureComponent {
   render() {
-    const { title, description, url, user } = this.props;
+    const { title, description } = this.props;
     return (
       <div className="c-page">
         <Head
@@ -31,10 +24,10 @@ class Layout extends React.Component {
 
         <Icons />
 
-        <Header url={url} user={user} />
+        <Header />
 
         <div className="container">
-          { this.props.children }
+          {this.props.children}
         </div>
 
         <Tooltip />
@@ -46,30 +39,26 @@ class Layout extends React.Component {
       </div>
     );
   }
-
 }
 
 Layout.propTypes = {
-  user: PropTypes.object.isRequired,
-  url: PropTypes.object.isRequired,
   children: PropTypes.any.isRequired,
   title: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-
-  // Store
-  setUser: PropTypes.func.isRequired
+  description: PropTypes.string.isRequired
 };
 
-const mapDispatchToProps = dispatch => ({
-  toggleModal: () => {
-    dispatch(toggleModal());
-  },
-  setModalOptions: () => {
-    dispatch(setModalOptions());
-  },
-  setUser: (user) => {
-    dispatch(setUser(user));
-  }
-});
+// const mapStateToProps = state => ({
+//   user: state.user,
+//   routes: state.routes
+// });
 
-export default withRedux(initStore, null, mapDispatchToProps)(Layout);
+// const mapDispatchToProps = dispatch => ({
+//   toggleModal: () => {
+//     dispatch(toggleModal());
+//   },
+//   setModalOptions: () => {
+//     dispatch(setModalOptions());
+//   }
+// });
+
+export default Layout;

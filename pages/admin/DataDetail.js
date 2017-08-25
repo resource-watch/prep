@@ -1,4 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import withRedux from 'next-redux-wrapper';
+import { initStore } from 'store';
+import { bindActionCreators } from 'redux';
+import { setUser } from 'redactions/user';
 import { singular } from 'pluralize';
 
 // Utils
@@ -22,77 +27,89 @@ import LayersTab from 'components/admin/layers/LayersTab';
 // Components
 import Title from 'components/ui/Title';
 
-class Data extends Page {
+class DataDetail extends Page {
+  static async getInitialProps({ asPath, pathname, req, store, query, isServer }) {
+    const tab = query.tab || 'datasets';
+    const { id, subtab } = query;
+    const url = { asPath, pathname };
+    const data = {};
+    const { user } = isServer ? req : store.getState();
 
-  constructor(props) {
-    super(props);
-
-    const { tab, id, subtab } = props.url.query;
-
-    this.state = {
-      tab,
-      id,
-      subtab,
-      data: {}
-    };
-
-    this.service = null;
-
-    switch (tab) {
-      case 'datasets':
-        if (id !== 'new') {
-          this.service = new DatasetService(id, {
-            apiURL: process.env.WRI_API_URL
-          });
-        }
-        break;
-
-      case 'widgets':
-        if (id !== 'new') {
-          console.log(id);
-          this.service = new WidgetsService();
-        }
-        break;
-
-      case 'layers':
-        if (id !== 'new') {
-          this.service = new LayersService();
-        }
-        break;
-
-      default:
-
+    if (isServer) {
+      store.dispatch(setUser(user));
     }
+
+    return { user, tab, id, subtab, url, data };
   }
 
-  componentWillMount() {
-    const { id } = this.state;
+  // constructor(props) {
+  //   super(props);
 
-    if (this.service) {
-      // Fetch the dataset / layer / widget depending on the tab
-      this.service.fetchData({ id })
-        .then((data) => {
-          this.setState({ data });
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    }
-  }
+  //   const { tab, id, subtab } = props.url.query;
 
-  componentWillReceiveProps(nextProps) {
-    const { tab, id, subtab } = nextProps.url.query;
+  //   this.state = {
+  //     tab,
+  //     id,
+  //     subtab,
+  //     data: {}
+  //   };
 
-    this.setState({ tab, id, subtab });
-  }
+  //   this.service = null;
 
+  //   switch (tab) {
+  //     case 'datasets':
+  //       if (id !== 'new') {
+  //         this.service = new DatasetService(id, {
+  //           apiURL: process.env.WRI_API_URL
+  //         });
+  //       }
+  //       break;
+
+  //     case 'widgets':
+  //       if (id !== 'new') {
+  //         console.log(id);
+  //         this.service = new WidgetsService();
+  //       }
+  //       break;
+
+  //     case 'layers':
+  //       if (id !== 'new') {
+  //         this.service = new LayersService();
+  //       }
+  //       break;
+
+  //     default:
+
+  //   }
+  // }
+
+  // componentWillMount() {
+  //   const { id } = this.state;
+
+  //   if (this.service) {
+  //     // Fetch the dataset / layer / widget depending on the tab
+  //     this.service.fetchData({ id })
+  //       .then((data) => {
+  //         this.setState({ data });
+  //       })
+  //       .catch((err) => {
+  //         console.error(err);
+  //       });
+  //   }
+  // }
+
+  // componentWillReceiveProps(nextProps) {
+  //   const { tab, id, subtab } = nextProps.url.query;
+
+  //   this.setState({ tab, id, subtab });
+  // }
 
   /**
    * HELPERS
    * - getName
   */
   getName() {
-    const { tab, id, data } = this.state;
+    const { tab, id, data } = this.props;
 
     if (id === 'new') {
       return `New ${singular(tab)}`;
@@ -102,12 +119,11 @@ class Data extends Page {
       return data.name;
     }
 
-    return '-';
+    return null;
   }
 
   render() {
-    const { url, user } = this.props;
-    const { tab, subtab, id } = this.state;
+    const { user, tab, id, subtab, url } = this.props;
 
     return (
       <Layout
@@ -157,10 +173,17 @@ class Data extends Page {
   }
 }
 
-Data.propTypes = {
-  user: React.PropTypes.object,
-  url: React.PropTypes.object
+DataDetail.propTypes = {
+  user: PropTypes.object,
+  url: PropTypes.object,
+  data: PropTypes.object,
+  tab: PropTypes.string,
+  subtab: PropTypes.string,
+  id: PropTypes.string
 };
 
+const mapStateToProps = state => ({
+  user: state.user
+});
 
-export default Data;
+export default withRedux(initStore, mapStateToProps, null)(DataDetail);

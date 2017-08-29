@@ -18,3 +18,4 @@ RUN yarn install
 # Bundle app source
 COPY . /usr/src/app
 RUN yarn run build
+CMD ["npm", "start"]

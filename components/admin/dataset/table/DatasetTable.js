@@ -4,8 +4,7 @@ import { Autobind } from 'es-decorators';
 
 // Redux
 import { connect } from 'react-redux';
-import { initStore } from 'store';
-import { getDatasets, setFilters } from 'redactions/admin/datasets';
+import { getDatasets, setFilters } from 'redactions/datasets';
 
 // Selectors
 import getFilteredDatasets from 'selectors/admin/datasets';
@@ -27,7 +26,6 @@ import RelatedContentTD from './td/RelatedContentTD';
 import UpdatedAtTD from './td/UpdatedAtTD';
 
 class DatasetTable extends React.Component {
-
   componentDidMount() {
     this.props.setFilters([]);
     this.props.getDatasets(this.props.application);
@@ -132,9 +130,9 @@ DatasetTable.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  loading: state.datasets.datasets.loading,
+  loading: state.datasets.loading,
   datasets: getFilteredDatasets(state),
-  error: state.datasets.datasets.error
+  error: state.datasets.error
 });
 const mapDispatchToProps = dispatch => ({
   getDatasets: () => dispatch(getDatasets()),

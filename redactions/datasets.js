@@ -15,12 +15,10 @@ const SET_DATASETS_FILTERS = 'datasets/SET_DATASETS_FILTERS';
  * @property {{ key: string, value: string|number }[]} datasets.filters
  */
 const initialState = {
-  datasets: {
-    list: [],       // Actual list of datasets
-    loading: false, // Are we loading the data?
-    error: null,    // An error was produced while loading the data
-    filters: []     // Filters for the list of datasets
-  }
+  list: [],       // Actual list of datasets
+  loading: false, // Are we loading the data?
+  error: null,    // An error was produced while loading the data
+  filters: []     // Filters for the list of datasets
 };
 
 const service = new DatasetsService();
@@ -34,33 +32,33 @@ const service = new DatasetsService();
 export default function (state = initialState, action) {
   switch (action.type) {
     case GET_DATASETS_LOADING: {
-      const datasets = Object.assign({}, state.datasets, {
+      const datasets = Object.assign({}, state, {
         loading: true,
         error: null
       });
-      return Object.assign({}, state, { datasets });
+      return Object.assign({}, state, datasets);
     }
 
     case GET_DATASETS_SUCCESS: {
-      const datasets = Object.assign({}, state.datasets, {
+      const datasets = Object.assign({}, state, {
         list: action.payload,
         loading: false,
         error: null
       });
-      return Object.assign({}, state, { datasets });
+      return Object.assign({}, state, datasets);
     }
 
     case GET_DATASETS_ERROR: {
-      const datasets = Object.assign({}, state.datasets, {
+      const datasets = Object.assign({}, state, {
         loading: false,
         error: action.payload
       });
-      return Object.assign({}, state, { datasets });
+      return Object.assign({}, state, datasets);
     }
 
     case SET_DATASETS_FILTERS: {
-      const datasets = Object.assign({}, state.datasets, { filters: action.payload });
-      return Object.assign({}, state, { datasets });
+      const datasets = Object.assign({}, state, { filters: action.payload });
+      return Object.assign({}, state, datasets);
     }
 
     default:

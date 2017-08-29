@@ -1,0 +1,52 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: {name}
+  name: {name}
+spec:
+  revisionHistoryLimit: 2
+  template:
+    metadata:
+      annotations:
+        chaos.alpha.kubernetes.io/enabled: "true"
+      labels:
+        name: {name}
+    spec:
+      containers:
+      - name: {name}
+        image: vizzuality/{name}
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "128Mi"
+          limits:
+            memory: "512Mi"
+        args:
+          - start
+        env:
+          - name: PORT
+            value: "3000"
+          - name: NODE_ENV
+            value: production
+          - name: BASEMAP_TILE_URL
+            value: http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png
+          - name: WRI_API_URL
+            value: https://api.resourcewatch.org/v1
+          - name: BACKOFFICE_API_URL
+            value: http://prep-manager.vizzuality.com/api
+          - name: CONTROL_TOWER_URL
+            value: https://production-api.globalforestwatch.org
+          - name: CALLBACK_URL
+            value: https://prep-manager.vizzuality.com
+          - name: APPLICATIONS
+            value: prep
+          - name: SECRET
+            valueFrom:
+                secretKeyRef:
+                  name: appsecrets
+                  key: PREP_SECRET
+        ports:
+          - containerPort: 3100
+
+      restartPolicy: Always

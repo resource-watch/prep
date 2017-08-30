@@ -29,7 +29,7 @@ const server = express();
 function isAuthenticated(req, res, nextAction) {
   if (req.isAuthenticated()) return nextAction();
   // if they aren't redirect them to the home page
-  return res.redirect('/');
+  return res.redirect('/admin/login');
 }
 
 function isAdmin(req, res, nextAction) {
@@ -86,11 +86,11 @@ app.prepare()
     server.get('/admin/auth', auth.authenticate({ failureRedirect: '/admin/login' }), (req, res) => {
       res.redirect('/admin/data/datasets');
     });
-    server.get('/auth/user', (req, res) => res.json(req.user));
-    server.get('/login', auth.login);
-    server.get('/logout', (req, res) => {
+    server.get('/admin/auth/user', (req, res) => res.json(req.user));
+    server.get('/admin/login', auth.login);
+    server.get('/admin/logout', (req, res) => {
       req.logout();
-      res.redirect('/login');
+      res.redirect('/admin/login');
     });
 
     // Admin redirections

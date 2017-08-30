@@ -42,18 +42,13 @@ function isAdmin(req, res, nextAction) {
 const sessionOptions = {
   secret: process.env.SECRET || 'keyboard cat',
   resave: false,
-  saveUninitialized: true,
-  cookie: {}
+  saveUninitialized: true
 };
 
 if (!dev) {
   const redisClient = redis.createClient(process.env.REDIS_URL);
-  server.set('trust proxy', 1);
-  sessionOptions.cookie.secure = true;
   sessionOptions.store = new RedisStore({
     client: redisClient,
-    no_ready_check: true,
-    ttl: 600,
     logErrors: true
   });
 }

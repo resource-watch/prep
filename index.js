@@ -77,15 +77,20 @@ app.prepare()
       });
     }
 
+    // Root
+    server.get('/', (req, res) => {
+      res.redirect('/login');
+    });
+
     // Authentication
-    server.get('/auth', auth.authenticate({ failureRedirect: '/' }), (req, res) => {
+    server.get('/auth', auth.authenticate({ failureRedirect: '/login' }), (req, res) => {
       res.redirect('/admin');
     });
     server.get('/auth/user', (req, res) => res.json(req.user));
     server.get('/login', auth.login);
     server.get('/logout', (req, res) => {
       req.logout();
-      res.redirect('/');
+      res.redirect('/login');
     });
 
     // Admin redirections

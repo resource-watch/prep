@@ -1,6 +1,11 @@
 import React from 'react';
 import { singular } from 'pluralize';
 
+import withRedux from 'next-redux-wrapper';
+import { initStore } from 'store';
+import { setUser } from 'redactions/user';
+import { setRouter } from 'redactions/routes';
+
 // Services
 import PartnersService from 'services/PartnersService';
 
@@ -19,6 +24,19 @@ import Breadcrumbs from 'components/ui/Breadcrumbs';
 import Title from 'components/ui/Title';
 
 class Resources extends Page {
+  static async getInitialProps({ asPath, pathname, req, store, query, isServer }) {
+    const tab = query.tab || 'datasets';
+    const { id, subtab } = query;
+    const routes = { asPath, pathname, id, subtab, tab };
+    const { user } = isServer ? req : store.getState();
+
+    if (isServer) {
+      store.dispatch(setUser(user));
+      store.dispatch(setRouter(routes));
+    }
+
+    return { user, tab, id, subtab, isServer };
+  }
 
   constructor(props) {
     super(props);
@@ -131,5 +149,4 @@ Resources.propTypes = {
   url: React.PropTypes.object
 };
 
-
-export default Resources;
+export default withRedux(initStore)(Resources);

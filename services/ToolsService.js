@@ -11,7 +11,7 @@ export default class ToolsService {
   fetchAllData() {
     return new Promise((resolve, reject) => {
       get({
-        url: `${process.env.BACKOFFICE_API_URL}/api/tools/?published=all`,
+        url: `${process.env.BACKOFFICE_API_URL}/tools/?published=all`,
         headers: [{
           key: 'Content-Type',
           value: 'application/json'
@@ -32,7 +32,7 @@ export default class ToolsService {
   fetchData(id) {
     return new Promise((resolve, reject) => {
       get({
-        url: `${process.env.BACKOFFICE_API_URL}/api/tools/${id}`,
+        url: `${process.env.BACKOFFICE_API_URL}/tools/${id}`,
         headers: [{
           key: 'Content-Type',
           value: 'application/json'
@@ -53,7 +53,7 @@ export default class ToolsService {
   saveData({ type, body, id }) {
     return new Promise((resolve, reject) => {
       post({
-        url: `${process.env.BACKOFFICE_API_URL}/api/tools/${id}`,
+        url: `${process.env.BACKOFFICE_API_URL}/tools/${id}`,
         type,
         body,
         headers: [{
@@ -76,7 +76,7 @@ export default class ToolsService {
   deleteData(id) {
     return new Promise((resolve, reject) => {
       remove({
-        url: `${process.env.BACKOFFICE_API_URL}/api/tools/${id}`,
+        url: `${process.env.BACKOFFICE_API_URL}/tools/${id}`,
         headers: [{
           key: 'Authorization',
           value: this.opts.authorization

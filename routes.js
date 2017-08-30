@@ -3,7 +3,7 @@ const nextRoutes = require('next-routes');
 
 const routes = nextRoutes();
 
-routes.add('homepage', '/', 'Home');
+// routes.add('homepage', '/', 'Home');
 
 // ========================= ADMIN ROUTES =====================
 

@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 
 // Redux
 import { connect } from 'react-redux';
-import { initStore } from 'store';
 
 import { FORM_ELEMENTS } from './constants';
 
@@ -45,7 +44,7 @@ class PageForm extends React.Component {
       this.setState({ loading: true });
 
       get({
-        url: `${process.env.BACKOFFICE_API_URL}/api/pages/${this.state.pageID}`,
+        url: `${process.env.BACKOFFICE_API_URL}/pages/${this.state.pageID}`,
         headers: [
           { key: 'Content-Type', value: 'application/json' },
           { key: 'Authorization', value: this.props.user.token }
@@ -77,14 +76,13 @@ class PageForm extends React.Component {
     if (this.props.mode === 'edit') {
       post({
         type: 'PATCH',
-        url: `${process.env.BACKOFFICE_API_URL}/api/pages/${this.state.pageID}`,
+        url: `${process.env.BACKOFFICE_API_URL}/pages/${this.state.pageID}`,
         headers: [
           { key: 'Content-Type', value: 'application/json' },
           { key: 'Authorization', value: this.props.user.token }
         ],
         body: this.state.page,
         onSuccess: response => {
-          console.log(response);
           alert('Static page updated successfully!');
           Router.pushRoute('pages');
         },
@@ -96,7 +94,7 @@ class PageForm extends React.Component {
     } else if (this.props.mode === 'new') {
       post({
         type: 'POST',
-        url: `${process.env.BACKOFFICE_API_URL}/api/pages`,
+        url: `${process.env.BACKOFFICE_API_URL}/pages`,
         headers: [
           { key: 'Content-Type', value: 'application/json' },
           { key: 'Authorization', value: this.props.user.token }

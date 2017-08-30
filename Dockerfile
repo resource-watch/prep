@@ -8,7 +8,7 @@ ENV WRI_API_URL https://api.resourcewatch.org/v1
 ENV BACKOFFICE_API_URL http://prep-manager.vizzuality.com/api
 ENV APPLICATIONS prep
 ENV CONTROL_TOWER_URL https://production-api.globalforestwatch.org
-ENV CALLBACK_URL https://prep-manager.vizzuality.com/auth
+ENV CALLBACK_URL https://prep-manager.vizzuality.com/admin/auth
 ENV BASEMAP_TILE_URL http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png
 ENV NODE_ENV production
 

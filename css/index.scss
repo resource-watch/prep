@@ -11,10 +11,10 @@
 @include foundation-responsive-embed;
 
 // Leaflet
-@import '../node_modules/leaflet/dist/leaflet.css';
+@import '../node_modules/leaflet/dist/leaflet';
 
 // React input range
-@import '../node_modules/react-input-range/lib/css/index.css';
+@import '../node_modules/react-input-range/lib/css/index';
 
 // Slick
 @import '../node_modules/slick-carousel/slick/slick.scss';

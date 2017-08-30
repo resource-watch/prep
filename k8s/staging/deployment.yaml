@@ -35,7 +35,7 @@ spec:
           - name: NODE_ENV
             value: production
           - name: BASEMAP_TILE_URL
-            value: http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png
+            value: https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png
           - name: WRI_API_URL
             value: https://api.resourcewatch.org/v1
           - name: BACKOFFICE_API_URL

@@ -69,7 +69,7 @@ app.prepare()
       // Add route to serve compiled SCSS from /assets/{build id}/main.css
       // Note: This is is only used in production, in development it is inlined
       const sassResult = sass.renderSync({ file: './css/index.scss', outputStyle: 'compressed' });
-      server.get('/styles/:id/index.css', postcssMiddleware(postcssConfig), (req, res) => {
+      server.get('/admin/styles/:id/index.css', postcssMiddleware(postcssConfig), (req, res) => {
         res.setHeader('Content-Type', 'text/css');
         res.setHeader('Cache-Control', 'public, max-age=2592000');
         res.setHeader('Expires', new Date(Date.now() + 2592000000).toUTCString());
@@ -78,13 +78,13 @@ app.prepare()
     }
 
     // Root
-    server.get('/', (req, res) => {
-      res.redirect('/login');
-    });
+    // server.get('/admin', (req, res) => {
+    //   res.redirect('/login');
+    // });
 
     // Authentication
-    server.get('/auth', auth.authenticate({ failureRedirect: '/login' }), (req, res) => {
-      res.redirect('/admin');
+    server.get('/admin/auth', auth.authenticate({ failureRedirect: '/admin/login' }), (req, res) => {
+      res.redirect('/admin/data/datasets');
     });
     server.get('/auth/user', (req, res) => res.json(req.user));
     server.get('/login', auth.login);

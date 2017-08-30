@@ -44,7 +44,7 @@ spec:
           - name: CONTROL_TOWER_URL
             value: https://production-api.globalforestwatch.org
           - name: CALLBACK_URL
-            value: https://prep-manager.vizzuality.com
+            value: https://prep-manager.vizzuality.com/auth
           - name: APPLICATIONS
             value: prep
           - name: SECRET

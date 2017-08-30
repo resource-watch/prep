@@ -5,7 +5,7 @@ MAINTAINER David Inga <david.inga@vizzuality.com>
 WORKDIR /usr/src/app
 
 ENV WRI_API_URL https://api.resourcewatch.org/v1
-ENV BACKOFFICE_API_URL http://prep-manager.vizzuality.com/api
+ENV BACKOFFICE_API_URL https://prep-manager.vizzuality.com/api
 ENV APPLICATIONS prep
 ENV CONTROL_TOWER_URL https://production-api.globalforestwatch.org
 ENV CALLBACK_URL https://prep-manager.vizzuality.com/admin/auth

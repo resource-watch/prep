@@ -44,7 +44,7 @@ spec:
           - name: CONTROL_TOWER_URL
             value: https://production-api.globalforestwatch.org
           - name: CALLBACK_URL
-            value: https://prep-manager.vizzuality.com/auth
+            value: https://prep-manager.vizzuality.com/admin/auth
           - name: APPLICATIONS
             value: prep
           - name: SECRET
@@ -53,6 +53,6 @@ spec:
                   name: appsecrets
                   key: PREP_SECRET
         ports:
-          - containerPort: 3100
+          - containerPort: 3000
 
       restartPolicy: Always

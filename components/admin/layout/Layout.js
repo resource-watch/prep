@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Progress from 'react-progress-2';
 
 // Redux
 import { bindActionCreators } from 'redux';
@@ -18,10 +19,12 @@ import Spinner from 'components/ui/Spinner';
 class Layout extends React.PureComponent {
   componentDidMount() {
     Router.onRouteChangeStart = () => {
+      Progress.show();
       this.props.updateIsLoading(true);
     };
     Router.onRouteChangeComplete = () => {
       this.props.updateIsLoading(false);
+      Progress.hideAll();
     };
   }
 
@@ -37,7 +40,7 @@ class Layout extends React.PureComponent {
 
         <Icons />
 
-        {isLoading && <div style={{ height: '3px', width: '100%', backgroundColor: 'red' }} />}
+        <Progress.Component />
 
         <Header />
 

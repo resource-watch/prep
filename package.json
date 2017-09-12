@@ -67,6 +67,7 @@
     "react-dom": "15.5.4",
     "react-dropzone": "3.13.3",
     "react-input-range": "1.1.4",
+    "react-progress-2": "^4.4.1",
     "react-redux": "^5.0.6",
     "react-redux-toastr": "7.0.0",
     "react-select": "1.0.0-rc.4",

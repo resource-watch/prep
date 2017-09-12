@@ -79,7 +79,7 @@ class HeaderUser extends React.Component {
                   </li>
                 }
                 <li className="header-dropdown-list-item">
-                  <a onClick={this.logout} href="/logout">Logout</a>
+                  <a href="/admin/logout">Logout</a>
                 </li>
               </ul>
             }

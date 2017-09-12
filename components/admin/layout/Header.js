@@ -36,7 +36,7 @@ const items = [
   },
   {
     name: 'Logout',
-    component: <a href="/logout">Logout</a>
+    component: <a href="/admin/logout">Logout</a>
   }
 ];
 

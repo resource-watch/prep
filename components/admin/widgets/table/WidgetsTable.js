@@ -22,6 +22,7 @@ import DeleteAction from './actions/DeleteAction';
 // TDs
 import TitleTD from './td/TitleTD';
 import PublishedTD from './td/PublishedTD';
+import EnvironmentTD from './td/EnvironmentTD';
 // import DatasetTD from './td/DatasetTD';
 
 
@@ -84,6 +85,7 @@ class WidgetsTable extends React.Component {
             columns={[
               { label: 'Title', value: 'name', td: TitleTD },
               // { label: 'Dataset', value: 'dataset', td: DatasetTD },
+              { label: 'Environment', value: 'env', td: EnvironmentTD },
               { label: 'Published', value: 'published', td: PublishedTD }
             ]}
             actions={{

@@ -1,7 +1,6 @@
 export { default as user } from './user';
 export { default as routes } from './routes';
 export { default as page } from './page';
-export { default as datasets } from './datasets';
 
 export { default as tooltip } from './tooltip';
 export { reducer as toastr } from 'react-redux-toastr';
@@ -9,6 +8,7 @@ export { reducer as toastr } from 'react-redux-toastr';
 export { default as staticPages } from './static_pages';
 export { default as modal } from './modal';
 export { default as widgetEditor } from './widgetEditor';
+export { default as datasets } from './admin/datasets';
 export { default as dashboards } from './admin/dashboards';
 export { default as indicators } from './admin/indicators';
 export { default as insights } from './admin/insights';

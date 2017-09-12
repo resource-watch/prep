@@ -11,7 +11,7 @@ export default class InsightsService {
   fetchAllData() {
     return new Promise((resolve, reject) => {
       get({
-        url: `${process.env.BACKOFFICE_API_URL}/api/insights/?published=all`,
+        url: `${process.env.BACKOFFICE_API_URL}/insights/?published=all`,
         headers: [{
           key: 'Content-Type',
           value: 'application/json'
@@ -32,7 +32,7 @@ export default class InsightsService {
   fetchData(id) {
     return new Promise((resolve, reject) => {
       get({
-        url: `${process.env.BACKOFFICE_API_URL}/api/insights/${id}`,
+        url: `${process.env.BACKOFFICE_API_URL}/insights/${id}`,
         headers: [{
           key: 'Content-Type',
           value: 'application/json'
@@ -53,7 +53,7 @@ export default class InsightsService {
   saveData({ type, body, id }) {
     return new Promise((resolve, reject) => {
       post({
-        url: `${process.env.BACKOFFICE_API_URL}/api/insights/${id}`,
+        url: `${process.env.BACKOFFICE_API_URL}/insights/${id}`,
         type,
         body,
         headers: [{
@@ -76,7 +76,7 @@ export default class InsightsService {
   deleteData(id) {
     return new Promise((resolve, reject) => {
       remove({
-        url: `${process.env.BACKOFFICE_API_URL}/api/insights/${id}`,
+        url: `${process.env.BACKOFFICE_API_URL}/insights/${id}`,
         headers: [{
           key: 'Authorization',
           value: this.opts.authorization

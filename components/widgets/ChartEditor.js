@@ -5,7 +5,7 @@ import { Autobind } from 'es-decorators';
 import { DragDropContext } from 'react-dnd';
 
 // Redux
-import withRedux from 'next-redux-wrapper';
+import { connect } from 'react-redux';
 import { initStore } from 'store';
 import { toggleModal, setModalOptions } from 'redactions/modal';
 import { setChartType } from 'redactions/widgetEditor';
@@ -212,4 +212,4 @@ const mapDispatchToProps = dispatch => ({
   setModalOptions: (options) => { dispatch(setModalOptions(options)); }
 });
 
-export default withRedux(initStore, mapStateToProps, mapDispatchToProps)(ChartEditor);
+export default connect(mapStateToProps, mapDispatchToProps)(ChartEditor);

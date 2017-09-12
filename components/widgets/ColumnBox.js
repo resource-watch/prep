@@ -5,7 +5,7 @@ import { Autobind } from 'es-decorators';
 import classNames from 'classnames';
 
 // Store
-import withRedux from 'next-redux-wrapper';
+import { connect } from 'react-redux';
 import { initStore } from 'store';
 import { removeFilter, removeColor, removeCategory, removeValue, removeSize, removeOrderBy, setOrderBy } from 'redactions/widgetEditor';
 import { toggleTooltip } from 'redactions/tooltip';
@@ -314,7 +314,7 @@ class ColumnBox extends React.Component {
   render() {
     const { aggregateFunction, aggregateFunctionSize, aggregateFunctionColor } = this.state;
     const { isDragging, connectDragSource, name, type, closable, configurable,
-    isA, widgetEditor } = this.props;
+      isA, widgetEditor } = this.props;
     const { orderBy } = widgetEditor;
 
     const orderType = orderBy ? orderBy.orderType : null;
@@ -345,7 +345,7 @@ class ColumnBox extends React.Component {
           name={iconName}
           className="-smaller"
         />
-        { (name.length > NAME_MAX_LENGTH) ? `${name.substr(0, NAME_MAX_LENGTH - 1)}...` : name }
+        {(name.length > NAME_MAX_LENGTH) ? `${name.substr(0, NAME_MAX_LENGTH - 1)}...` : name}
         {isA === 'value' && aggregateFunction &&
           <div className="aggregate-function">
             {aggregateFunction}
@@ -447,4 +447,4 @@ const mapDispatchToProps = dispatch => ({
 });
 
 
-export default DragSource('columnbox', columnBoxSource, collect)(withRedux(initStore, mapStateToProps, mapDispatchToProps)(ColumnBox));
+export default DragSource('columnbox', columnBoxSource, collect)(connect(mapStateToProps, mapDispatchToProps)(ColumnBox));

@@ -1,20 +1,23 @@
+// Load environment variables from .env file if present
+require('dotenv').load();
+
 const express = require('express');
-const passport = require('passport');
 const next = require('next');
-const cookieSession = require('cookie-session');
 const session = require('express-session');
-const ControlTowerStrategy = require('passport-control-tower');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-global.XMLHttpRequest = require('xhr2');
 const { parse } = require('url');
+const sass = require('node-sass');
+const postcssMiddleware = require('postcss-middleware');
+const redis = require('redis');
+const RedisStore = require('connect-redis')(session);
 const routes = require('./routes');
-
-// Load environment variables from .env file if present
-const dotenv = require('dotenv').load();
+const auth = require('./auth');
+const postcssConfig = require('./postcss.config');
 
 const port = process.env.PORT || 3000;
-const dev = process.env.NODE_ENV !== 'production';
+const env = process.env.NODE_ENV || 'development';
+const dev = env !== 'production';
 
 // Next app creation
 const app = next({ dev });
@@ -26,92 +29,85 @@ const server = express();
 function isAuthenticated(req, res, nextAction) {
   if (req.isAuthenticated()) return nextAction();
   // if they aren't redirect them to the home page
-  return res.redirect('/login');
+  return res.redirect('/admin/login');
 }
 
 function isAdmin(req, res, nextAction) {
   if (req.user.role === 'ADMIN') return nextAction();
   // if they aren't redirect them to the home page
-  return res.redirect('/login');
+  return res.redirect('/');
 }
 
-// Use the Control Tower Strategy within Passport.
-const controlTowerStrategy = new ControlTowerStrategy({
-  controlTowerUrl: process.env.CONTROL_TOWER_URL,
-  callbackUrl: process.env.CALLBACK_URL
-});
-passport.use(controlTowerStrategy);
+// Configuring session and cookie options
+const sessionOptions = {
+  secret: process.env.SECRET || 'keyboard cat',
+  resave: false,
+  saveUninitialized: true
+};
 
-// Passport session setup.
-// To support persistent login sessions, Passport needs to be able to
-// serialize users into and deserialize users out of the session.
-passport.serializeUser(function (user, done) {
-  done(null, user);
-});
-passport.deserializeUser(function (obj, done) {
-  done(null, obj);
-});
+if (!dev) {
+  const redisClient = redis.createClient(process.env.REDIS_URL);
+  sessionOptions.store = new RedisStore({
+    client: redisClient,
+    logErrors: true
+  });
+}
 
 // configure Express
 server.use(cookieParser());
 server.use(bodyParser.urlencoded({ extended: false }));
 server.use(bodyParser.json());
-server.use(cookieSession({
-  name: 'session',
-  keys: [process.env.SECRET || 'keyboard cat']
-}));
-server.use(session({
-  secret: process.env.SECRET || 'keyboard cat',
-  resave: false,
-  saveUninitialized: true
-}));
+server.use(session(sessionOptions));
 
 // Initialize Passport!
-server.use(passport.initialize());
-server.use(passport.session());
+auth.initialize(server);
 
 // Initializing next app before express server
 app.prepare()
   .then(() => {
-    // Public/landing page
-    server.get('/', function (req, res) {
-      // return app.render(req, res, '/app/Home');
-      res.redirect('/admin');
-    });
+    if (!dev) {
+      // Add route to serve compiled SCSS from /assets/{build id}/main.css
+      // Note: This is is only used in production, in development it is inlined
+      const sassResult = sass.renderSync({ file: './css/index.scss', outputStyle: 'compressed' });
+      server.get('/admin/styles/:id/index.css', postcssMiddleware(postcssConfig), (req, res) => {
+        res.setHeader('Content-Type', 'text/css');
+        res.setHeader('Cache-Control', 'public, max-age=2592000');
+        res.setHeader('Expires', new Date(Date.now() + 2592000000).toUTCString());
+        res.send(sassResult.css);
+      });
+    }
 
-    server.get('/auth', passport.authenticate('control-tower', { failureRedirect: '/login' }), function (req, res) {
-      // On success, redirecting to My RW
-      res.redirect('/admin');
-    });
+    // Root
+    // server.get('/admin', (req, res) => {
+    //   res.redirect('/login');
+    // });
 
-    server.get('/auth/user', function (req, res) {
-      // On success, redirecting to My RW
-      return res.json(req.user || {});
+    // Authentication
+    server.get('/admin/auth', auth.authenticate({ failureRedirect: '/admin/login' }), (req, res) => {
+      res.redirect('/admin/data/datasets');
     });
-
-    server.get('/login', function(req, res) {
-      controlTowerStrategy.login(req, res);
-    });
-
-    server.get('/logout', function (req, res) {
+    server.get('/admin/auth/user', (req, res) => res.json(req.user));
+    server.get('/admin/login', auth.login);
+    server.get('/admin/logout', (req, res) => {
       req.logout();
-      res.redirect('/');
+      res.redirect('/admin/login');
     });
 
-    server.get('/myrw*?', isAuthenticated, function (req, res) {
+    // Admin redirections
+    server.get('/admin', (req, res) => res.redirect('/admin/data/datasets'));
+    server.get('/admin/data', (req, res) => res.redirect('/admin/data/datasets'));
+
+    // For admin always check if user is authenticated
+    server.get('/admin*?', isAuthenticated, isAdmin, (req, res) => {
       const parsedUrl = parse(req.url, true);
       return handle(req, res, parsedUrl);
     });
 
-    server.get('/admin*?', isAuthenticated, isAdmin, function (req, res) {
-      const parsedUrl = parse(req.url, true);
-      return handle(req, res, parsedUrl);
-    });
-
+    // Using next routes
     server.use(handle);
 
     server.listen(port, (err) => {
       if (err) throw err;
-      console.log(`> Ready on http://localhost:${port}`);
+      console.info(`> Ready on http://localhost:${port} [${env}]`);
     });
   });

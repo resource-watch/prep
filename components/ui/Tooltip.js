@@ -1,7 +1,7 @@
 import React from 'react';
 import TetherComponent from 'react-tether';
 import { initStore } from 'store';
-import withRedux from 'next-redux-wrapper';
+import { connect } from 'react-redux';
 import { toggleTooltip, setTooltipPosition } from 'redactions/tooltip';
 
 class Tooltip extends React.Component {
@@ -99,4 +99,4 @@ const mapDispatchToProps = dispatch => ({
   setTooltipPosition: (pos) => { dispatch(setTooltipPosition(pos)); }
 });
 
-export default withRedux(initStore, mapStateToProps, mapDispatchToProps)(Tooltip);
+export default connect(mapStateToProps, mapDispatchToProps)(Tooltip);

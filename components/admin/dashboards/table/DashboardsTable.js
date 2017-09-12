@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import { Autobind } from 'es-decorators';
 
 // Redux
-import withRedux from 'next-redux-wrapper';
-import { initStore } from 'store';
+import { connect } from 'react-redux';
 import { getDashboards, setFilters } from 'redactions/admin/dashboards';
 
 // Selectors
@@ -146,4 +145,4 @@ const mapDispatchToProps = dispatch => ({
   setFilters: filters => dispatch(setFilters(filters))
 });
 
-export default withRedux(initStore, mapStateToProps, mapDispatchToProps)(DashboardsTable);
+export default connect(mapStateToProps, mapDispatchToProps)(DashboardsTable);

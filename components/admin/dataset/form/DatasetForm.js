@@ -22,7 +22,8 @@ class DatasetForm extends React.Component {
       columns: [],
       form: Object.assign({}, STATE_DEFAULT.form, {
         application: props.application,
-        authorization: props.authorization
+        authorization: props.authorization,
+        env: 'preproduction'
       })
     });
 

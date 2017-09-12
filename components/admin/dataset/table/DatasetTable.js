@@ -3,9 +3,8 @@ import PropTypes from 'prop-types';
 import { Autobind } from 'es-decorators';
 
 // Redux
-import withRedux from 'next-redux-wrapper';
-import { initStore } from 'store';
-import { getDatasets, setFilters } from 'redactions/admin/datasets';
+import { connect } from 'react-redux';
+import { getDatasets, setFilters } from 'redactions/datasets';
 
 // Selectors
 import getFilteredDatasets from 'selectors/admin/datasets';
@@ -27,7 +26,6 @@ import RelatedContentTD from './td/RelatedContentTD';
 import UpdatedAtTD from './td/UpdatedAtTD';
 
 class DatasetTable extends React.Component {
-
   componentDidMount() {
     this.props.setFilters([]);
     this.props.getDatasets(this.props.application);
@@ -79,6 +77,7 @@ class DatasetTable extends React.Component {
               { label: 'Status', value: 'status', td: StatusTD },
               { label: 'Published', value: 'published', td: PublishedTD },
               { label: 'Provider', value: 'provider' },
+              { label: 'Environment', value: 'env' },
               { label: 'Updated at', value: 'updatedAt', td: UpdatedAtTD },
               { label: 'Related content', value: 'status', td: RelatedContentTD }
             ]}
@@ -132,13 +131,13 @@ DatasetTable.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  loading: state.datasets.datasets.loading,
+  loading: state.datasets.loading,
   datasets: getFilteredDatasets(state),
-  error: state.datasets.datasets.error
+  error: state.datasets.error
 });
 const mapDispatchToProps = dispatch => ({
   getDatasets: () => dispatch(getDatasets()),
   setFilters: filters => dispatch(setFilters(filters))
 });
 
-export default withRedux(initStore, mapStateToProps, mapDispatchToProps)(DatasetTable);
+export default connect(mapStateToProps, mapDispatchToProps)(DatasetTable);

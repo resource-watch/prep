@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Router } from 'routes';
 
 // Redux
-import withRedux from 'next-redux-wrapper';
+import { connect } from 'react-redux';
 import { initStore } from 'store';
 
 // Components
@@ -32,4 +32,4 @@ const mapStateToProps = state => ({
   user: state.user
 });
 
-export default withRedux(initStore, mapStateToProps, null)(DatasetNew);
+export default connect(mapStateToProps, null)(DatasetNew);

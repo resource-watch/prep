@@ -4,7 +4,7 @@ import CompoundMenu from 'components/ui/CompoundMenu';
 import Carousel from 'components/ui/Carousel';
 import { getPartners } from 'redactions/admin/partners';
 import { initStore } from 'store';
-import withRedux from 'next-redux-wrapper';
+import { connect } from 'react-redux';
 
 const data = [
   { name: 'Data' },
@@ -96,4 +96,4 @@ const mapDispatchToProps = dispatch => ({
   getPartners: () => { dispatch(getPartners()); }
 });
 
-export default withRedux(initStore, mapStateToProps, mapDispatchToProps)(Footer);
+export default connect(mapStateToProps, mapDispatchToProps)(Footer);

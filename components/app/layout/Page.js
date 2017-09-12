@@ -5,8 +5,7 @@ import isEmpty from 'lodash/isEmpty';
 // Components
 import User from 'components/user';
 
-class Page extends React.Component {
-
+class Page extends React.PureComponent {
   // Expose session to all pages
   static async getInitialProps({ req }) {
     this.user = new User({ req });

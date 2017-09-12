@@ -11,7 +11,7 @@ export default class DashboardsService {
   fetchAllData() {
     return new Promise((resolve, reject) => {
       get({
-        url: `${process.env.BACKOFFICE_API_URL}/api/dashboards/?published=all`,
+        url: `${process.env.BACKOFFICE_API_URL}/dashboards/?published=all`,
         headers: [{
           key: 'Content-Type',
           value: 'application/json'
@@ -32,7 +32,7 @@ export default class DashboardsService {
   fetchData(id) {
     return new Promise((resolve, reject) => {
       get({
-        url: `${process.env.BACKOFFICE_API_URL}/api/dashboards/${id}`,
+        url: `${process.env.BACKOFFICE_API_URL}/dashboards/${id}`,
         headers: [{
           key: 'Content-Type',
           value: 'application/json'
@@ -53,7 +53,7 @@ export default class DashboardsService {
   saveData({ type, body, id }) {
     return new Promise((resolve, reject) => {
       post({
-        url: `${process.env.BACKOFFICE_API_URL}/api/dashboards/${id}`,
+        url: `${process.env.BACKOFFICE_API_URL}/dashboards/${id}`,
         type,
         body,
         headers: [{
@@ -76,7 +76,7 @@ export default class DashboardsService {
   deleteData(id) {
     return new Promise((resolve, reject) => {
       remove({
-        url: `${process.env.BACKOFFICE_API_URL}/api/dashboards/${id}`,
+        url: `${process.env.BACKOFFICE_API_URL}/dashboards/${id}`,
         headers: [{
           key: 'Authorization',
           value: this.opts.authorization

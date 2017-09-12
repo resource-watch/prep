@@ -2,26 +2,32 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 // Redux
-import withRedux from 'next-redux-wrapper';
-import { initStore } from 'store';
-import { toggleModal, setModalOptions } from 'redactions/modal';
-import { setUser } from 'redactions/user';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { updateIsLoading } from 'redactions/page';
 
 // Components
+import { Router } from 'routes';
 import Header from 'components/admin/layout/Header';
 import Head from 'components/admin/layout/head';
 import Icons from 'components/admin/layout/icons';
 import Tooltip from 'components/ui/Tooltip';
 import Toastr from 'react-redux-toastr';
+import Spinner from 'components/ui/Spinner';
 
-class Layout extends React.Component {
-
+class Layout extends React.PureComponent {
   componentDidMount() {
-    this.props.setUser(this.props.user);
+    Router.onRouteChangeStart = () => {
+      this.props.updateIsLoading(true);
+    };
+    Router.onRouteChangeComplete = () => {
+      this.props.updateIsLoading(false);
+    };
   }
 
   render() {
-    const { title, description, url, user } = this.props;
+    const { title, description, isLoading } = this.props;
+
     return (
       <div className="c-page">
         <Head
@@ -31,10 +37,12 @@ class Layout extends React.Component {
 
         <Icons />
 
-        <Header url={url} user={user} />
+        {isLoading && <div style={{ height: '3px', width: '100%', backgroundColor: 'red' }} />}
+
+        <Header />
 
         <div className="container">
-          { this.props.children }
+          {this.props.children}
         </div>
 
         <Tooltip />
@@ -46,30 +54,28 @@ class Layout extends React.Component {
       </div>
     );
   }
-
 }
 
 Layout.propTypes = {
-  user: PropTypes.object.isRequired,
-  url: PropTypes.object.isRequired,
   children: PropTypes.any.isRequired,
   title: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
-
-  // Store
-  setUser: PropTypes.func.isRequired
+  isLoading: PropTypes.bool,
+  updateIsLoading: PropTypes.func
 };
 
-const mapDispatchToProps = dispatch => ({
-  toggleModal: () => {
-    dispatch(toggleModal());
-  },
-  setModalOptions: () => {
-    dispatch(setModalOptions());
-  },
-  setUser: (user) => {
-    dispatch(setUser(user));
-  }
+Layout.defaultProps = {
+  title: 'PREP Manager',
+  description: '',
+  isLoading: false
+};
+
+const mapStateToProps = state => ({
+  isLoading: state.page.isLoading
 });
 
-export default withRedux(initStore, null, mapDispatchToProps)(Layout);
+const mapDispatchToProps = dispatch => ({
+  updateIsLoading: bindActionCreators(isLoading => updateIsLoading(isLoading), dispatch)
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Layout);

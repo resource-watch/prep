@@ -2,62 +2,47 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
-// Utils
-import UsersService from 'services/UsersService';
+// Redux
+import { connect } from 'react-redux';
 
 // Next components
 import { Link } from 'routes';
 
-export default class Header extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.usersService = new UsersService({});
+const items = [
+  {
+    name: 'Data',
+    pathnames: ['/admin/Data', '/admin/DataDetail'],
+    component: <Link route="admin_data"><a>Data</a></Link>
+  },
+  {
+    name: 'Dashboards',
+    pathnames: ['/admin/Dashboards', '/admin/DashboardsDetail'],
+    component: <Link route="admin_dashboards"><a>Dashboards</a></Link>
+  },
+  {
+    name: 'Insights',
+    pathnames: ['/admin/Insights', '/admin/InsightsDetail'],
+    component: <Link route="admin_insights"><a>Insights</a></Link>
+  },
+  {
+    name: 'Resources',
+    pathnames: ['/admin/Resources', '/admin/ResourcesDetail'],
+    component: <Link route="admin_resources"><a>Resources</a></Link>
+  },
+  {
+    name: 'Widgets',
+    pathnames: ['/admin/Widgets', '/admin/WidgetsDetail'],
+    component: <Link route="admin_widgets"><a>Widgets</a></Link>
+  },
+  {
+    name: 'Logout',
+    component: <a href="/logout">Logout</a>
   }
+];
 
-  /**
-   * UI EVENTS
-   * - logout
-  */
-  logout(e) {
-    e && e.preventDefault();
-    this.usersService.logout();
-  }
-
+class Header extends React.PureComponent {
   render() {
-    const { url } = this.props;
-
-    const items = [
-      {
-        name: 'Data',
-        pathnames: ['/admin/Data', '/admin/DataDetail'],
-        component: <Link route="admin_data"><a>Data</a></Link>
-      },
-      {
-        name: 'Dashboards',
-        pathnames: ['/admin/Dashboards', '/admin/DashboardsDetail'],
-        component: <Link route="admin_dashboards"><a>Dashboards</a></Link>
-      },
-      {
-        name: 'Insights',
-        pathnames: ['/admin/Insights', '/admin/InsightsDetail'],
-        component: <Link route="admin_insights"><a>Insights</a></Link>
-      },
-      {
-        name: 'Resources',
-        pathnames: ['/admin/Resources', '/admin/ResourcesDetail'],
-        component: <Link route="admin_resources"><a>Resources</a></Link>
-      },
-      {
-        name: 'Widgets',
-        pathnames: ['/admin/Widgets', '/admin/WidgetsDetail'],
-        component: <Link route="admin_widgets"><a>Widgets</a></Link>
-      },
-      {
-        name: 'Logout',
-        component: <a onClick={this.logout} href="/logout">Logout</a>
-      }
-    ];
+    const { routes } = this.props;
 
     return (
       <header className="c-header -transparent">
@@ -78,7 +63,7 @@ export default class Header extends React.Component {
               <ul>
                 {items.map((item) => {
                   const activeClassName = classnames({
-                    '-active': item.pathnames && item.pathnames.includes(url.pathname)
+                    '-active': item.pathnames && item.pathnames.includes(routes.pathname)
                   });
 
                   return (
@@ -96,12 +81,12 @@ export default class Header extends React.Component {
   }
 }
 
-Header.defaultProps = {
-  url: {}
-};
-
-
 Header.propTypes = {
-  url: PropTypes.object,
-  user: PropTypes.object
+  routes: PropTypes.object
 };
+
+const mapStateToProps = state => ({
+  routes: state.routes
+});
+
+export default connect(mapStateToProps)(Header);

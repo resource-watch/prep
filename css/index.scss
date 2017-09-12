@@ -1,7 +1,7 @@
 @import "css/settings";
 
 // Reset
-@import "normalize.css";
+@import "../node_modules/normalize.css/normalize";
 
 // Foundation
 @import '../node_modules/foundation-sites/scss/foundation';
@@ -11,14 +11,14 @@
 @include foundation-responsive-embed;
 
 // Leaflet
-@import 'leaflet/dist/leaflet.css';
+@import '../node_modules/leaflet/dist/leaflet';
 
 // React input range
-@import 'react-input-range/lib/css/index.css';
+@import '../node_modules/react-input-range/lib/css/index';
 
 // Slick
-@import 'slick-carousel/slick/slick.scss';
-@import 'slick-carousel/slick/slick-theme.scss';
+@import '../node_modules/slick-carousel/slick/slick.scss';
+@import '../node_modules/slick-carousel/slick/slick-theme.scss';
 
 // Common files
 @import "css/base";

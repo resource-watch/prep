@@ -11,7 +11,7 @@ export default class IndicatorsService {
   fetchAllData() {
     return new Promise((resolve, reject) => {
       get({
-        url: `${process.env.BACKOFFICE_API_URL}/api/indicators/?published=all`,
+        url: `${process.env.BACKOFFICE_API_URL}/indicators/?published=all`,
         headers: [{
           key: 'Content-Type',
           value: 'application/json'
@@ -32,7 +32,7 @@ export default class IndicatorsService {
   fetchData(id) {
     return new Promise((resolve, reject) => {
       get({
-        url: `${process.env.BACKOFFICE_API_URL}/api/indicators/${id}`,
+        url: `${process.env.BACKOFFICE_API_URL}/indicators/${id}`,
         headers: [{
           key: 'Content-Type',
           value: 'application/json'
@@ -53,7 +53,7 @@ export default class IndicatorsService {
   saveData({ type, body, id }) {
     return new Promise((resolve, reject) => {
       post({
-        url: `${process.env.BACKOFFICE_API_URL}/api/indicators/${id}`,
+        url: `${process.env.BACKOFFICE_API_URL}/indicators/${id}`,
         type,
         body,
         headers: [{
@@ -76,7 +76,7 @@ export default class IndicatorsService {
   deleteData(id) {
     return new Promise((resolve, reject) => {
       remove({
-        url: `${process.env.BACKOFFICE_API_URL}/api/indicators/${id}`,
+        url: `${process.env.BACKOFFICE_API_URL}/indicators/${id}`,
         headers: [{
           key: 'Authorization',
           value: this.opts.authorization

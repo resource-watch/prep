@@ -30,7 +30,7 @@ import Title from 'components/ui/Title';
 class DataDetail extends Page {
   static async getInitialProps({ asPath, pathname, req, store, query, isServer }) {
     const tab = query.tab || 'datasets';
-    const { id, subtab } = query;
+    const { id, subtab, dataset } = query;
     const url = { asPath, pathname };
     const data = {};
     const { user } = isServer ? req : store.getState();
@@ -39,64 +39,57 @@ class DataDetail extends Page {
       store.dispatch(setUser(user));
     }
 
-    return { user, tab, id, subtab, url, data };
+    return { user, tab, id, subtab, url, data, dataset };
   }
 
-  // constructor(props) {
-  //   super(props);
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: {}
+    };
+  }
 
-  //   const { tab, id, subtab } = props.url.query;
+  componentDidMount() {
+    this.service = null;
+    const { id, tab } = this.props;
 
-  //   this.state = {
-  //     tab,
-  //     id,
-  //     subtab,
-  //     data: {}
-  //   };
+    switch (tab) {
+      case 'datasets':
+        if (id !== 'new') {
+          this.service = new DatasetService(id, {
+            apiURL: process.env.WRI_API_URL
+          });
+        }
+        break;
 
-  //   this.service = null;
+      case 'widgets':
+        if (id !== 'new') {
+          console.log(id);
+          this.service = new WidgetsService();
+        }
+        break;
 
-  //   switch (tab) {
-  //     case 'datasets':
-  //       if (id !== 'new') {
-  //         this.service = new DatasetService(id, {
-  //           apiURL: process.env.WRI_API_URL
-  //         });
-  //       }
-  //       break;
+      case 'layers':
+        if (id !== 'new') {
+          this.service = new LayersService();
+        }
+        break;
 
-  //     case 'widgets':
-  //       if (id !== 'new') {
-  //         console.log(id);
-  //         this.service = new WidgetsService();
-  //       }
-  //       break;
+      default:
 
-  //     case 'layers':
-  //       if (id !== 'new') {
-  //         this.service = new LayersService();
-  //       }
-  //       break;
+    }
 
-  //     default:
-
-  //   }
-  // }
-
-  // componentWillMount() {
-  //   const { id } = this.state;
-
-  //   if (this.service) {
-  //     // Fetch the dataset / layer / widget depending on the tab
-  //     this.service.fetchData({ id })
-  //       .then((data) => {
-  //         this.setState({ data });
-  //       })
-  //       .catch((err) => {
-  //         console.error(err);
-  //       });
-  //   }
-  // }
+    if (this.service) {
+      // Fetch the dataset / layer / widget depending on the tab
+      this.service.fetchData({ id })
+        .then((data) => {
+          this.setState({ data });
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    }
+  }
 
   // componentWillReceiveProps(nextProps) {
   //   const { tab, id, subtab } = nextProps.url.query;
@@ -109,10 +102,15 @@ class DataDetail extends Page {
    * - getName
   */
   getName() {
-    const { tab, id, data } = this.props;
+    const { tab, id } = this.props;
+    const { data } = this.state;
 
     if (id === 'new') {
       return `New ${singular(tab)}`;
+    }
+
+    if (data.attributes && data.attributes.name) {
+      return data.attributes.name;
     }
 
     if (data.name) {
@@ -123,7 +121,7 @@ class DataDetail extends Page {
   }
 
   render() {
-    const { user, tab, id, subtab, url } = this.props;
+    const { user, tab, id, subtab, url, dataset } = this.props;
 
     return (
       <Layout
@@ -152,11 +150,11 @@ class DataDetail extends Page {
             }
 
             {tab === 'widgets' &&
-              <WidgetsTab tab={tab} subtab={subtab} id={id} />
+              <WidgetsTab tab={tab} subtab={subtab} id={id} dataset={dataset} />
             }
 
             {tab === 'layers' &&
-              <LayersTab tab={tab} subtab={subtab} id={id} />
+              <LayersTab tab={tab} subtab={subtab} id={id} dataset={dataset} />
             }
 
             {tab === 'dashboards' &&

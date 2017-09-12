@@ -7,8 +7,8 @@ import WidgetsNew from 'components/admin/widgets/pages/new';
 import WidgetsShow from 'components/admin/widgets/pages/show';
 
 export default function WidgetsTab(props) {
-  const { tab, subtab, id } = props;
-
+  const { tab, subtab, id , dataset } = props;
+  console.log(dataset)
   return (
     <div className="c-widgets-tab">
       {!id &&
@@ -16,7 +16,7 @@ export default function WidgetsTab(props) {
       }
 
       {id && id === 'new' &&
-        <WidgetsNew tab={tab} subtab={subtab} id={id} />
+        <WidgetsNew tab={tab} subtab={subtab} id={id} dataset={dataset} />
       }
 
       {id && id !== 'new' &&

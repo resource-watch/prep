@@ -8,7 +8,7 @@ export { reducer as toastr } from 'react-redux-toastr';
 
 export { default as staticPages } from './static_pages';
 export { default as modal } from './modal';
-export { default as widgetEditor } from './widgetEditor';
+export { default as widgetEditor } from 'components/widgets/editor/redux/widgetEditor';
 export { default as dashboards } from './admin/dashboards';
 export { default as indicators } from './admin/indicators';
 export { default as insights } from './admin/insights';

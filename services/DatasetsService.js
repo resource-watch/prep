@@ -3,16 +3,22 @@ import { get, post, remove } from 'utils/request';
 import sortBy from 'lodash/sortBy';
 
 export default class DatasetsService {
-
   constructor(options = {}) {
     this.opts = options;
   }
 
   // GET ALL DATA
-  fetchAllData({ applications = [process.env.APPLICATIONS], includes }) {
+  fetchAllData({ applications = [process.env.APPLICATIONS], includes, filters } = {}) {
+    const qParams = {
+      application: applications.join(','),
+      ...!!includes && { includes },
+      'page[size]': 9999999,
+      ...filters
+    };
+
     return new Promise((resolve, reject) => {
       get({
-        url: `${process.env.WRI_API_URL}/dataset?application=${applications.join(',')}&includes=${includes}&page[size]=${Date.now() / 100000}&env=production,preproduction`,
+        url: `${process.env.WRI_API_URL}/dataset?${Object.keys(qParams).map(k => `${k}=${qParams[k]}`).join('&')}`,
         headers: [{
           key: 'Content-Type',
           value: 'application/json'
@@ -31,10 +37,16 @@ export default class DatasetsService {
     });
   }
 
-  fetchData({ id, applications = [process.env.APPLICATIONS], includes }) {
+  fetchData({ id, applications = [process.env.APPLICATIONS], includes, filters }) {
+    const qParams = {
+      application: applications.join(','),
+      includes,
+      ...filters
+    };
+
     return new Promise((resolve, reject) => {
       get({
-        url: `${process.env.WRI_API_URL}/dataset/${id}?application=${applications.join(',')}&includes=${includes}`,
+        url: `${process.env.WRI_API_URL}/dataset/${id}?${Object.keys(qParams).map(k => `${k}=${qParams[k]}`).join('&')}`,
         headers: [{
           key: 'Content-Type',
           value: 'application/json'

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import omit from 'lodash/omit';
 
@@ -116,6 +117,7 @@ class File extends FormElement {
   uploadFile(file) {
     const formData = new FormData();
     formData.append('dataset', file);
+    formData.append('provider', this.props.properties.provider);
 
     this.setState({ loading: true, errors: [] });
 
@@ -199,9 +201,9 @@ class File extends FormElement {
 }
 
 File.propTypes = {
-  properties: React.PropTypes.object.isRequired,
-  validations: React.PropTypes.array,
-  onChange: React.PropTypes.func
+  properties: PropTypes.object.isRequired,
+  validations: PropTypes.array,
+  onChange: PropTypes.func
 };
 
 export default File;

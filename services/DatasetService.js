@@ -1,7 +1,5 @@
 import 'isomorphic-fetch';
-import _ from 'lodash';
 import Promise from 'bluebird';
-
 
 // Utils
 import { isFieldDate, isFieldNumber } from 'utils/widgets/WidgetHelper';
@@ -18,7 +16,6 @@ import { isFieldDate, isFieldNumber } from 'utils/widgets/WidgetHelper';
     });
  */
 export default class DatasetService {
-
   constructor(datasetId, options) {
     if (!options) {
       throw new Error('options params is required.');
@@ -31,11 +28,20 @@ export default class DatasetService {
   }
 
   /**
+   * Get subscribable datasets
+   */
+  getSubscribableDatasets(includes = '') {
+    return fetch(`${this.opts.apiURL}/dataset?application=rw&includes=${includes}&subscribable=true&page[size]=999`)
+      .then(response => response.json())
+      .then(jsonData => jsonData.data);
+  }
+
+  /**
    * Get dataset info
    * @returns {Promise}
    */
   fetchData(includes = '', applications = [process.env.APPLICATIONS]) {
-    return fetch(`${this.opts.apiURL}/dataset/${this.datasetId}?application=${applications.join(',')}&includes=${includes}`)
+    return fetch(`${this.opts.apiURL}/dataset/${this.datasetId}?application=${applications.join(',')}&includes=${includes}&page[size]=999`)
       .then(response => response.json())
       .then(jsonData => jsonData.data);
   }
@@ -52,18 +58,30 @@ export default class DatasetService {
 
   /**
    * Get Jiminy chart suggestions
-   * @returns {Promise}
+   * NOTE: the API might be really slow to give a result (or even fail
+   * to do so) so a timeout is necessary
+   * @param {string} query - SQL query to pass to Jiminy
+   * @param {number} [timeout=10000] Timeout before rejecting the provise
+   * @returns {Promise<any>}
    */
-  fetchJiminy(query) {
-    return fetch(`${this.opts.apiURL}/jiminy`, {
-      method: 'POST',
-      body: JSON.stringify({ sql: query }),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-      .then(response => response.json())
-      .then(jsonData => jsonData.data);
+  fetchJiminy(query, timeout = 10000) {
+    return new Promise((resolve, reject) => {
+      // If the timeout time has elapsed, we reject
+      // the promise
+      setTimeout(reject, timeout);
+
+      fetch(`${this.opts.apiURL}/jiminy`, {
+        method: 'POST',
+        body: JSON.stringify({ sql: query }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(response => response.json())
+        .then(jsonData => jsonData.data)
+        .then(resolve)
+        .catch(reject);
+    });
   }
 
 
@@ -73,15 +91,16 @@ export default class DatasetService {
    */
   getFilter(fieldData) {
     return new Promise((resolve) => {
-      if (isFieldNumber(fieldData.columnType) || isFieldDate(fieldData.columnType)) {
+      const newFieldData = fieldData;
+      if (isFieldNumber(fieldData) || isFieldDate(fieldData)) {
         this.getMinAndMax(fieldData.columnName, fieldData.tableName).then((data) => {
-          fieldData.properties = data;
-          resolve(fieldData);
+          newFieldData.properties = data;
+          resolve(newFieldData);
         });
       } else {
         this.getValues(fieldData.columnName, fieldData.tableName).then((data) => {
-          fieldData.properties = data;
-          resolve(fieldData);
+          newFieldData.properties = data;
+          resolve(newFieldData);
         });
       }
     });
@@ -91,14 +110,14 @@ export default class DatasetService {
     return new Promise((resolve) => {
       this.getFields().then((fieldsData) => {
         const filteredFields = fieldsData.fields.filter(field => field.columnType === 'number' || field.columnType === 'date' || field.columnType === 'string');
-        const promises = _.map(filteredFields, (field) => {
+        const promises = (filteredFields || []).map(field => {
           if (field.columnType === 'number' || field.columnType === 'date') {
             return this.getMinAndMax(field.columnName, fieldsData.tableName);
           }
           return this.getValues(field.columnName, fieldsData.tableName);
         });
         Promise.all(promises).then((results) => {
-          const filters = _.map(filteredFields, (field, index) => {
+          const filters = (filteredFields || []).map((field, index) => {
             const filterResult = {
               columnName: field.columnName,
               columnType: field.columnType
@@ -122,11 +141,12 @@ export default class DatasetService {
     return fetch(`${this.opts.apiURL}/fields/${this.datasetId}`)
       .then(response => response.json())
       .then((jsonData) => {
+        const fieldsObj = jsonData.fields;
         const parsedData = {
           tableName: jsonData.tableName,
-          fields: _.map(jsonData.fields, (value, key) => ({
+          fields: (Object.keys(fieldsObj) || []).map(key => ({
             columnName: key,
-            columnType: value.type
+            columnType: fieldsObj[key].type
           }))
         };
         return parsedData;
@@ -165,7 +185,7 @@ export default class DatasetService {
       fetch(`https://api.resourcewatch.org/v1/query/${this.datasetId}?sql=${query}`)
         .then(response => response.json())
         .then((jsonData) => {
-          const parsedData = _.map(jsonData.data, data => data[columnName]);
+          const parsedData = (jsonData.data || []).map(data => data[columnName]);
           resolve(parsedData);
         });
     });
@@ -188,14 +208,41 @@ export default class DatasetService {
     document.body.removeChild(a);
   }
 
-  getSimilarDatasets(tags) {
-    return fetch(`${this.opts.apiURL}/dataset/vocabulary/find?legacy=${tags}`)
+  getSimilarDatasets() {
+    return fetch(`${this.opts.apiURL}/graph/query/similar-dataset/${this.datasetId}`)
       .then(response => response.json())
       .then(jsonData => jsonData.data);
   }
 
-  getDatasets(datasetIDs) {
-    return fetch(`${this.opts.apiURL}/dataset/?ids=${datasetIDs}&includes=widget,layer`)
+  /**
+   * Fetch several datasets at once
+   * @static
+   * @param {string[]} datasetIDs - List of dataset IDs
+   * @param {string} [includes=''] - List of entities to fetch
+   * (string of values separated with commas)
+   * @param {string[]} [applications=[process.env.APPLICATIONS]] List of applications
+   * @returns {object[]}
+   */
+  static getDatasets(datasetIDs, includes = '', applications = [process.env.APPLICATIONS]) {
+    return fetch(`${process.env.WRI_API_URL}/dataset/?ids=${datasetIDs}&includes=${includes}&application=${applications.join(',')}&page[size]=999`)
+      .then((response) => {
+        if (!response.ok) throw new Error(response.statusText);
+        return response.json();
+      })
+      .then(jsonData => jsonData.data);
+  }
+
+  searchDatasetsByConcepts(topics, geographies, dataTypes) {
+    let counter = 0;
+    const topicsSt = (topics || []).map((val, index) => `concepts[${counter}][${index}]=${val}`).join('&');
+    counter++;
+    const geographiesSt = (geographies || []).map((val, index) => `concepts[${counter}][${index}]=${val}`).join('&');
+    counter++;
+    const dataTypesSt = (dataTypes || []).map((val, index) => `concepts[${counter}][${index}]=${val}`).join('&');
+    const querySt = `&${topicsSt}${geographiesSt}${dataTypesSt}`;
+
+
+    return fetch(`${this.opts.apiURL}/graph/query/search-datasets?${querySt}`)
       .then(response => response.json())
       .then(jsonData => jsonData.data);
   }

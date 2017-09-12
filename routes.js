@@ -11,9 +11,8 @@ const routes = nextRoutes();
 routes.add('admin_home', '/admin/data/datasets', 'admin/Data'); // Redirecting to admin_data_tab
 
 // Data
-routes.add('admin_data', '/admin/data/datasets', 'admin/Data') // Redirecting to admin_data_tab
 routes.add('admin_data_detail', '/admin/data/:tab/:id/:subtab?', 'admin/DataDetail');
-routes.add('admin_data_tab', '/admin/data/:tab?', 'admin/Data');
+routes.add('admin_data', '/admin/data/:tab?', 'admin/Data');
 
 // DASHBOARDS
 routes.add('admin_dashboards_detail', '/admin/dashboards/:tab/:id/:subtab?', 'admin/DashboardsDetail');

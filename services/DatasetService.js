@@ -30,8 +30,8 @@ export default class DatasetService {
   /**
    * Get subscribable datasets
    */
-  getSubscribableDatasets(includes = '') {
-    return fetch(`${this.opts.apiURL}/dataset?application=rw&includes=${includes}&subscribable=true&page[size]=999`)
+  getSubscribableDatasets(includes = '', applications = [process.env.APPLICATIONS]) {
+    return fetch(`${this.opts.apiURL}/dataset?application=${applications.join(',')}&includes=${includes}&subscribable=true&page[size]=999`)
       .then(response => response.json())
       .then(jsonData => jsonData.data);
   }
@@ -192,7 +192,7 @@ export default class DatasetService {
   }
 
   getLayers() {
-    return fetch(`${this.opts.apiURL}/dataset/${this.datasetId}/layer?app=rw`)
+    return fetch(`${this.opts.apiURL}/dataset/${this.datasetId}/layer?app=${process.env.APPLICATIONS.join(',')}`)
       .then(response => response.json())
       .then(jsonData => jsonData.data);
   }

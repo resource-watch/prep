@@ -17,7 +17,7 @@ export default class WidgetService {
 
   saveUserWidget(widget, datasetId, token) {
     const widgetObj = {
-      application: ['rw'],
+      application: process.env.APPLICATIONS.split(','),
       published: false,
       default: false,
       dataset: datasetId
@@ -66,7 +66,7 @@ export default class WidgetService {
   }
 
   getUserWidgetCollections(user) {
-    return fetch(`${this.opts.apiURL}/vocabulary/widget_collections?application=rw`)
+    return fetch(`${this.opts.apiURL}/vocabulary/widget_collections?application=${process.env.APPLICATIONS.join(',')}`)
       .then(response => response.json())
       .then((jsonData) => {
         const dataObj = jsonData.data;

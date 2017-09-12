@@ -115,7 +115,7 @@ export default class UserService {
   createSubscriptionToArea(areaId, datasets, datasetsQuery, user, name = '') {
     const bodyObj = {
       name,
-      application: 'rw',
+      application: process.env.APPLICATIONS.join(','),
       language: 'en',
       datasets,
       datasetsQuery,
@@ -143,7 +143,7 @@ export default class UserService {
    */
   updateSubscriptionToArea(subscriptionId, datasets, datasetsQuery, user) {
     const bodyObj = {
-      application: 'rw',
+      application: process.env.APPLICATIONS.join(','),
       language: 'en',
       datasets,
       datasetsQuery
@@ -164,7 +164,7 @@ export default class UserService {
    */
   getSubscriptions(token) {
     return new Promise((resolve) => {
-      fetch(`${this.opts.apiURL}/subscriptions?application=rw`, {
+      fetch(`${this.opts.apiURL}/subscriptions?application=${process.env.APPLICATIONS.join(',')}`, {
         headers: {
           Authorization: token
         }
@@ -195,7 +195,7 @@ export default class UserService {
    */
   getUserAreas(token) {
     return new Promise((resolve, reject) => {
-      fetch(`${this.opts.apiURL}/area?application=rw`, {
+      fetch(`${this.opts.apiURL}/area?application=${process.env.APPLICATIONS.join(',')}`, {
         headers: {
           Authorization: token
         }
@@ -215,7 +215,7 @@ export default class UserService {
   createNewArea(name, geostore, iso, token) {
     const bodyObj = {
       name,
-      application: 'rw'
+      application: process.env.APPLICATIONS.join(',')
     };
 
     if (geostore) {
@@ -243,7 +243,7 @@ export default class UserService {
   updateArea(id, name, token) {
     const bodyObj = {
       name,
-      application: 'rw'
+      application: process.env.APPLICATIONS.join(',')
     };
 
     return fetch(`${this.opts.apiURL}/area/${id}`, {

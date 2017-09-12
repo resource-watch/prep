@@ -8,9 +8,9 @@ import { substitution } from 'utils/utils';
 
 // Components
 import Aside from 'components/ui/Aside';
-import DatasetForm from 'components/admin/dataset/form/DatasetForm';
+import DatasetsForm from 'components/datasets/form/DatasetsForm';
 import MetadataForm from 'components/admin/metadata/form/MetadataForm';
-import VocabulariesAssociationForm from 'components/admin/vocabularies/association/VocabulariesAssociationForm';
+import TagsForm from 'components/admin/tags/TagsForm';
 import WidgetIndex from 'components/admin/widget/pages/index';
 import LayersIndex from 'components/admin/layers/pages/index';
 
@@ -26,10 +26,10 @@ const DATASET_SUBTABS = [{
   route: 'admin_data_detail',
   params: { tab: 'datasets', id: '{{id}}', subtab: 'metadata' }
 }, {
-  label: 'Vocabularies',
-  value: 'vocabularies',
+  label: 'Tags',
+  value: 'tags',
   route: 'admin_data_detail',
-  params: { tab: 'datasets', id: '{{id}}', subtab: 'vocabularies' }
+  params: { tab: 'datasets', id: '{{id}}', subtab: 'tags' }
 }, {
   label: 'Widgets',
   value: 'widgets',
@@ -42,8 +42,7 @@ const DATASET_SUBTABS = [{
   params: { tab: 'datasets', id: '{{id}}', subtab: 'layers' }
 }];
 
-class DatasetShow extends React.Component {
-
+class DatasetsShow extends React.Component {
   /**
    * HELPERS
    * - parseTabs
@@ -78,7 +77,7 @@ class DatasetShow extends React.Component {
 
             <div className="columns small-12 medium-9">
               {subtab === 'edit' &&
-                <DatasetForm
+                <DatasetsForm
                   application={[process.env.APPLICATIONS]}
                   authorization={user.token}
                   dataset={id}
@@ -95,13 +94,13 @@ class DatasetShow extends React.Component {
                 />
               }
 
-              {subtab === 'vocabularies' &&
-                <VocabulariesAssociationForm
-                  application={process.env.APPLICATIONS}
-                  authorization={user.token}
-                  dataset={id}
-                  language="en"
-                />
+              {subtab === 'tags' &&
+                <div>
+                  <TagsForm
+                    dataset={id}
+                    user={user}
+                  />
+                </div>
               }
 
               {subtab === 'widgets' &&
@@ -120,7 +119,7 @@ class DatasetShow extends React.Component {
   }
 }
 
-DatasetShow.propTypes = {
+DatasetsShow.propTypes = {
   id: PropTypes.string,
   subtab: PropTypes.string,
 
@@ -128,4 +127,4 @@ DatasetShow.propTypes = {
   user: PropTypes.object.isRequired
 };
 
-export default DatasetShow;
+export default DatasetsShow;

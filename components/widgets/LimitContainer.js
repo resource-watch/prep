@@ -5,14 +5,13 @@ import debounce from 'lodash/debounce';
 
 // Redux
 import { connect } from 'react-redux';
-import { initStore } from 'store';
+
 import { setLimit } from 'redactions/widgetEditor';
 
 // Maximum value for the query limit
 const LIMIT_MAX_VALUE = 500;
 
 class LimitContainer extends React.Component {
-
   constructor(props) {
     super(props);
     this.state = {

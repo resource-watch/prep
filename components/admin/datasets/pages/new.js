@@ -3,14 +3,14 @@ import { Router } from 'routes';
 import PropTypes from 'prop-types';
 
 // Components
-import DatasetForm from 'components/admin/dataset/form/DatasetForm';
+import DatasetsForm from 'components/datasets/form/DatasetsForm';
 
-function DatasetNew(props) {
+function DatasetsNew(props) {
   const { user } = props;
 
   return (
     <div className="c-datasets-new">
-      <DatasetForm
+      <DatasetsForm
         application={[process.env.APPLICATIONS]}
         authorization={user.token}
         onSubmit={() => Router.pushRoute('admin_data', { tab: 'datasets' })}
@@ -19,9 +19,9 @@ function DatasetNew(props) {
   );
 }
 
-DatasetNew.propTypes = {
+DatasetsNew.propTypes = {
   // Store
   user: PropTypes.object.isRequired
 };
 
-export default DatasetNew;
+export default DatasetsNew;

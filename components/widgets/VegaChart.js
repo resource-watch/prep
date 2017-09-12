@@ -6,20 +6,27 @@ import isEmpty from 'lodash/isEmpty';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import isEqual from 'lodash/isEqual';
+import { toastr } from 'react-redux-toastr';
 
 // Redux
 import { connect } from 'react-redux';
-import { initStore } from 'store';
+
 import { toggleTooltip } from 'redactions/tooltip';
 
 // Components
-import VegaChartTooltip from './VegaChartTooltip';
-import VegaChartLegend from './VegaChartLegend';
+import VegaChartTooltip from 'components/widgets/VegaChartTooltip';
+import VegaChartLegend from 'components/widgets/VegaChartLegend';
+
+// Utils
+import { fetchRasterData } from 'utils/widgets/WidgetHelper';
 
 class VegaChart extends React.Component {
-
   constructor(props) {
     super(props);
+
+    this.state = {
+      vegaConfig: null
+    };
 
     // BINDINGS
     this.triggerResize = debounce(this.triggerResize.bind(this), 250);
@@ -145,7 +152,8 @@ class VegaChart extends React.Component {
     // [2] As the scatter plot can have several points at the same
     //     x position, we want to avoid showing the data of a
     //     random point when not hovering a dot
-    const hasXAxis = !!(vegaConfig.axes && vegaConfig.axes.find(axis => axis.type === 'x'));
+    const xAxis = vegaConfig.axes && vegaConfig.axes.find(axis => axis.type === 'x');
+    const hasXAxis = !!(xAxis && (xAxis.real === undefined || xAxis.real));
     const isScatter = vegaConfig.marks.length === 1 && vegaConfig.marks[0].type === 'symbol';
     if (!hasXAxis || !visData || x === undefined || x === null || isScatter) {
       return this.props.toggleTooltip(false);
@@ -212,8 +220,8 @@ class VegaChart extends React.Component {
 
   setSize() {
     if (this.chartViewportContainer) {
-      this.width = this.chartViewportContainer.offsetWidth;
-      this.height = this.chartViewportContainer.offsetHeight;
+      this.width = this.props.width || this.chartViewportContainer.offsetWidth;
+      this.height = this.props.height || this.chartViewportContainer.offsetHeight;
     }
   }
 
@@ -221,42 +229,74 @@ class VegaChart extends React.Component {
    * Return the Vega configuration of the chart
    * This method is necessary because we need to define the size of
    * the chart, as well as a signal to display a tooltip
-   * @returns {object}
+   * @returns {Promise<object>}
    */
-  getVegaConfig() {
-    const padding = this.props.data.padding || 'strict';
-    const size = {
-      // Please don't change these conditions, the bar chart
-      // needs its height and width to not be overriden to display
-      // properly
-      width: this.props.data.width
-        || this.width - (padding.left && padding.right ? (padding.left + padding.right) : 0),
-      height: this.props.data.height
-        || this.height - (padding.top && padding.bottom ? (padding.top + padding.bottom) : 0)
-    };
+  async getVegaConfig() {
+    // We toggle on the loading but we don't do it off because
+    // it will be done once the parsing of the Vega config is done
+    this.props.toggleLoading(true);
 
-    // This signal is used for the tooltip
-    const signal = {
-      /* eslint-disable */
-      "name": "onMousemove",
-      "streams": [{
-        "type": "mousemove",
-        "expr": "{ x: iscale('x', eventX()), item: eventItem() }"
-      }]
-      /* eslint-enable */
-    };
+    return new Promise((resolve, reject) => {
+      const padding = this.props.data.padding || 'strict';
+      const size = {
+        // Please don't change these conditions, the bar chart
+        // needs its height and width to not be overriden to display
+        // properly
+        width: this.props.data.width
+          || this.width - (padding.left && padding.right ? (padding.left + padding.right) : 0),
+        height: this.props.data.height
+          || this.height - (padding.top && padding.bottom ? (padding.top + padding.bottom) : 0)
+      };
 
-    const config = Object.assign({}, this.props.data, size, { padding });
+      // This signal is used for the tooltip
+      const signal = {
+        /* eslint-disable */
+        "name": "onMousemove",
+        "streams": [{
+          "type": "mousemove",
+          "expr": "{ x: iscale('x', eventX()), item: eventItem() }"
+        }]
+        /* eslint-enable */
+      };
 
-    // If the configuration already has signals, we don't override it
-    // but push a new one instead
-    if (config.signals) {
-      config.signals.push(signal);
-    } else {
-      config.signals = [signal];
-    }
+      const config = Object.assign({}, this.props.data, size, { padding });
 
-    return config;
+      // If the configuration already has signals, we don't override it
+      // but push a new one instead
+      if (config.signals) {
+        config.signals.push(signal);
+      } else {
+        config.signals = [signal];
+      }
+
+      // If the widget represents a raster dataset, we need to fetch
+      // and parse the data
+      if (config.data[0].format && config.data[0].format.band) {
+        fetchRasterData(
+          config.data[0].url,
+          config.data[0].format.band,
+          config.data[0].format.provider
+        )
+          .then((data) => {
+            const dataObj = Object.assign({}, config.data[0]);
+            dataObj.values = data;
+
+            // If we don't remove the format and the URL, Vega won't use
+            // the data we pass in
+            delete dataObj.format;
+            delete dataObj.url;
+
+            resolve(Object.assign(
+              {},
+              config,
+              { data: [dataObj].concat(config.data.slice(1, config.data.length)) }
+            ));
+          })
+          .catch(() => reject('Unable to get the raster data'));
+      } else {
+        resolve(config);
+      }
+    });
   }
 
   /**
@@ -272,7 +312,7 @@ class VegaChart extends React.Component {
 
   parseVega() {
     const theme = this.props.theme || {};
-    const vegaConfig = this.getVegaConfig();
+    const vegaConfig = this.state.vegaConfig;
 
     // While Vega parses the configuration and renders the chart
     // we display a loader
@@ -281,7 +321,10 @@ class VegaChart extends React.Component {
     vega.parse.spec(vegaConfig, theme, (err, chart) => {
       // If there's an error or the component has been unmounted
       // we don't do anything
-      if (err || !this.mounted) return;
+      if (err || !this.mounted) {
+        this.toggleLoading(false);
+        return;
+      }
 
       // We render the chart
       const vis = chart({ el: this.chart, renderer: 'canvas' });
@@ -313,11 +356,14 @@ class VegaChart extends React.Component {
 
   renderChart() {
     this.setSize();
-    this.parseVega();
+    this.getVegaConfig()
+      .then(vegaConfig => this.setState({ vegaConfig }))
+      .then(() => this.parseVega())
+      .catch(err => toastr.error('Error', err)); // TODO: UI feedback
   }
 
   render() {
-    const vegaConfig = this.getVegaConfig();
+    const { vegaConfig } = this.state;
 
     return (
       <div
@@ -326,7 +372,7 @@ class VegaChart extends React.Component {
         ref={(el) => { this.chartViewportContainer = el; }}
       >
         <div ref={(c) => { this.chart = c; }} className="chart" />
-        { this.props.showLegend && vegaConfig.legend
+        { this.props.showLegend && vegaConfig && vegaConfig.legend
           && <VegaChartLegend config={vegaConfig.legend} /> }
       </div>
     );
@@ -334,6 +380,9 @@ class VegaChart extends React.Component {
 }
 
 VegaChart.propTypes = {
+  width: PropTypes.number,
+  height: PropTypes.number,
+
   reloadOnResize: PropTypes.bool.isRequired,
   showLegend: PropTypes.bool,
   // Define the chart data
@@ -348,6 +397,8 @@ VegaChart.propTypes = {
 };
 
 VegaChart.defaultProps = {
+  width: 0,
+  height: 0,
   showLegend: true
 };
 

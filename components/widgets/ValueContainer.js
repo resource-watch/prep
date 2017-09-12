@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { DropTarget } from 'react-dnd';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
-import { initStore } from 'store';
+
 import { setValue, setAggregateFunction } from 'redactions/widgetEditor';
 import ColumnBox from 'components/widgets/ColumnBox';
 
@@ -14,13 +14,12 @@ const boxTarget = {
   }
 };
 
-@DropTarget('columnbox', boxTarget, (connect, monitor) => ({
-  connectDropTarget: connect.dropTarget(),
+@DropTarget('columnbox', boxTarget, (connectDrop, monitor) => ({
+  connectDropTarget: connectDrop.dropTarget(),
   isOver: monitor.isOver(),
   canDrop: monitor.canDrop()
 }))
 class DimensionYContainer extends React.Component {
-
   constructor(props) {
     super(props);
 

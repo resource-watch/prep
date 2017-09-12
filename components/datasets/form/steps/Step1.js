@@ -1,18 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import compact from 'lodash/compact';
 
 // Redux
 import { connect } from 'react-redux';
 
+
 // Constants
-import { PROVIDER_TYPES_DICTIONARY, FORM_ELEMENTS } from 'components/admin/dataset/form/constants';
+import { PROVIDER_TYPES_DICTIONARY, FORM_ELEMENTS } from 'components/datasets/form/constants';
 
 // Components
 import Field from 'components/form/Field';
 import Input from 'components/form/Input';
 import File from 'components/form/File';
 import Select from 'components/form/SelectInput';
-import Title from 'components/ui/Title';
 import Checkbox from 'components/form/Checkbox';
 
 class Step1 extends React.Component {
@@ -53,9 +54,37 @@ class Step1 extends React.Component {
     this.props.onChange({ legend });
   }
 
+  /**
+   * HELPERS
+   * - setProviderOptions
+  */
+  setProviderOptions() {
+    const { basic, dataset } = this.props;
+
+    const options = Object.keys(PROVIDER_TYPES_DICTIONARY).map((key) => {
+      if (basic && !dataset) {
+        if (PROVIDER_TYPES_DICTIONARY[key].basic) {
+          return {
+            label: PROVIDER_TYPES_DICTIONARY[key].label,
+            value: PROVIDER_TYPES_DICTIONARY[key].value
+          };
+        }
+
+        return null;
+      }
+
+      return {
+        label: PROVIDER_TYPES_DICTIONARY[key].label,
+        value: PROVIDER_TYPES_DICTIONARY[key].value
+      };
+    });
+
+    return (basic) ? compact(options) : options;
+  }
+
 
   render() {
-    const { user, columns } = this.props;
+    const { user, columns, basic } = this.props;
     const { dataset } = this.state;
     const { provider } = this.state.form;
 
@@ -74,13 +103,7 @@ class Step1 extends React.Component {
 
     return (
       <fieldset className="c-field-container">
-        {dataset &&
-          <Title className="form-title -big -secondary">
-            Edit dataset
-          </Title>
-        }
-
-        {user.role === 'ADMIN' &&
+        {user.role === 'ADMIN' && !basic &&
           <Field
             ref={(c) => { if (c) FORM_ELEMENTS.elements.published = c; }}
             onChange={value => this.props.onChange({ published: value.checked })}
@@ -95,43 +118,6 @@ class Step1 extends React.Component {
             }}
           >
             {Checkbox}
-          </Field>
-        }
-
-        {user.role === 'ADMIN' ?
-          <Field
-            ref={(c) => { if (c) FORM_ELEMENTS.elements.env = c; }}
-            hint={'Choose "preproduction" to see this dataset it only as admin, "production" option will show it in public site.'}
-            className="-fluid"
-            options={[{ label: 'Pre-production', value: 'preproduction' }, { label: 'Production', value: 'production' }]}
-            onChange={value => this.props.onChange({ env: value })}
-            properties={{
-              name: 'env',
-              label: 'Environment',
-              placeholder: 'Type the columns...',
-              noResultsText: 'Please, type the name of the columns and press enter',
-              promptTextCreator: label => `The name of the column is "${label}"`,
-              default: 'preproduction',
-              value: this.props.form.env
-            }}
-          >
-            {Select}
-          </Field>
-          :
-          <Field
-            ref={(c) => { if (c) FORM_ELEMENTS.elements.env = c; }}
-            hint="Environment"
-            className="-fluid"
-            options={[{ label: 'Pre-production', value: 'preproduction' }, { label: 'Production', value: 'production' }]}
-            properties={{
-              name: 'env',
-              label: 'Environment',
-              hidden: true,
-              default: 'preproduction',
-              value: this.props.form.env
-            }}
-          >
-            {Input}
           </Field>
         }
 
@@ -166,6 +152,21 @@ class Step1 extends React.Component {
         </Field>
 
         <Field
+          ref={(c) => { if (c) FORM_ELEMENTS.elements.geoInfo = c; }}
+          onChange={value => this.props.onChange({ geoInfo: value.checked })}
+          validations={['required']}
+          properties={{
+            name: 'geoInfo',
+            label: 'Does this dataset contain geographical features such as points, polygons or lines?',
+            value: 'geoInfo',
+            defaultChecked: this.props.form.geoInfo,
+            checked: this.props.form.geoInfo
+          }}
+        >
+          {Checkbox}
+        </Field>
+
+        <Field
           ref={(c) => { if (c) FORM_ELEMENTS.elements.provider = c; }}
           onChange={value => this.props.onChange({
             provider: value,
@@ -174,12 +175,7 @@ class Step1 extends React.Component {
           })}
           className="-fluid"
           validations={['required']}
-          options={Object.keys(PROVIDER_TYPES_DICTIONARY).map(key => (
-            {
-              label: PROVIDER_TYPES_DICTIONARY[key].label,
-              value: PROVIDER_TYPES_DICTIONARY[key].value
-            }
-          ))}
+          options={this.setProviderOptions()}
           properties={{
             name: 'provider',
             label: 'Provider',
@@ -198,8 +194,7 @@ class Step1 extends React.Component {
           ****************** CARTODB FIELDS * ***************
           *****************************************************
         */}
-        {
-          isCarto && !dataset &&
+        {isCarto && !dataset &&
           <Field
             ref={(c) => { if (c) FORM_ELEMENTS.elements.cartoAccountUsername = c; }}
             onChange={(value) => {
@@ -226,8 +221,7 @@ class Step1 extends React.Component {
           </Field>
         }
 
-        {
-          isCarto && !dataset &&
+        {isCarto && !dataset &&
           <Field
             ref={(c) => { if (c) FORM_ELEMENTS.elements.tableName = c; }}
             onChange={(value) => {
@@ -254,8 +248,7 @@ class Step1 extends React.Component {
           </Field>
         }
 
-        {
-          isCarto && !!dataset &&
+        {isCarto && !!dataset &&
           <Field
             ref={(c) => { if (c) FORM_ELEMENTS.elements.connectorUrl = c; }}
             validations={['required']}
@@ -278,8 +271,7 @@ class Step1 extends React.Component {
           ****************** GEE FIELDS * ***************
           *****************************************************
         */}
-        {
-          isGee &&
+        {isGee &&
           <Field
             ref={(c) => { if (c) FORM_ELEMENTS.elements.tableName = c; }}
             onChange={value => this.props.onChange({ tableName: value })}
@@ -304,8 +296,7 @@ class Step1 extends React.Component {
           ****************** FEATURE SERVICE ****************
           *****************************************************
         */}
-        {
-          isFeatureservice &&
+        {isFeatureservice &&
           <Field
             ref={(c) => { if (c) FORM_ELEMENTS.elements.connectorUrl = c; }}
             onChange={value => this.props.onChange({ connectorUrl: value })}
@@ -330,8 +321,7 @@ class Step1 extends React.Component {
           ****************** WMS ****************
           *****************************************************
         */}
-        {
-          isWMS &&
+        {isWMS &&
           <Field
             ref={(c) => { if (c) FORM_ELEMENTS.elements.connectorUrl = c; }}
             onChange={value => this.props.onChange({ connectorUrl: value })}
@@ -356,8 +346,7 @@ class Step1 extends React.Component {
           ****************** DOCUMENT ****************
           *****************************************************
         */}
-        {
-          isDocument && !dataset &&
+        {isDocument && !dataset &&
           <Field
             ref={(c) => { if (c) FORM_ELEMENTS.elements.connectorUrl = c; }}
             onChange={(value) => {
@@ -371,6 +360,7 @@ class Step1 extends React.Component {
               type: 'text',
               placeholder: 'Paste a URL here or browse file',
               authorization: this.state.form.authorization,
+              provider: this.state.form.provider,
               default: this.state.form.connectorUrl,
               disabled: !!this.state.dataset,
               required: true
@@ -380,8 +370,7 @@ class Step1 extends React.Component {
           </Field>
         }
 
-        {
-          isDocument && !!dataset &&
+        {isDocument && !!dataset &&
           <Field
             ref={(c) => { if (c) FORM_ELEMENTS.elements.connectorUrl = c; }}
             onChange={(value) => {
@@ -402,8 +391,7 @@ class Step1 extends React.Component {
           </Field>
         }
 
-        {
-          (isJson || isXml) &&
+        {(isJson || isXml) &&
           <Field
             ref={(c) => { if (c) FORM_ELEMENTS.elements.dataPath = c; }}
             onChange={value => this.props.onChange({ dataPath: value })}
@@ -423,8 +411,7 @@ class Step1 extends React.Component {
           </Field>
         }
 
-        {
-          isDocument &&
+        {isDocument &&
           <div className="c-field-row">
             <div className="row l-row">
               <div className="column small-12 medium-6">
@@ -522,8 +509,7 @@ class Step1 extends React.Component {
           </div>
         }
 
-        {
-          this.state.form.provider && dataset && columns.length &&
+        {this.state.form.provider && dataset && !!columns.length &&
           <div className="c-field-row">
             <div className="l-row row">
               <div className="column small-12 medium-6">
@@ -578,7 +564,7 @@ class Step1 extends React.Component {
             </div>
           </div>
         }
-      </fieldset >
+      </fieldset>
     );
   }
 }
@@ -587,6 +573,7 @@ Step1.propTypes = {
   dataset: PropTypes.string,
   form: PropTypes.object,
   columns: PropTypes.array,
+  basic: PropTypes.bool,
   onChange: PropTypes.func,
 
   // Store

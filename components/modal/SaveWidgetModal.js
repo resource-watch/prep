@@ -2,10 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Router } from 'routes';
 import { Autobind } from 'es-decorators';
+import { toastr } from 'react-redux-toastr';
 
 // Redux
 import { connect } from 'react-redux';
-import { initStore } from 'store';
+
 import { toggleModal } from 'redactions/modal';
 
 // Components
@@ -18,7 +19,7 @@ import Spinner from 'components/ui/Spinner';
 import WidgetService from 'services/WidgetService';
 
 // utils
-import { getChartConfig } from 'utils/widgets/WidgetHelper';
+import { getChartConfig, getChartInfo } from 'utils/widgets/WidgetHelper';
 
 const FORM_ELEMENTS = {
   elements: {
@@ -42,7 +43,6 @@ const FORM_ELEMENTS = {
 
 
 class SaveWidgetModal extends React.Component {
-
   constructor(props) {
     super(props);
 
@@ -67,21 +67,34 @@ class SaveWidgetModal extends React.Component {
     this.setState({
       loading: true
     });
-    const { widgetEditor, tableName, dataset } = this.props;
+    const { widgetEditor, tableName, dataset, datasetType, datasetProvider } = this.props;
     const { limit, value, category, color, size, orderBy, aggregateFunction,
-      chartType, filters } = widgetEditor;
+      chartType, filters, areaIntersection, visualizationType, band, layer } = widgetEditor;
 
-    let chartConfig;
-    try {
-      chartConfig = await getChartConfig(widgetEditor, tableName, dataset);
-    } catch (err) {
-      this.setState({
-        saved: false,
-        error: true,
-        errorMessage: 'Unable to generate the configuration of the chart'
-      });
+    let chartConfig = {};
 
-      return;
+    // If the visualization if a map, we don't have any chartConfig
+    if (visualizationType !== 'map') {
+      const chartInfo = getChartInfo(dataset, datasetType, datasetProvider, widgetEditor);
+
+      try {
+        chartConfig = await getChartConfig(
+          dataset,
+          datasetType,
+          tableName,
+          band,
+          datasetProvider,
+          chartInfo
+        );
+      } catch (err) {
+        this.setState({
+          saved: false,
+          error: true,
+          errorMessage: 'Unable to generate the configuration of the chart'
+        });
+
+        return;
+      }
     }
 
     const widgetConfig = {
@@ -89,6 +102,7 @@ class SaveWidgetModal extends React.Component {
         {},
         {
           paramsConfig: {
+            visualizationType,
             limit,
             value,
             category,
@@ -97,7 +111,10 @@ class SaveWidgetModal extends React.Component {
             orderBy,
             aggregateFunction,
             chartType,
-            filters
+            filters,
+            areaIntersection,
+            band,
+            layer: layer && layer.id
           }
         },
         chartConfig
@@ -108,27 +125,18 @@ class SaveWidgetModal extends React.Component {
 
     this.widgetService.saveUserWidget(widgetObj, this.props.dataset, this.props.user.token)
       .then((response) => {
-        if (response.errors) {
-          this.setState({
-            saved: false,
-            loading: false,
-            error: true,
-            errorMessage: response.errors[0].detail
-          });
-        } else {
-          this.setState({
-            saved: true,
-            loading: false,
-            error: false
-          });
-        }
-      }).catch((err) => {
+        if (response.errors) throw new Error(response.errors[0].detail);
+      })
+      .then(() => this.setState({ saved: true, error: false }))
+      .catch((err) => {
         this.setState({
           saved: false,
-          error: true
+          error: true,
+          errorMessage: err.message
         });
-        console.log(err); // eslint-disable-line no-console
-      });
+        toastr.error('Error', err); // eslint-disable-line no-console
+      })
+      .then(() => this.setState({ loading: false }));
   }
 
   @Autobind
@@ -139,7 +147,7 @@ class SaveWidgetModal extends React.Component {
   @Autobind
   handleGoToMyRW() {
     this.props.toggleModal(false);
-    Router.pushRoute('myrw', { tab: 'widgets', subtab: 'my-widgets' });
+    Router.pushRoute('myrw', { tab: 'widgets', subtab: 'my_widgets' });
   }
 
   @Autobind
@@ -154,10 +162,10 @@ class SaveWidgetModal extends React.Component {
     return (
       <div className="c-save-widget-modal">
         {!saved &&
-        <h1 className="c-text -header-normal -thin title">Save widget</h1>
+        <h2>Save widget</h2>
         }
         {saved &&
-        <h1 className="c-text -header-normal -thin title -green">Widget saved!</h1>
+        <h2>Widget saved!</h2>
         }
         <Spinner
           isLoading={loading}
@@ -207,8 +215,8 @@ class SaveWidgetModal extends React.Component {
                   className: '-secondary'
                 }}
               >
-                  Save
-                </Button>
+                Save
+              </Button>
               <Button
                 properties={{
                   disabled: submitting,
@@ -216,8 +224,8 @@ class SaveWidgetModal extends React.Component {
                 }}
                 onClick={this.handleCancel}
               >
-                  Cancel
-                </Button>
+                Cancel
+              </Button>
             </div>
           </form>
         }
@@ -248,6 +256,10 @@ class SaveWidgetModal extends React.Component {
 }
 
 SaveWidgetModal.propTypes = {
+  dataset: PropTypes.string.isRequired,
+  tableName: PropTypes.string.isRequired,
+  datasetType: PropTypes.string,
+  datasetProvider: PropTypes.string,
   // Store
   user: PropTypes.object.isRequired,
   toggleModal: PropTypes.func.isRequired

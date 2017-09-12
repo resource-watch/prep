@@ -5,7 +5,7 @@ import classNames from 'classnames';
 
 // Redux
 import { connect } from 'react-redux';
-import { initStore } from 'store';
+
 import { setSize } from 'redactions/widgetEditor';
 
 // Components
@@ -22,13 +22,12 @@ const boxTarget = {
   }
 };
 
-@DropTarget('columnbox', boxTarget, (connect, monitor) => ({
-  connectDropTarget: connect.dropTarget(),
+@DropTarget('columnbox', boxTarget, (connectDrop, monitor) => ({
+  connectDropTarget: connectDrop.dropTarget(),
   isOver: monitor.isOver(),
   canDrop: monitor.canDrop()
 }))
 class SizeContainer extends React.Component {
-
   setAggregateFunction(value) {
     const newSize = Object.assign(
       {},

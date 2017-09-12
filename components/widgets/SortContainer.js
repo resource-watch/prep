@@ -6,7 +6,7 @@ import { Autobind } from 'es-decorators';
 
 // Redux
 import { connect } from 'react-redux';
-import { initStore } from 'store';
+
 import { setOrderBy } from 'redactions/widgetEditor';
 
 // Components
@@ -24,7 +24,6 @@ const boxTarget = {
   canDrop: monitor.canDrop()
 }))
 class SortContainer extends React.Component {
-
   @Autobind
   handleSetOrderType(orderBy) {
     this.props.setOrderBy(orderBy);

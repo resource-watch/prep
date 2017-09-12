@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Autobind } from 'es-decorators';
 
 // Redux
 import { connect } from 'react-redux';
-import { getDatasets, setFilters } from 'redactions/datasets';
+import { getDatasets, setFilters } from 'redactions/admin/datasets';
 
 // Selectors
 import getFilteredDatasets from 'selectors/admin/datasets';
@@ -25,17 +24,27 @@ import StatusTD from './td/StatusTD';
 import RelatedContentTD from './td/RelatedContentTD';
 import UpdatedAtTD from './td/UpdatedAtTD';
 
-class DatasetTable extends React.Component {
+class DatasetsTable extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.onSearch = this.onSearch.bind(this);
+  }
+
   componentDidMount() {
+    const { getDatasetsFilters } = this.props;
     this.props.setFilters([]);
-    this.props.getDatasets(this.props.application);
+
+    this.props.getDatasets({
+      includes: 'widget,layer,metadata,vocabulary',
+      filters: getDatasetsFilters
+    });
   }
 
   /**
    * Event handler executed when the user search for a dataset
    * @param {string} { value } Search keywords
    */
-  @Autobind
   onSearch(value) {
     if (!value.length) {
       this.props.setFilters([]);
@@ -49,6 +58,8 @@ class DatasetTable extends React.Component {
   }
 
   render() {
+    const { routes } = this.props;
+
     return (
       <div className="c-dataset-table">
         <Spinner className="-light" isLoading={this.props.loading} />
@@ -63,7 +74,7 @@ class DatasetTable extends React.Component {
           }}
           link={{
             label: 'New dataset',
-            route: 'admin_data_detail',
+            route: routes.detail,
             params: { tab: 'datasets', id: 'new' }
           }}
           onSearch={this.onSearch}
@@ -73,24 +84,23 @@ class DatasetTable extends React.Component {
         {!this.props.error && (
           <CustomTable
             columns={[
-              { label: 'Name', value: 'name', td: NameTD },
+              { label: 'Name', value: 'name', td: NameTD, tdProps: { route: routes.detail } },
               { label: 'Status', value: 'status', td: StatusTD },
               { label: 'Published', value: 'published', td: PublishedTD },
               { label: 'Provider', value: 'provider' },
-              { label: 'Environment', value: 'env' },
               { label: 'Updated at', value: 'updatedAt', td: UpdatedAtTD },
-              { label: 'Related content', value: 'status', td: RelatedContentTD }
+              { label: 'Related content', value: 'status', td: RelatedContentTD, tdProps: { route: routes.detail } }
             ]}
             actions={{
               show: true,
               list: [
-                { name: 'Edit', route: 'admin_data_detail', params: { tab: 'datasets', subtab: 'edit', id: '{{id}}' }, show: true, component: EditAction },
-                { name: 'Remove', route: 'admin_data_detail', params: { tab: 'datasets', subtab: 'remove', id: '{{id}}' }, component: DeleteAction, componentProps: { authorization: this.props.authorization } }
+                { name: 'Edit', route: routes.detail, params: { tab: 'datasets', subtab: 'edit', id: '{{id}}' }, show: true, component: EditAction, componentProps: { route: routes.detail } },
+                { name: 'Remove', route: routes.detail, params: { tab: 'datasets', subtab: 'remove', id: '{{id}}' }, component: DeleteAction, componentProps: { authorization: this.props.user.token } }
               ]
             }}
             sort={{
-              field: 'name',
-              value: 1
+              field: 'updatedAt',
+              value: -1
             }}
             filters={false}
             data={this.getDatasets()}
@@ -100,8 +110,6 @@ class DatasetTable extends React.Component {
               pageSize: 20,
               page: 0
             }}
-            onToggleSelectedRow={(ids) => { console.info(ids); }}
-            onRowDelete={(id) => { console.info(id); }}
           />
         )}
       </div>
@@ -109,18 +117,24 @@ class DatasetTable extends React.Component {
   }
 }
 
-DatasetTable.defaultProps = {
-  application: [],
+DatasetsTable.defaultProps = {
+  routes: {
+    index: '',
+    detail: ''
+  },
   columns: [],
   actions: {},
+  getDatasetsFilters: {},
   // Store
   datasets: []
 };
 
-DatasetTable.propTypes = {
-  application: PropTypes.array.isRequired,
-  authorization: PropTypes.string,
+DatasetsTable.propTypes = {
+  routes: PropTypes.object,
+  getDatasetsFilters: PropTypes.object,
+
   // Store
+  user: PropTypes.object,
   loading: PropTypes.bool.isRequired,
   datasets: PropTypes.array.isRequired,
   error: PropTypes.string,
@@ -131,13 +145,14 @@ DatasetTable.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  loading: state.datasets.loading,
+  user: state.user,
+  loading: state.datasets.datasets.loading,
   datasets: getFilteredDatasets(state),
-  error: state.datasets.error
+  error: state.datasets.datasets.error
 });
 const mapDispatchToProps = dispatch => ({
-  getDatasets: () => dispatch(getDatasets()),
+  getDatasets: options => dispatch(getDatasets(options)),
   setFilters: filters => dispatch(setFilters(filters))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(DatasetTable);
+export default connect(mapStateToProps, mapDispatchToProps)(DatasetsTable);

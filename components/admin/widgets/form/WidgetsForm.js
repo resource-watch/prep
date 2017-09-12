@@ -4,8 +4,6 @@ import PropTypes from 'prop-types';
 // Services
 import WidgetsService from 'services/WidgetsService';
 import DatasetsService from 'services/DatasetsService';
-import PartnersService from 'services/PartnersService';
-
 
 import { toastr } from 'react-redux-toastr';
 
@@ -21,10 +19,14 @@ class WidgetsForm extends React.Component {
   constructor(props) {
     super(props);
 
+    const formObj = props.dataset ?
+      Object.assign({}, STATE_DEFAULT.form, { dataset: props.dataset }) :
+      STATE_DEFAULT.form;
+
     this.state = Object.assign({}, STATE_DEFAULT, {
       id: props.id,
       loading: !!props.id,
-      form: STATE_DEFAULT.form
+      form: formObj
     });
 
     // BINDINGS
@@ -39,16 +41,12 @@ class WidgetsForm extends React.Component {
     this.datasetsService = new DatasetsService({
       authorization: props.authorization
     });
-    this.partnersService = new PartnersService({
-      authorization: props.authorization
-    });
   }
 
   componentDidMount() {
     const { id } = this.state;
 
     const promises = [
-      this.partnersService.fetchAllData(),
       this.datasetsService.fetchAllData({})
     ];
 
@@ -59,21 +57,19 @@ class WidgetsForm extends React.Component {
 
     Promise.all(promises)
       .then((response) => {
-        const partners = response[0];
-        const datasets = response[1];
-        const current = response[2];
+        const datasets = response[0];
+        const current = response[1];
 
         this.setState({
           // CURRENT DASHBOARD
           form: (id) ? this.setFormFromParams(current) : this.state.form,
           loading: false,
           // OPTIONS
-          partners: partners.map(p => ({ label: p.name, value: p.id })),
           datasets: datasets.map(p => ({ label: p.name, value: p.id }))
         });
       })
       .catch((err) => {
-        console.error(err);
+        toastr.error(err);
       });
   }
 
@@ -101,26 +97,32 @@ class WidgetsForm extends React.Component {
           // Start the submitting
           this.setState({ submitting: true });
 
-          // Save data
-          this.service.saveData({
+          const obj = {
+            dataset: this.state.form.dataset,
             id: id || '',
             type: (id) ? 'PATCH' : 'POST',
             body: this.state.form
-          })
+          };
+
+          if (obj.body.sourceUrl === '') {
+            delete obj.body.sourceUrl;
+          }
+
+          // Save data
+          this.service.saveData(obj)
             .then((data) => {
-              toastr.success('Success', `The widget "${data.id}" - "${data.title}" has been uploaded correctly`);
+              toastr.success('Success', `The widget "${data.id}" - "${data.name}" has been uploaded correctly`);
 
               if (this.props.onSubmit) this.props.onSubmit();
             })
             .catch((err) => {
               this.setState({ submitting: false });
-              toastr.error('Error', `Oops! There was an error, try again`);
-              console.error(err);
+              toastr.error('Error', `Oops! There was an error, try again. ${err}`);
             });
         } else {
           this.setState({
             step: this.state.step + 1
-          }, () => console.info(this.state));
+          });
         }
       } else {
         toastr.error('Error', 'Fill all the required fields');
@@ -130,7 +132,7 @@ class WidgetsForm extends React.Component {
 
   onChange(obj) {
     const form = Object.assign({}, this.state.form, obj);
-    this.setState({ form }, () => console.info(this.state.form));
+    this.setState({ form });
   }
 
   onStepChange(step) {
@@ -143,20 +145,6 @@ class WidgetsForm extends React.Component {
 
     Object.keys(params).forEach((f) => {
       switch (f) {
-        case 'partner': {
-          if (params[f]) {
-            newForm.partner_id = params[f].id;
-          }
-          break;
-        }
-        case 'image': {
-          // TODO: if the API doesn't send it we won't need to handle it
-          if (params[f] && params[f] !== '/images/original/missing.png') {
-            newForm[f] = params[f];
-          }
-          break;
-        }
-
         default: {
           if ((typeof params[f] !== 'undefined' || params[f] !== null) ||
               (typeof this.state.form[f] !== 'undefined' || this.state.form[f] !== null)) {
@@ -200,7 +188,8 @@ class WidgetsForm extends React.Component {
 WidgetsForm.propTypes = {
   authorization: PropTypes.string,
   id: PropTypes.string,
-  onSubmit: PropTypes.func
+  onSubmit: PropTypes.func,
+  dataset: PropTypes.string // ID of the dataset that should be pre-selected
 };
 
 export default WidgetsForm;

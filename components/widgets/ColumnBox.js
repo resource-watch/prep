@@ -6,7 +6,7 @@ import classNames from 'classnames';
 
 // Store
 import { connect } from 'react-redux';
-import { initStore } from 'store';
+
 import { removeFilter, removeColor, removeCategory, removeValue, removeSize, removeOrderBy, setOrderBy } from 'redactions/widgetEditor';
 import { toggleTooltip } from 'redactions/tooltip';
 
@@ -38,15 +38,14 @@ const columnBoxSource = {
 /**
  * Specifies the props to inject into your component.
  */
-function collect(connect, monitor) {
+function collect(connectDrop, monitor) {
   return {
-    connectDragSource: connect.dragSource(),
+    connectDragSource: connectDrop.dragSource(),
     isDragging: monitor.isDragging()
   };
 }
 
 class ColumnBox extends React.Component {
-
   /**
    * Return the position of the click within the page taking
    * into account the scroll (relative to the page, not the
@@ -345,7 +344,7 @@ class ColumnBox extends React.Component {
           name={iconName}
           className="-smaller"
         />
-        {(name.length > NAME_MAX_LENGTH) ? `${name.substr(0, NAME_MAX_LENGTH - 1)}...` : name}
+        { (name.length > NAME_MAX_LENGTH) ? `${name.substr(0, NAME_MAX_LENGTH - 1)}...` : name }
         {isA === 'value' && aggregateFunction &&
           <div className="aggregate-function">
             {aggregateFunction}
@@ -367,7 +366,10 @@ class ColumnBox extends React.Component {
           </div>
         }
         {closable &&
-          <button onClick={this.triggerClose}>
+          <button
+            type="button"
+            onClick={this.triggerClose}
+          >
             <Icon
               name="icon-cross"
               className="-smaller close-button"
@@ -375,7 +377,11 @@ class ColumnBox extends React.Component {
           </button>
         }
         {configurable && isConfigurable &&
-          <button onClick={this.triggerConfigure} ref={(node) => { this.settingsButton = node; }}>
+          <button
+            type="button"
+            onClick={this.triggerConfigure}
+            ref={(node) => { this.settingsButton = node; }}
+          >
             <Icon
               name="icon-cog"
               className="-smaller configure-button"

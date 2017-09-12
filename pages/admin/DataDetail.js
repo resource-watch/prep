@@ -1,16 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { singular } from 'pluralize';
+import { toastr } from 'react-redux-toastr';
+
+// Redux
 import withRedux from 'next-redux-wrapper';
 import { initStore } from 'store';
-import { bindActionCreators } from 'redux';
-import { setUser } from 'redactions/user';
-import { singular } from 'pluralize';
 
 // Utils
 import { capitalizeFirstLetter } from 'utils/utils';
 
 // Services
-import DatasetService from 'services/DatasetService';
+import DatasetsService from 'services/DatasetsService';
 import WidgetsService from 'services/WidgetsService';
 import LayersService from 'services/LayersService';
 
@@ -20,96 +21,77 @@ import Layout from 'components/admin/layout/Layout';
 import Breadcrumbs from 'components/ui/Breadcrumbs';
 
 // Tabs
-import DatasetTab from 'components/admin/dataset/DatasetTab';
+import DatasetsTab from 'components/admin/datasets/DatasetsTab';
 import WidgetsTab from 'components/admin/widgets/WidgetsTab';
 import LayersTab from 'components/admin/layers/LayersTab';
 
-// Components
-import Title from 'components/ui/Title';
-
 class DataDetail extends Page {
-  static async getInitialProps({ asPath, pathname, req, store, query, isServer }) {
-    const tab = query.tab || 'datasets';
-    const { id, subtab } = query;
-    const url = { asPath, pathname };
-    const data = {};
-    const { user } = isServer ? req : store.getState();
+  constructor(props) {
+    super(props);
 
-    if (isServer) {
-      store.dispatch(setUser(user));
+    const { tab, id, subtab, dataset } = props.url.query;
+
+    this.state = {
+      tab,
+      id,
+      subtab,
+      data: {},
+      dataset
+    };
+
+    this.service = null;
+
+    switch (tab) {
+      case 'datasets':
+        if (id !== 'new') {
+          this.service = new DatasetsService();
+        }
+        break;
+
+      case 'widgets':
+        if (id !== 'new') {
+          this.service = new WidgetsService();
+        }
+        break;
+
+      case 'layers':
+        if (id !== 'new') {
+          this.service = new LayersService();
+        }
+        break;
+
+      default:
     }
-
-    return { user, tab, id, subtab, url, data };
   }
 
-  // constructor(props) {
-  //   super(props);
+  componentDidMount() {
+    const { id } = this.state;
 
-  //   const { tab, id, subtab } = props.url.query;
+    if (this.service) {
+      // Fetch the dataset / layer / widget depending on the tab
+      this.service.fetchData({ id })
+        .then((data) => {
+          this.setState({ data });
+        })
+        .catch((err) => {
+          toastr.error('Error', err);
+        });
+    }
+  }
 
-  //   this.state = {
-  //     tab,
-  //     id,
-  //     subtab,
-  //     data: {}
-  //   };
+  componentWillReceiveProps(nextProps) {
+    const { tab, id, subtab, dataset } = nextProps.url.query;
 
-  //   this.service = null;
+    this.setState({ tab, id, subtab, dataset });
+  }
 
-  //   switch (tab) {
-  //     case 'datasets':
-  //       if (id !== 'new') {
-  //         this.service = new DatasetService(id, {
-  //           apiURL: process.env.WRI_API_URL
-  //         });
-  //       }
-  //       break;
-
-  //     case 'widgets':
-  //       if (id !== 'new') {
-  //         console.log(id);
-  //         this.service = new WidgetsService();
-  //       }
-  //       break;
-
-  //     case 'layers':
-  //       if (id !== 'new') {
-  //         this.service = new LayersService();
-  //       }
-  //       break;
-
-  //     default:
-
-  //   }
-  // }
-
-  // componentWillMount() {
-  //   const { id } = this.state;
-
-  //   if (this.service) {
-  //     // Fetch the dataset / layer / widget depending on the tab
-  //     this.service.fetchData({ id })
-  //       .then((data) => {
-  //         this.setState({ data });
-  //       })
-  //       .catch((err) => {
-  //         console.error(err);
-  //       });
-  //   }
-  // }
-
-  // componentWillReceiveProps(nextProps) {
-  //   const { tab, id, subtab } = nextProps.url.query;
-
-  //   this.setState({ tab, id, subtab });
-  // }
 
   /**
    * HELPERS
    * - getName
   */
   getName() {
-    const { tab, id, data } = this.props;
+    const { tab, id, data } = this.state;
 
     if (id === 'new') {
       return `New ${singular(tab)}`;
@@ -119,11 +101,12 @@ class DataDetail extends Page {
       return data.name;
     }
 
-    return null;
+    return '-';
   }
 
   render() {
-    const { user, tab, id, subtab, url } = this.props;
+    const { url, user } = this.props;
+    const { tab, subtab, id, dataset } = this.state;
 
     return (
       <Layout
@@ -135,37 +118,36 @@ class DataDetail extends Page {
         {/* PAGE HEADER */}
         <div className="c-page-header -admin">
           <div className="l-container">
-            <div className="page-header-content">
-              <Breadcrumbs
-                items={[{ name: capitalizeFirstLetter(tab), route: 'admin_data', params: { tab } }]}
-              />
-              <Title className="-primary -huge page-header-title" >
-                {this.getName()}
-              </Title>
+            <div className="row">
+              <div className="column small-12">
+                <div className="page-header-content">
+                  <Breadcrumbs
+                    items={[{ name: capitalizeFirstLetter(tab), route: 'admin_data', params: { tab } }]}
+                  />
+                  <h1>{this.getName()}</h1>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
         <div className="c-page-section">
           <div className="l-container">
-            {tab === 'datasets' &&
-              <DatasetTab tab={tab} subtab={subtab} id={id} />
-            }
+            <div className="row">
+              <div className="column small-12">
+                {tab === 'datasets' &&
+                  <DatasetsTab tab={tab} subtab={subtab} id={id} />
+                }
 
-            {tab === 'widgets' &&
-              <WidgetsTab tab={tab} subtab={subtab} id={id} />
-            }
+                {tab === 'widgets' &&
+                  <WidgetsTab tab={tab} subtab={subtab} id={id} dataset={dataset} />
+                }
 
-            {tab === 'layers' &&
-              <LayersTab tab={tab} subtab={subtab} id={id} />
-            }
-
-            {tab === 'dashboards' &&
-              <h2>Dashboards</h2>
-            }
-
-            {tab === 'vocabularies' &&
-              <h2>Vocabularies</h2>
-            }
+                {tab === 'layers' &&
+                  <LayersTab tab={tab} subtab={subtab} id={id} dataset={dataset} />
+                }
+              </div>
+            </div>
           </div>
         </div>
       </Layout>
@@ -175,15 +157,8 @@ class DataDetail extends Page {
 
 DataDetail.propTypes = {
   user: PropTypes.object,
-  url: PropTypes.object,
-  data: PropTypes.object,
-  tab: PropTypes.string,
-  subtab: PropTypes.string,
-  id: PropTypes.string
+  url: PropTypes.object
 };
 
-const mapStateToProps = state => ({
-  user: state.user
-});
 
-export default withRedux(initStore, mapStateToProps, null)(DataDetail);
+export default withRedux(initStore, null, null)(DataDetail);

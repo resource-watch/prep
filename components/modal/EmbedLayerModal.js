@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { toastr } from 'react-redux-toastr';
 
 class EmbedLayerModal extends React.Component {
   constructor(props) {
@@ -17,28 +18,32 @@ class EmbedLayerModal extends React.Component {
       document.execCommand('copy');
       this.setState({ copied: true });
     } catch (err) {
-      console.warn('Oops, unable to copy');
+      toastr.warning('Oops, unable to copy');
     }
   }
 
   render() {
-    const { layerId } = this.props;
+    const { protocol, hostname, port } = window && window.location ? window.location : {};
+    const embedHost = window && window.location ? `${protocol}//${hostname}${port !== '' ? `:${port}` : port}` : '';
     return (
       <div className="c-embed-layer-modal">
-        <h1 className="c-text -header-big -thin title">Share into my web</h1>
+        <h2>Share into my web</h2>
         <p>You may include this content on your webpage. To do this, copy the following html
         code and insert it into the source code of your page:</p>
-        <h5>Code to embed</h5>
         <div className="url-container">
-          <input
-            ref={(n) => { this.input = n; }}
-            value={`<iframe src="https://staging.resourcewatch.org/embed/layer/${layerId}" width="100%" height="474px" frameBorder="0"></iframe>`}
-            className="url"
-            readOnly
-          />
-          <button className="c-btn -primary -filled" onClick={() => this.onCopyClick()}>
-            Copy
-          </button>
+          <div className="c-field">
+            <label htmlFor="embed-url">Code to embed</label>
+            <input
+              id="embed-url"
+              ref={(n) => { this.input = n; }}
+              value={`<iframe src="${embedHost}/embed/layers?layers=${encodeURIComponent(JSON.stringify(this.props.layerGroups))}" width="100%" height="474px" frameBorder="0"></iframe>`}
+              className="url"
+              readOnly
+            />
+            <button className="c-btn -primary" onClick={() => this.onCopyClick()}>
+              Copy
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -46,7 +51,7 @@ class EmbedLayerModal extends React.Component {
 }
 
 EmbedLayerModal.propTypes = {
-  layerId: PropTypes.string.isRequired
+  layerGroups: PropTypes.array.isRequired
 };
 
 export default EmbedLayerModal;

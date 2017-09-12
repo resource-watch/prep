@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 
 // Redux
 import { connect } from 'react-redux';
-import { initStore } from 'store';
+
 
 // Components
-import DatasetIndex from 'components/admin/dataset/pages/index';
-import DatasetNew from 'components/admin/dataset/pages/new';
-import DatasetShow from 'components/admin/dataset/pages/show';
+import DatasetIndex from 'components/admin/datasets/pages/index';
+import DatasetNew from 'components/admin/datasets/pages/new';
+import DatasetShow from 'components/admin/datasets/pages/show';
 
 function DatasetTab(props) {
   const { tab, subtab, id, user } = props;

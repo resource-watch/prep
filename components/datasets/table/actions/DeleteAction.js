@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 // SERVICES
 import DatasetsService from 'services/DatasetsService';
@@ -6,7 +7,6 @@ import { toastr } from 'react-redux-toastr';
 
 
 class DeleteAction extends React.Component {
-
   constructor(props) {
     super(props);
 
@@ -20,7 +20,10 @@ class DeleteAction extends React.Component {
   }
 
   handleOnClickDelete(e) {
-    e && e.preventDefault() && e.stopPropagation();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
 
     const { data } = this.props;
 
@@ -32,28 +35,26 @@ class DeleteAction extends React.Component {
             toastr.success('Success', `The dataset "${data.id}" - "${data.name}" has been removed correctly`);
           })
           .catch((err) => {
-            toastr.error('Error', `The dataset "${data.id}" - "${data.name}" was not deleted. Try again`);
-            console.error(err);
+            toastr.error('Error', `The dataset "${data.id}" - "${data.name}" was not deleted. Try again. ${err}`);
           });
-      },
-      onCancel: () => console.info('canceled')
+      }
     });
   }
 
   render() {
     return (
       <span>
-        <a href="#delete-dataset" onClick={this.handleOnClickDelete}> Remove </a>
+        <a className="c-btn" href="#delete-dataset" onClick={this.handleOnClickDelete}> Remove </a>
       </span>
     );
   }
 }
 
 DeleteAction.propTypes = {
-  data: React.PropTypes.object,
+  data: PropTypes.object,
 
-  authorization: React.PropTypes.string,
-  onRowDelete: React.PropTypes.func
+  authorization: PropTypes.string,
+  onRowDelete: PropTypes.func
 };
 
 export default DeleteAction;

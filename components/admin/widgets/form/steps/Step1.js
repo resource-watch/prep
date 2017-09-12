@@ -1,5 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classnames from 'classnames';
+
+import { toastr } from 'react-redux-toastr';
 
 // Constants
 import { FORM_ELEMENTS, CONFIG_TEMPLATE, CONFIG_TEMPLATE_OPTIONS } from 'components/admin/widgets/form/constants';
@@ -21,7 +24,7 @@ class Step1 extends React.Component {
     this.state = {
       id: props.id,
       form: props.form,
-      mode: 'advanced'
+      mode: 'editor'
     };
 
     // BINDINGS
@@ -44,15 +47,19 @@ class Step1 extends React.Component {
     // Reset FORM_ELEMENTS
     FORM_ELEMENTS.elements = {};
 
-    return (
-      <div>
-        <fieldset className="c-field-container">
+    const editorFieldContainerClass = classnames({
+      '-expanded': this.state.mode === 'editor'
+    });
 
+    return (
+      <fieldset className="c-field-container">
+        <fieldset className="c-field-container">
           {/* DATASET */}
           <Field
             ref={(c) => { if (c) FORM_ELEMENTS.elements.dataset = c; }}
             onChange={value => this.props.onChange({
-              dataset: value
+              dataset: value,
+              widgetConfig: {}
             })}
             validations={['required']}
             className="-fluid"
@@ -81,39 +88,6 @@ class Step1 extends React.Component {
               type: 'text',
               required: true,
               default: this.state.form.name
-            }}
-          >
-            {Input}
-          </Field>
-
-          {/* SLUG */}
-          <Field
-            ref={(c) => { if (c) FORM_ELEMENTS.elements.slug = c; }}
-            onChange={value => this.props.onChange({ slug: value })}
-            validations={['required']}
-            className="-fluid"
-            properties={{
-              name: 'slug',
-              label: 'Slug',
-              type: 'text',
-              required: true,
-              default: this.state.form.slug
-            }}
-          >
-            {Input}
-          </Field>
-
-          {/* QUERY */}
-          <Field
-            ref={(c) => { if (c) FORM_ELEMENTS.elements.queryUrl = c; }}
-            onChange={value => this.props.onChange({ queryUrl: value })}
-            className="-fluid"
-            properties={{
-              name: 'queryUrl',
-              label: 'Query',
-              type: 'text',
-              required: true,
-              default: this.state.form.queryUrl
             }}
           >
             {Input}
@@ -149,67 +123,88 @@ class Step1 extends React.Component {
             {Checkbox}
           </Field>
 
+          {/* DEFAULT */}
+          <Field
+            ref={(c) => { if (c) FORM_ELEMENTS.elements.default = c; }}
+            onChange={value => this.props.onChange({ default: value.checked })}
+            properties={{
+              name: 'default',
+              label: 'Do you want to set this widget as default?',
+              value: 'default',
+              title: 'Default',
+              defaultChecked: this.props.form.default,
+              checked: this.props.form.default
+            }}
+          >
+            {Checkbox}
+          </Field>
+
         </fieldset>
 
-        {/* {this.state.form.dataset && */}
-        <fieldset className="c-field-container">
-          {/* <div className="l-row row align-right">
-            <div className="column shrink">
-              <SwitchOptions
-                selected={this.state.mode}
-                options={[{
-                  value: 'advanced',
-                  label: 'Advanced'
-                }, {
-                  value: 'editor',
-                  label: 'Editor'
-                }]}
-                onChange={selected => this.triggerChangeMode(selected.value)}
-              />
+        {this.state.form.dataset &&
+          <fieldset className={`c-field-container ${editorFieldContainerClass}`}>
+            <div className="l-row row align-right">
+              <div className="column shrink">
+                <SwitchOptions
+                  selected={this.state.mode}
+                  options={[{
+                    value: 'advanced',
+                    label: 'Advanced'
+                  }, {
+                    value: 'editor',
+                    label: 'Editor'
+                  }]}
+                  onChange={selected => this.triggerChangeMode(selected.value)}
+                />
+              </div>
             </div>
-          </div> */}
 
-          {this.state.mode === 'editor' &&
-            <WidgetEditor
-              dataset={this.state.form.dataset}
-              mode="dataset"
-              showSaveButton={false}
-              onChange={(value) => { this.props.onChange({ widgetConfig: value }); }}
-            />
-          }
+            {this.state.mode === 'editor' &&
+              <WidgetEditor
+                dataset={this.state.form.dataset}
+                mode="dataset"
+                showSaveButton={false}
+                onChange={(value) => { this.props.onChange({ widgetConfig: value }); }}
+                onError={() => {
+                  toastr.error('Error', 'This dataset doesn\'t allow editor mode');
+                  this.setState({ mode: 'advanced' });
+                }}
+              />
+            }
 
-          {this.state.mode === 'advanced' &&
-            <Field
-              onChange={value => this.props.onChange({ widgetConfig: CONFIG_TEMPLATE[value] })}
-              options={CONFIG_TEMPLATE_OPTIONS}
-              properties={{
-                name: 'template',
-                label: 'Template',
-                instanceId: 'selectTemplate'
-              }}
-            >
-              {Select}
-            </Field>
-          }
+            {this.state.mode === 'advanced' &&
+              <Field
+                onChange={value => this.props.onChange({
+                  widgetConfig: CONFIG_TEMPLATE[value] || {}
+                })}
+                options={CONFIG_TEMPLATE_OPTIONS}
+                properties={{
+                  name: 'template',
+                  label: 'Template',
+                  instanceId: 'selectTemplate'
+                }}
+              >
+                {Select}
+              </Field>
+            }
 
-          {this.state.mode === 'advanced' &&
-            <Field
-              ref={(c) => { if (c) FORM_ELEMENTS.elements.widgetConfig = c; }}
-              onChange={value => this.props.onChange({ widgetConfig: value })}
-              properties={{
-                name: 'widgetConfig',
-                label: 'Widget config',
-                type: 'textarea',
-                default: this.state.form.widgetConfig,
-                value: this.state.form.widgetConfig
-              }}
-            >
-              {Code}
-            </Field>
-          }
-        </fieldset>
-        {/* } */}
-      </div>
+            {this.state.mode === 'advanced' &&
+              <Field
+                ref={(c) => { if (c) FORM_ELEMENTS.elements.widgetConfig = c; }}
+                onChange={value => this.props.onChange({ widgetConfig: value })}
+                properties={{
+                  name: 'widgetConfig',
+                  label: 'Widget config',
+                  default: this.state.form.widgetConfig,
+                  value: this.state.form.widgetConfig
+                }}
+              >
+                {Code}
+              </Field>
+            }
+          </fieldset>
+        }
+      </fieldset>
     );
   }
 }

@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { Autobind } from 'es-decorators';
 import { DragDropContext } from 'react-dnd';
+import { toastr } from 'react-redux-toastr';
 
 // Redux
 import { connect } from 'react-redux';
-import { initStore } from 'store';
+
 import { toggleModal, setModalOptions } from 'redactions/modal';
-import { setChartType } from 'redactions/widgetEditor';
+import { setChartType, setAreaIntersection } from 'redactions/widgetEditor';
 
 // Components
 import FilterContainer from 'components/widgets/FilterContainer';
@@ -16,19 +17,124 @@ import DimensionsContainer from 'components/widgets/DimensionsContainer';
 import FieldsContainer from 'components/widgets/FieldsContainer';
 import SortContainer from 'components/widgets/SortContainer';
 import LimitContainer from 'components/widgets/LimitContainer';
+import CustomSelect from 'components/ui/CustomSelect';
 import Select from 'components/form/SelectInput';
 import SaveWidgetModal from 'components/modal/SaveWidgetModal';
 import HowToWidgetEditorModal from 'components/modal/HowToWidgetEditorModal';
+import UploadAreaIntersectionModal from 'components/modal/UploadAreaIntersectionModal';
+import Spinner from 'components/ui/Spinner';
+
+// Services
+import AreasService from 'services/AreasService';
+import UserService from 'services/UserService';
+
+const AREAS = [
+  {
+    label: 'Custom area',
+    value: 'custom',
+    items: [
+      {
+        label: 'Upload new area',
+        value: 'upload',
+        as: 'Custom area'
+      }
+    ]
+  }
+];
 
 @DragDropContext(HTML5Backend)
 class ChartEditor extends React.Component {
+  /**
+   * Return the geostore id associated with the country's ISO
+   * NOTE: errors are not caught intentionally
+   * @param {string} iso Valid 3-letter ISO
+   * @returns {Promise<string>}
+   */
+  static getCountryGeostoreId(iso) {
+    return fetch(`${process.env.WRI_API_URL}/geostore/admin/${iso}`)
+      .then((response) => {
+        if (response.ok) return response.json();
+        throw new Error(`Unable to get the geostore id associated with the ISO ${iso}`);
+      })
+      .then(({ data }) => data.id);
+  }
 
   constructor(props) {
     super(props);
 
     this.state = {
-      areaOptions: []
+      areaOptions: [],
+      loadingAreaIntersection: false,
+      loadingUserAreas: false
     };
+
+    // Services
+    this.areasService = new AreasService({ apiURL: process.env.WRI_API_URL });
+    this.userService = new UserService({ apiURL: process.env.WRI_API_URL });
+  }
+
+  /**
+  * COMPONENT LIFECYCLE
+  * - componentDidMount
+  */
+  componentDidMount() {
+    if (this.props.hasGeoInfo) {
+      this.fetchAreas();
+      if (this.props.user.id) { // Only try to load the user areas when an user is logged in
+        this.fetchUserAreas();
+      }
+    }
+  }
+
+  /**
+   * Event handler executed when the selected area
+   * intersection is changed
+   * @param {{ label: string, value: string }} item Option of the selector
+   */
+  @Autobind
+  async onChangeAreaIntersection(item) {
+    return new Promise((resolve) => {
+      // The user unselected the option
+      if (!item) {
+        this.props.setAreaIntersection(null);
+      } else if (item.value === 'upload') {
+        this.props.toggleModal(true, {
+          children: UploadAreaIntersectionModal,
+          childrenProps: {
+            onUploadArea: (id) => {
+              // We close the modal
+              this.props.toggleModal(false, {});
+
+              // We save the ID of the area
+              this.props.setAreaIntersection(id);
+
+              resolve(true);
+            }
+          },
+          onCloseModal: () => resolve(false)
+        });
+      } else if (item.isGeostore) {
+        // The user selected a custom area that is not a country
+        this.props.setAreaIntersection(item.value);
+        resolve(true);
+      } else {
+        this.setState({ loadingAreaIntersection: true });
+        ChartEditor.getCountryGeostoreId(item.value)
+          .then((id) => {
+            this.props.setAreaIntersection(id);
+            resolve(true);
+          })
+          .catch((err) => {
+            // In case of an error, we prevent the selector from setting
+            // the area as selected
+            resolve(false);
+
+            // TODO: improve this 💩
+            toastr.error('Error', `Unable to filter with this country. ${err}`);
+          })
+          .then(() => this.setState({ loadingAreaIntersection: false }));
+      }
+    });
   }
 
   @Autobind
@@ -42,6 +148,8 @@ class ChartEditor extends React.Component {
       children: SaveWidgetModal,
       childrenProps: {
         dataset: this.props.dataset,
+        datasetType: this.props.datasetType,
+        datasetProvider: this.props.datasetProvider,
         tableName: this.props.tableName
       }
     };
@@ -64,9 +172,47 @@ class ChartEditor extends React.Component {
     this.props.setModalOptions(options);
   }
 
-  @Autobind
-  handleShareEmbed() {
+  /**
+   * Fetch the list of the areas for the area intersection
+   * filter
+   */
+  fetchAreas() {
+    this.setState({ loadingAreaIntersection: true });
 
+    // When this resolves, we'll also be able to display the countries
+    this.areasService.fetchCountries()
+      .then(({ data }) => {
+        this.setState({
+          areaOptions: [...this.state.areaOptions, ...AREAS, ...data]
+        });
+      })
+      // We don't really care if the countries don't load, we can still
+      // let the user use a custom area
+      .catch(err => toastr.error('Error', err))
+      .then(() => this.setState({ loadingAreaIntersection: false }));
+  }
+
+  /**
+   * Fetchs the user areas
+   */
+  fetchUserAreas() {
+    this.setState({ loadingUserAreas: true });
+    this.userService.getUserAreas(this.props.user.token)
+      .then((response) => {
+        const userAreas = response.map(val => ({
+          label: val.attributes.name,
+          value: val.attributes.geostore ? val.attributes.geostore : val.attributes.iso.country,
+          isGeostore: val.attributes.geostore
+        }));
+        this.setState({
+          loadingUserAreas: false,
+          areaOptions: [...this.state.areaOptions, ...userAreas]
+        });
+      })
+      .catch((err) => {
+        this.setState({ loadingUserAreas: false });
+        toastr.error('Error loading user areas', err);
+      });
   }
 
   render() {
@@ -78,55 +224,61 @@ class ChartEditor extends React.Component {
       tableViewMode,
       user,
       mode,
-      showSaveButton
-     } = this.props;
-    const { chartType, fields, category, value, areaIntersection } = widgetEditor;
-    const { areaOptions } = this.state;
-
+      showSaveButton,
+      hasGeoInfo
+    } = this.props;
+    const { chartType, fields, category, value } = widgetEditor;
+    const { areaOptions, loadingAreaIntersection } = this.state;
     const showSaveButtonFlag =
       chartType && category && value && user && user.token && showSaveButton;
     const showUpdateButton = showSaveButtonFlag;
-
     const chartOptions = (
-        jiminy
-        && jiminy.general
-        && jiminy.general.map(val => ({ label: val, value: val }))
-      ) || [];
+      jiminy
+      && jiminy.general
+      && jiminy.general.map(val => ({ label: val, value: val }))
+    ) || [];
 
     return (
       <div className="c-chart-editor">
         <div className="selectors-container">
           {!tableViewMode &&
             <div className="chart-type">
-              <h5>Chart style</h5>
-              <Select
-                properties={{
-                  name: 'chart-type',
-                  value: chartType,
-                  default: chartType
-                }}
-                options={chartOptions}
-                onChange={this.handleChartTypeChange}
-              />
+              <div className="c-field">
+                <label htmlFor="chart-style-select">
+                  Chart style
+                </label>
+                <Select
+                  id="chart-style-select"
+                  properties={{
+                    name: 'chart-type',
+                    value: chartType,
+                    default: chartType
+                  }}
+                  options={chartOptions}
+                  onChange={this.handleChartTypeChange}
+                />
+              </div>
             </div>
           }
-          <div className="area-intersection">
-            <h5>Area intersection</h5>
-            <Select
-              properties={{
-                className: 'area-intersection-selector',
-                name: 'area-intersection',
-                value: areaIntersection,
-                default: areaIntersection
-              }}
-              options={areaOptions}
-              onChange={this.handleAreaIntersectionChange}
-            />
-          </div>
+          {hasGeoInfo &&
+            <div className="area-intersection">
+              <div className="c-field">
+                <label htmlFor="area-intersection-select">
+                  Area intersection { loadingAreaIntersection && <Spinner isLoading className="-light -small -inline" /> }
+                </label>
+                <CustomSelect
+                  id="area-intersection-select"
+                  placeholder="Select area"
+                  options={areaOptions}
+                  onValueChange={this.onChangeAreaIntersection}
+                  allowNonLeafSelection={false}
+                  waitForChangeConfirmation
+                />
+              </div>
+            </div>
+          }
         </div>
-        <div className="text-container">
-          Drag and drop elements from the list to the boxes:
-        </div>
+        <p>Drag and drop elements from the list to the boxes:</p>
         <div className="actions-div">
           {fields &&
             <FieldsContainer
@@ -147,7 +299,8 @@ class ChartEditor extends React.Component {
         </div>
         <div className="save-widget-container">
           <button
-            className="c-button -primary"
+            type="button"
+            className="c-button -secondary"
             onClick={this.handleNeedHelp}
           >
             Need help?
@@ -155,24 +308,17 @@ class ChartEditor extends React.Component {
           {showSaveButtonFlag && mode === 'save' &&
           <a
             role="button"
+            className="c-button -primary"
             tabIndex={-2}
             onClick={this.handleSaveWidget}
           >
             Save widget
           </a>
           }
-          {mode === 'update' &&
-          <a
-            role="button"
-            tabIndex={-1}
-            onClick={this.handleShareEmbed}
-          >
-            Share/embed
-          </a>
-          }
           {showUpdateButton && mode === 'update' &&
           <a
             role="button"
+            className="c-button -primary"
             tabIndex={0}
             onClick={this.handleUpdateWidget}
           >
@@ -185,12 +331,14 @@ class ChartEditor extends React.Component {
   }
 }
 
-
 ChartEditor.propTypes = {
-  mode: PropTypes.string.isRequired, // save | update
+  mode: PropTypes.oneOf(['save', 'update']).isRequired,
   tableName: PropTypes.string.isRequired,
+  hasGeoInfo: PropTypes.bool.isRequired,
   jiminy: PropTypes.object,
   dataset: PropTypes.string.isRequired, // Dataset ID
+  datasetType: PropTypes.string,
+  datasetProvider: PropTypes.string,
   tableViewMode: PropTypes.bool.isRequired,
   showSaveButton: PropTypes.bool.isRequired,
   // Store
@@ -199,6 +347,7 @@ ChartEditor.propTypes = {
   setChartType: PropTypes.func.isRequired,
   toggleModal: PropTypes.func.isRequired,
   setModalOptions: PropTypes.func.isRequired,
+  setAreaIntersection: PropTypes.func.isRequired,
   // Callback
   onUpdateWidget: PropTypes.func
 };
@@ -208,8 +357,9 @@ const mapDispatchToProps = dispatch => ({
   setChartType: (type) => {
     dispatch(setChartType(type));
   },
-  toggleModal: (open) => { dispatch(toggleModal(open)); },
-  setModalOptions: (options) => { dispatch(setModalOptions(options)); }
+  toggleModal: (open, opts) => { dispatch(toggleModal(open, opts)); },
+  setModalOptions: (options) => { dispatch(setModalOptions(options)); },
+  setAreaIntersection: id => dispatch(setAreaIntersection(id))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChartEditor);

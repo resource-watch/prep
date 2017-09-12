@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Autobind } from 'es-decorators';
 
 // Redux
-import { initStore } from 'store';
+
 import { connect } from 'react-redux';
 import { toggleTooltip } from 'redactions/tooltip';
 
@@ -16,7 +16,6 @@ const AGGREGATE_FUNCTIONS = [
 const AGGREGATE_FUNCTIONS_ONLY_COUNT = ['count', 'none'];
 
 class AggregateFunctionTooltip extends React.Component {
-
   constructor(props) {
     super(props);
 
@@ -80,7 +79,7 @@ class AggregateFunctionTooltip extends React.Component {
           )}
         </div>
         <Button
-          properties={{ type: 'button', className: '-primary' }}
+          properties={{ type: 'button', className: '-primary -compressed' }}
           onClick={() => this.onApply()}
         >
           Done

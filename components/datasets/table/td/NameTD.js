@@ -1,16 +1,16 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 // Next components
 import { Link } from 'routes';
 
 class NameTD extends React.Component {
-
   render() {
-    const { row, value, index } = this.props;
+    const { row, value, index, route } = this.props;
 
     return (
       <td key={index} className="main">
-        <Link route="admin_data_detail" params={{ tab: 'datasets', id: row.id }}>
+        <Link route={route} params={{ tab: 'datasets', id: row.id }}>
           <a>{value}</a>
         </Link>
       </td>
@@ -19,9 +19,10 @@ class NameTD extends React.Component {
 }
 
 NameTD.propTypes = {
-  row: React.PropTypes.object,
-  value: React.PropTypes.string,
-  index: React.PropTypes.string
+  row: PropTypes.object,
+  route: PropTypes.string,
+  value: PropTypes.string,
+  index: PropTypes.string
 };
 
 export default NameTD;

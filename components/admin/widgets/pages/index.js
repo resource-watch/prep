@@ -11,6 +11,7 @@ export default function WidgetsIndex(props) {
     <div className="c-widgets-index">
       <WidgetsTable
         application={[process.env.APPLICATIONS]}
+        dataset={props.dataset}
         authorization={user.token}
       />
     </div>
@@ -18,7 +19,8 @@ export default function WidgetsIndex(props) {
 }
 
 WidgetsIndex.propTypes = {
-  user: PropTypes.object.isRequired
+  user: PropTypes.object.isRequired,
+  dataset: PropTypes.string
 };
 
 WidgetsIndex.defaultProps = {

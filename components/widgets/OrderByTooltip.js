@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Autobind } from 'es-decorators';
 
 // Redux
-import { initStore } from 'store';
+
 import { connect } from 'react-redux';
 import { toggleTooltip } from 'redactions/tooltip';
 
@@ -15,7 +15,6 @@ const ORDER_BY_OPTIONS = [
 ];
 
 class OrderByTooltip extends React.Component {
-
   constructor(props) {
     super(props);
 
@@ -77,7 +76,7 @@ class OrderByTooltip extends React.Component {
           )}
         </div>
         <Button
-          properties={{ type: 'button', className: '-primary' }}
+          properties={{ type: 'button', className: '-primary -compressed' }}
           onClick={() => this.onApply()}
         >
           Done

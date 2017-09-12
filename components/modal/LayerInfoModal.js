@@ -1,23 +1,19 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-class LayerInfoModal extends React.Component {
-  render() {
-    const { data } = this.props;
-
-    return (
-      <div className="layer-info-modal">
-        <div className="layer-info-content">
-          <h1 className="c-text -header-normal -thin title">{data.name}</h1>
-          <p>{data.description}</p>
-        </div>
+const LayerInfoModal = function LayerInfoModal(props) {
+  return (
+    <div className="layer-info-modal">
+      <div className="layer-info-content">
+        <h2>{props.data.name}</h2>
+        <p>{props.data.description}</p>
       </div>
-    );
-  }
-}
-
-LayerInfoModal.propTypes = {
-  data: React.PropTypes.object
+    </div>
+  );
 };
 
+LayerInfoModal.propTypes = {
+  data: PropTypes.object
+};
 
 export default LayerInfoModal;

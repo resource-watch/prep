@@ -29,11 +29,11 @@ const items = [
     pathnames: ['/admin/Resources', '/admin/ResourcesDetail'],
     component: <Link route="admin_resources"><a>Resources</a></Link>
   },
-  {
-    name: 'Widgets',
-    pathnames: ['/admin/Widgets', '/admin/WidgetsDetail'],
-    component: <Link route="admin_widgets"><a>Widgets</a></Link>
-  },
+  // {
+  //   name: 'Widgets',
+  //   pathnames: ['/admin/Widgets', '/admin/WidgetsDetail'],
+  //   component: <Link route="admin_widgets"><a>Widgets</a></Link>
+  // },
   {
     name: 'Logout',
     component: <a href="/admin/logout">Logout</a>

@@ -13,7 +13,7 @@ export default class WidgetsService {
   fetchAllData({ applications = [process.env.APPLICATIONS], dataset = '' }) {
     return new Promise((resolve, reject) => {
       get({
-        url: `${process.env.WRI_API_URL}/dataset/${dataset}?application=${applications.join(',')}&includes=widget&page[size]=${Date.now() / 100000}`,
+        url: `${process.env.WRI_API_URL}/dataset/${dataset}?application=${applications.join(',')}&includes=widget&page[size]=${999}&env=production,preproduction`,
         headers: [{
           key: 'Content-Type',
           value: 'application/json'

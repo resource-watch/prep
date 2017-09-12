@@ -121,6 +121,43 @@ class Step1 extends React.Component {
           </Field>
         }
 
+        {user.role === 'ADMIN' ?
+          <Field
+            ref={(c) => { if (c) FORM_ELEMENTS.elements.env = c; }}
+            hint={'Choose "preproduction" to see this dataset it only as admin, "production" option will show it in public site.'}
+            className="-fluid"
+            options={[{ label: 'Pre-production', value: 'preproduction' }, { label: 'Production', value: 'production' }]}
+            onChange={value => this.props.onChange({ env: value })}
+            properties={{
+              name: 'env',
+              label: 'Environment',
+              placeholder: 'Type the columns...',
+              noResultsText: 'Please, type the name of the columns and press enter',
+              promptTextCreator: label => `The name of the column is "${label}"`,
+              default: 'preproduction',
+              value: this.props.form.env
+            }}
+          >
+            {Select}
+          </Field>
+          :
+          <Field
+            ref={(c) => { if (c) FORM_ELEMENTS.elements.env = c; }}
+            hint="Environment"
+            className="-fluid"
+            options={[{ label: 'Pre-production', value: 'preproduction' }, { label: 'Production', value: 'production' }]}
+            properties={{
+              name: 'env',
+              label: 'Environment',
+              hidden: true,
+              default: 'preproduction',
+              value: this.props.form.env
+            }}
+          >
+            {Input}
+          </Field>
+        }
+
         <Field
           ref={(c) => { if (c) FORM_ELEMENTS.elements.name = c; }}
           onChange={value => this.props.onChange({ name: value })}

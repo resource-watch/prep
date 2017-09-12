@@ -13,7 +13,8 @@ export default class DatasetsService {
       application: applications.join(','),
       ...!!includes && { includes },
       'page[size]': 9999999,
-      ...filters
+      ...filters,
+      'env': 'preproduction,production'
     };
 
     return new Promise((resolve, reject) => {

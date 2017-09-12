@@ -113,6 +113,31 @@ class WidgetEditor extends React.Component {
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.dataset !== this.props.dataset) {
+      // DatasetService
+      this.datasetService = new DatasetService(nextProps.dataset, {
+        apiURL: process.env.WRI_API_URL
+      });
+
+      // WidgetService
+      this.widgetService = new WidgetService(nextProps.dataset, {
+        apiURL: process.env.WRI_API_URL
+      });
+
+      this.getFields()
+        .then(() => {
+          this.getJiminy();
+          this.getDatasetInfo();
+        })
+        .catch(() => console.error('Unable to retrieve the fields'));
+
+      if (this.props.mode === 'dataset') {
+        this.getLayers();
+      }
+    }
+  }
+
   componentDidUpdate(previousProps, previousState) {
     // If the configuration of the chart is updated, then we
     // fetch the Vega chart config again
@@ -536,6 +561,7 @@ WidgetEditor.propTypes = {
     PropTypes.oneOf(VISUALIZATION_TYPES.map(viz => viz.value))
   ),
   onChange: PropTypes.func,
+  onError: PropTypes.func,
   onUpdateWidget: PropTypes.func,
   // Store
   user: PropTypes.object.isRequired,

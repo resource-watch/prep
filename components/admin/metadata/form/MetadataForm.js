@@ -36,7 +36,7 @@ class MetadataForm extends React.Component {
       this.setState({ loading: true });
 
       get({
-        url: `${process.env.WRI_API_URL}/dataset/${this.state.datasetID}/?includes=metadata&cache=${Date.now()}`,
+        url: `${process.env.WRI_API_URL}/dataset/${this.state.datasetID}/?includes=metadata&application=prep&cache=${Date.now()}`,
         headers: [{
           key: 'Content-Type',
           value: 'application/json'

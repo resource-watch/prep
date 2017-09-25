@@ -37,7 +37,7 @@ class WidgetTable extends React.Component {
       process.env.WRI_API_URL,
       // If a dataset is passed, we only display its widgets
       this.props.dataset ? `/dataset/${this.props.dataset}` : '',
-      `/widget?application=${application.join(',')}&page[size]=999&env=production,prepduction`
+      `/widget?application=${application.join(',')}&page[size]=999&env=production,preproduction`
     ].join('');
 
     fetch(new Request(url))

@@ -10,13 +10,13 @@ import { connect } from 'react-redux';
 import { toggleModal } from 'redactions/modal';
 
 // Components
-import Field from 'components/form/Field';
-import Input from 'components/form/Input';
-import Button from 'components/ui/Button';
-import Spinner from 'components/ui/Spinner';
+import Field from 'components/widgets/editor/form/Field';
+import Input from 'components/widgets/editor/form/Input';
+import Button from 'components/widgets/editor/ui/Button';
+import Spinner from 'components/widgets/editor/ui/Spinner';
 
 // Services
-import WidgetService from 'services/WidgetService';
+import WidgetService from 'components/widgets/editor/services/WidgetService';
 
 // utils
 import { getChartConfig, getChartInfo } from 'components/widgets/editor/helpers/WidgetHelper';

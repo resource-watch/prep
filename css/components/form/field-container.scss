@@ -1,9 +1,9 @@
 .c-field-container {
-  max-width: none;
+  // max-width: 800px;
   margin: 0 auto;
   border: none;
   padding: 50px 0;
-  border-top: 1px solid $border-color-1;
+  border-top: 1px solid $border-color-2;
 
   &:first-of-type {
     padding-top: 0;
@@ -21,8 +21,12 @@
     }
   }
 
+  &.-expanded {
+    max-width: none;
+  }
+
   &.-padding {
-    margin: 24px auto;
+    margin: 24px auto 0;
     padding: 50px 0;
     border-top: 1px solid $border-color-1;
   }

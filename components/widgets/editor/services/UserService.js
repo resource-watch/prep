@@ -115,7 +115,7 @@ export default class UserService {
   createSubscriptionToArea(areaId, datasets, datasetsQuery, user, name = '') {
     const bodyObj = {
       name,
-      application: process.env.APPLICATIONS.join(','),
+      application: process.env.APPLICATIONS,
       language: 'en',
       datasets,
       datasetsQuery,
@@ -143,7 +143,7 @@ export default class UserService {
    */
   updateSubscriptionToArea(subscriptionId, datasets, datasetsQuery, user) {
     const bodyObj = {
-      application: process.env.APPLICATIONS.join(','),
+      application: process.env.APPLICATIONS,
       language: 'en',
       datasets,
       datasetsQuery
@@ -164,7 +164,7 @@ export default class UserService {
    */
   getSubscriptions(token) {
     return new Promise((resolve) => {
-      fetch(`${this.opts.apiURL}/subscriptions?application=${process.env.APPLICATIONS.join(',')}`, {
+      fetch(`${this.opts.apiURL}/subscriptions?application=rw`, {
         headers: {
           Authorization: token
         }
@@ -195,7 +195,7 @@ export default class UserService {
    */
   getUserAreas(token) {
     return new Promise((resolve, reject) => {
-      fetch(`${this.opts.apiURL}/area?application=${process.env.APPLICATIONS.join(',')}`, {
+      fetch(`${this.opts.apiURL}/area?application=rw`, {
         headers: {
           Authorization: token
         }
@@ -212,19 +212,12 @@ export default class UserService {
   /**
    * Create new area
    */
-  createNewArea(name, geostore, iso, token) {
+  createNewArea(name, geostore, token) {
     const bodyObj = {
       name,
-      application: process.env.APPLICATIONS.join(',')
+      application: process.env.APPLICATIONS,
+      geostore
     };
-
-    if (geostore) {
-      bodyObj.geostore = geostore;
-    }
-
-    if (iso) {
-      bodyObj.iso = { country: iso.value };
-    }
 
     return fetch(`${this.opts.apiURL}/area`, {
       method: 'POST',
@@ -243,7 +236,7 @@ export default class UserService {
   updateArea(id, name, token) {
     const bodyObj = {
       name,
-      application: process.env.APPLICATIONS.join(',')
+      application: process.env.APPLICATIONS
     };
 
     return fetch(`${this.opts.apiURL}/area/${id}`, {

@@ -1,7 +1,9 @@
 .c-widget-editor {
   display: flex;
   position: relative;
-  background-color: $color-pale-grey;
+  padding-left: 10px;
+  padding-right: 10px;
+  background-color: $ui-bg-color;
 
   .customize-visualization {
     position: relative;
@@ -14,21 +16,20 @@
     flex-basis: 430px;
     flex-shrink: 0;
     flex-grow: 0;
-    padding: 20px 40px;
-    border: 1px solid rgba($color-black, .15);
+    padding: $margin-size-small;
+    border: 1px solid $border-color-1;
     box-shadow: 0 1px 2px 0 rgba($color-black, .09);
-    background-color: $color-white;
+    background-color: $base-bg-color;
 
-    .title {
-      margin: 20px 0;
-      color: $primary-color;
+    > .title {
+      color: $color-dark-pink;
       font-weight: $font-weight-light;
     }
 
-    h5 {
-      margin: 0 0 10px;
-      font-size: $font-size-small-medium;
-    }
+    // h5 {
+    //   margin: 0 0 10px;
+    //   font-size: $font-size-extra-small;
+    // }
 
     .visualization-type-selector {
       max-width: none;
@@ -44,6 +45,8 @@
     flex-shrink: 1;
     flex-basis: 100%;
     overflow-x: hidden;
+    padding: $margin-size-extra-small;
+    padding-right: 0;
 
     &.-error {
       text-align: center;
@@ -56,12 +59,12 @@
       }
     }
 
-    &.-chart {
-      margin-left: 20px;
-      // This padding avoids the chart to touch the top and
-      // the bottom of the container
-      padding: 20px 0;
-    }
+    // &.-chart {
+    //   margin-left: 20px;
+    //   // This padding avoids the chart to touch the top and
+    //   // the bottom of the container
+    //   padding: 20px 0;
+    // }
 
     > .c-chart {
       display: flex;
@@ -81,6 +84,34 @@
           // hand side which will be cut)
           text-align: center;
         }
+      }
+    }
+
+    // Share button of the map
+    .share-button {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      top: 90px;
+      right: 30px;
+      width: 30px;
+      height: 30px;
+      background-color: $color-white;
+      border-radius: 3px;
+      cursor: pointer;
+      z-index: 999;
+
+      &:hover {
+        background-color: mix($color-primary, $color-white, 5%);
+      }
+
+      a {
+        color: $color-white;
+      }
+
+      svg {
+        fill: $color-black;
       }
     }
   }

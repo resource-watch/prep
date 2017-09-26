@@ -52,7 +52,7 @@ class Step1 extends React.Component {
     });
 
     return (
-      <fieldset className="c-field-container">
+      <fieldset className="c-field-container -expanded">
         <fieldset className="c-field-container">
           {/* DATASET */}
           <Field

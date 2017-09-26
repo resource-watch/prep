@@ -4,6 +4,7 @@
   border: none;
   padding: 50px 0;
   border-top: 1px solid $border-color-2;
+  max-width: $max-width-form;
 
   &:first-of-type {
     padding-top: 0;
@@ -15,9 +16,9 @@
   }
 
   > * {
-    margin: 24px 0 0;
+    margin: 24px auto 0 auto;
     &:first-child {
-      margin: 0;
+      margin-top: 0;
     }
   }
 

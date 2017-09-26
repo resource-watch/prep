@@ -10,10 +10,9 @@ import { STATE_DEFAULT, FORM_ELEMENTS } from 'components/admin/dataset/form/cons
 
 import Navigation from 'components/form/Navigation';
 import Step1 from 'components/admin/dataset/form/steps/Step1';
-import Step2 from 'components/admin/dataset/form/steps/Step2';
 import Spinner from 'components/ui/Spinner';
 
-class DatasetForm extends React.Component {
+class DatasetsForm extends React.Component {
   constructor(props) {
     super(props);
 
@@ -22,8 +21,7 @@ class DatasetForm extends React.Component {
       columns: [],
       form: Object.assign({}, STATE_DEFAULT.form, {
         application: props.application,
-        authorization: props.authorization,
-        env: 'preproduction'
+        authorization: props.authorization
       })
     });
 
@@ -40,29 +38,33 @@ class DatasetForm extends React.Component {
   componentDidMount() {
     // Get the dataset and fill the
     // state with its params if it exists
-
     if (this.props.dataset) {
       this.service.fetchData({ id: this.props.dataset })
         .then((data) => {
+          const { provider, tableName } = data || {};
           this.setState({
             form: this.setFormFromParams(data),
             // Stop the loading
             loading: false
           });
+
+          this.service.fetchFields({
+            id: this.props.dataset,
+            provider,
+            tableName
+          })
+            .then((columns) => {
+              this.setState({
+                columns
+              });
+            })
+            .catch((err) => {
+              toastr.error('Error', err);
+            });
         })
         .catch((err) => {
           this.setState({ loading: false });
-          console.error(err);
-        });
-
-      this.service.fetchFields({ id: this.props.dataset })
-        .then((data) => {
-          this.setState({
-            columns: data
-          });
-        })
-        .catch((err) => {
-          console.error(err);
+          toastr.error('Error', err);
         });
     }
   }
@@ -105,27 +107,38 @@ class DatasetForm extends React.Component {
           })
             .then((data) => {
               toastr.success('Success', `The dataset "${data.id}" - "${data.name}" has been uploaded correctly`);
-              this.props.onSubmit && this.props.onSubmit();
+              if (this.props.onSubmit) {
+                this.props.onSubmit();
+              }
             })
             .catch((err) => {
               this.setState({ submitting: false });
-              toastr.error('Error', `Oops! There was an error, try again`);
-              console.error(err);
+              try {
+                if (err && !!err.length) {
+                  err.forEach((e) => {
+                    toastr.error('Error', e.detail);
+                  });
+                } else {
+                  toastr.error('Error', 'Oops! There was an error, try again');
+                }
+              } catch (e) {
+                toastr.error('Error', 'Oops! There was an error, try again');
+              }
             });
         } else {
           this.setState({
             step: this.state.step + 1
-          }, () => console.info(this.state));
+          });
         }
       } else {
-        toastr.error('Error', 'Fill all the required fields');
+        toastr.error('Error', 'Fill all the required fields or correct the invalid values');
       }
     }, 0);
   }
 
   onChange(obj) {
     const form = Object.assign({}, this.state.form, obj);
-    this.setState({ form }, () => console.info(this.state.form));
+    this.setState({ form });
   }
 
   onStepChange(step) {
@@ -154,17 +167,10 @@ class DatasetForm extends React.Component {
         {(this.state.step === 1 && !this.state.loading) &&
           <Step1
             onChange={value => this.onChange(value)}
+            basic={this.props.basic}
             form={this.state.form}
             dataset={this.props.dataset}
             columns={this.state.columns}
-          />
-        }
-
-        {(this.state.step === 2 && !this.state.loading) &&
-          <Step2
-            onChange={value => this.onChange(value)}
-            form={this.state.form}
-            dataset={this.props.dataset}
           />
         }
 
@@ -181,11 +187,12 @@ class DatasetForm extends React.Component {
   }
 }
 
-DatasetForm.propTypes = {
+DatasetsForm.propTypes = {
   application: PropTypes.array,
   authorization: PropTypes.string,
   dataset: PropTypes.string,
+  basic: PropTypes.bool,
   onSubmit: PropTypes.func
 };
 
-export default DatasetForm;
+export default DatasetsForm;

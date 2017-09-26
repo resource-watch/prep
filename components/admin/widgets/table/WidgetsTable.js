@@ -125,8 +125,8 @@ WidgetsTable.defaultProps = {
 };
 
 WidgetsTable.propTypes = {
-  authorization: PropTypes.string,
   // Store
+  authorization: PropTypes.string,
   loading: PropTypes.bool.isRequired,
   widgets: PropTypes.array.isRequired,
   filteredWidgets: PropTypes.array.isRequired,
@@ -138,6 +138,7 @@ WidgetsTable.propTypes = {
 };
 
 const mapStateToProps = state => ({
+  authorization: state.user.token,
   loading: state.widgets.widgets.loading,
   widgets: state.widgets.widgets.list,
   filteredWidgets: getFilteredWidgets(state),

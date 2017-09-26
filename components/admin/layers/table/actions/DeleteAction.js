@@ -30,9 +30,15 @@ class DeleteAction extends React.Component {
             this.props.onRowDelete(data.id);
             toastr.success('Success', `The layer "${data.id}" - "${data.name}" has been removed correctly`);
           })
-          .catch((err) => {
-            toastr.error('Error', `The layer "${data.id}" - "${data.name}" was not deleted. Try again`);
-            console.error(err);
+          .catch((errors) => {
+            try {
+              errors.forEach(er => (
+                toastr.error('Error', er.detail)
+              ));
+            } catch (e) {
+              toastr.error('Error', `The layer "${data.id}" - "${data.name}" was not deleted. Try again`);
+              console.error(errors);
+            }
           });
       },
       onCancel: () => console.info('canceled')

@@ -80,6 +80,7 @@
     "redis": "2.8.0",
     "redux": "^3.7.2",
     "redux-thunk": "2.1.0",
+    "redux-devtools-extension": "^2.13.2",
     "reselect": "3.0.1",
     "sass-loader": "6.0.6",
     "session-file-store": "1.0.0",

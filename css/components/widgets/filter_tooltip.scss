@@ -1,27 +1,17 @@
 .c-filter-tooltip {
   position: relative;
   transform: translate(0, 0);
-  padding: 20px;
   min-height: 80px;
   min-width: 200px;
-  max-width: 350px;
+  max-width: 502px;
 
-  .checkboxes {
+  .filter-tooltip-content {
     max-height: 200px;
     overflow-y: auto;
   }
 
   .buttons {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    button {
-      margin-right: 10px;
-      &:last-child{
-        margin-right: 0px;
-      }
-    }
+    margin-top: $margin-size-extra-small;
   }
 
   .range {
@@ -76,10 +66,4 @@
       }
     }
   }
-
-  .c-button {
-    margin-top: 10px;
-    width: 100%;
-  }
-
 }

@@ -17,12 +17,12 @@ import DimensionsContainer from 'components/widgets/editor/ui/DimensionsContaine
 import FieldsContainer from 'components/widgets/editor/ui/FieldsContainer';
 import SortContainer from 'components/widgets/editor/ui/SortContainer';
 import LimitContainer from 'components/widgets/editor/ui/LimitContainer';
-import CustomSelect from 'components/ui/CustomSelect';
-import Select from 'components/form/SelectInput';
+import CustomSelect from 'components/widgets/editor/ui/CustomSelect';
+import Select from 'components/widgets/editor/form/SelectInput';
 import SaveWidgetModal from 'components/widgets/editor/modal/SaveWidgetModal';
 import HowToWidgetEditorModal from 'components/widgets/editor/modal/HowToWidgetEditorModal';
 import UploadAreaIntersectionModal from 'components/widgets/editor/modal/UploadAreaIntersectionModal';
-import Spinner from 'components/ui/Spinner';
+import Spinner from 'components/widgets/editor/ui/Spinner';
 
 // Services
 import AreasService from 'components/widgets/editor/services/AreasService';
@@ -44,20 +44,6 @@ const AREAS = [
 
 @DragDropContext(HTML5Backend)
 class ChartEditor extends React.Component {
-  /**
-   * Return the geostore id associated with the country's ISO
-   * NOTE: errors are not caught intentionally
-   * @param {string} iso Valid 3-letter ISO
-   * @returns {Promise<string>}
-   */
-  static getCountryGeostoreId(iso) {
-    return fetch(`${process.env.WRI_API_URL}/geostore/admin/${iso}`)
-      .then((response) => {
-        if (response.ok) return response.json();
-        throw new Error(`Unable to get the geostore id associated with the ISO ${iso}`);
-      })
-      .then(({ data }) => data.id);
-  }
 
   constructor(props) {
     super(props);
@@ -113,26 +99,10 @@ class ChartEditor extends React.Component {
           },
           onCloseModal: () => resolve(false)
         });
-      } else if (item.isGeostore) {
-        // The user selected a custom area that is not a country
-        this.props.setAreaIntersection(item.value);
-        resolve(true);
       } else {
-        this.setState({ loadingAreaIntersection: true });
-        ChartEditor.getCountryGeostoreId(item.value)
-          .then((id) => {
-            this.props.setAreaIntersection(id);
-            resolve(true);
-          })
-          .catch((err) => {
-            // In case of an error, we prevent the selector from setting
-            // the area as selected
-            resolve(false);
-
-            // TODO: improve this 💩
-            toastr.error('Error', `Unable to filter with this country. ${err}`);
-          })
-          .then(() => this.setState({ loadingAreaIntersection: false }));
+        // The user selected a custom area that is not a country
+        this.props.setAreaIntersection(item.id);
+        resolve(true);
       }
     });
   }
@@ -172,6 +142,11 @@ class ChartEditor extends React.Component {
     this.props.setModalOptions(options);
   }
 
+  @Autobind
+  handleEmbedTable() {
+    this.props.onEmbedTable();
+  }
+
   /**
    * Fetch the list of the areas for the area intersection
    * filter
@@ -181,9 +156,14 @@ class ChartEditor extends React.Component {
 
     // When this resolves, we'll also be able to display the countries
     this.areasService.fetchCountries()
-      .then(({ data }) => {
+      .then((data) => {
         this.setState({
-          areaOptions: [...this.state.areaOptions, ...AREAS, ...data]
+          areaOptions: [...this.state.areaOptions, ...AREAS,
+            ...data.map(elem => ({
+              label: elem.name || '',
+              id: elem.geostoreId,
+              value: `country-${elem.geostoreId}`
+            }))]
         });
       })
       // We don't really care if the countries don't load, we can still
@@ -201,8 +181,8 @@ class ChartEditor extends React.Component {
       .then((response) => {
         const userAreas = response.map(val => ({
           label: val.attributes.name,
-          value: val.attributes.geostore ? val.attributes.geostore : val.attributes.iso.country,
-          isGeostore: val.attributes.geostore
+          id: val.attributes.geostore,
+          value: `user-area-${val.attributes.geostore}`
         }));
         this.setState({
           loadingUserAreas: false,
@@ -225,9 +205,12 @@ class ChartEditor extends React.Component {
       user,
       mode,
       showSaveButton,
-      hasGeoInfo
+      hasGeoInfo,
+      showEmbedTable,
+      showLimitContainer,
+      showOrderByContainer
     } = this.props;
-    const { chartType, fields, category, value } = widgetEditor;
+    const { chartType, fields, category, value, areaIntersection } = widgetEditor;
     const { areaOptions, loadingAreaIntersection } = this.state;
     const showSaveButtonFlag =
       chartType && category && value && user && user.token && showSaveButton;
@@ -237,6 +220,11 @@ class ChartEditor extends React.Component {
       && jiminy.general
       && jiminy.general.map(val => ({ label: val, value: val }))
     ) || [];
+
+    const areaToBeSelected = areaIntersection && !loadingAreaIntersection &&
+     areaOptions.find(opt => opt.id === areaIntersection);
+
+    const areaValue = areaToBeSelected && areaToBeSelected.value;
 
     return (
       <div className="c-chart-editor">
@@ -270,6 +258,7 @@ class ChartEditor extends React.Component {
                   id="area-intersection-select"
                   placeholder="Select area"
                   options={areaOptions}
+                  value={areaValue}
                   onValueChange={this.onChangeAreaIntersection}
                   allowNonLeafSelection={false}
                   waitForChangeConfirmation
@@ -293,8 +282,12 @@ class ChartEditor extends React.Component {
           <div className="customization-container">
             <DimensionsContainer />
             <FilterContainer />
-            <SortContainer />
-            <LimitContainer />
+            {showOrderByContainer &&
+              <SortContainer />
+            }
+            {showLimitContainer &&
+              <LimitContainer />
+            }
           </div>
         </div>
         <div className="save-widget-container">
@@ -325,11 +318,25 @@ class ChartEditor extends React.Component {
             Save widget
           </a>
           }
+          {tableViewMode && showEmbedTable &&
+            <a
+              role="button"
+              className="c-button -primary"
+              tabIndex={0}
+              onClick={this.handleEmbedTable}
+            >
+              Embed table
+            </a>
+          }
         </div>
       </div>
     );
   }
 }
+
+ChartEditor.defaultProps = {
+  showEmbedTable: true
+};
 
 ChartEditor.propTypes = {
   mode: PropTypes.oneOf(['save', 'update']).isRequired,
@@ -341,6 +348,9 @@ ChartEditor.propTypes = {
   datasetProvider: PropTypes.string,
   tableViewMode: PropTypes.bool.isRequired,
   showSaveButton: PropTypes.bool.isRequired,
+  showEmbedTable: PropTypes.bool,
+  showLimitContainer: PropTypes.bool.isRequired,
+  showOrderByContainer: PropTypes.bool.isRequired,
   // Store
   widgetEditor: PropTypes.object.isRequired,
   user: PropTypes.object.isRequired,
@@ -349,7 +359,8 @@ ChartEditor.propTypes = {
   setModalOptions: PropTypes.func.isRequired,
   setAreaIntersection: PropTypes.func.isRequired,
   // Callback
-  onUpdateWidget: PropTypes.func
+  onUpdateWidget: PropTypes.func,
+  onEmbedTable: PropTypes.func
 };
 
 const mapStateToProps = ({ widgetEditor, user }) => ({ widgetEditor, user });

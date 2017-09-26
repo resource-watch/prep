@@ -3,15 +3,15 @@ import { format } from 'd3';
 import { toastr } from 'react-redux-toastr';
 
 // Components
-import BarChart from 'utils/widgets/bar';
-import LineChart from 'utils/widgets/line';
-import PieChart from 'utils/widgets/pie';
-import OneDScatterChart from 'utils/widgets/1d_scatter';
-import OneDTickChart from 'utils/widgets/1d_tick';
-import ScatterChart from 'utils/widgets/scatter';
+import BarChart from 'components/widgets/editor/helpers/bar';
+import LineChart from 'components/widgets/editor/helpers/line';
+import PieChart from 'components/widgets/editor/helpers/pie';
+import OneDScatterChart from 'components/widgets/editor/helpers/1d_scatter';
+import OneDTickChart from 'components/widgets/editor/helpers/1d_tick';
+import ScatterChart from 'components/widgets/editor/helpers/scatter';
 
 // Utils
-import getQueryByFilters from 'utils/getQueryByFilters';
+import getQueryByFilters from 'components/widgets/editor/helpers/getQueryByFilters';
 
 // Services
 import RasterService from 'components/widgets/editor/services/RasterService';
@@ -165,7 +165,7 @@ export function getChartInfo(dataset, datasetType, datasetProvider, widgetEditor
 
   const chartInfo = {
     chartType,
-    limit,
+    limit: (datasetProvider === 'nexgddp') ? null : limit,
     order: orderBy,
     filters,
     areaIntersection,
@@ -297,7 +297,11 @@ export function getDataURL(dataset, datasetType, tableName, band, provider, char
   }
 
   const sortOrder = chartInfo.order ? chartInfo.order.orderType : 'asc';
-  const query = `${getQueryByFilters(tableName, chartInfo.filters, columns, orderByColumn, sortOrder)} LIMIT ${chartInfo.limit}`;
+  let query = `${getQueryByFilters(tableName, chartInfo.filters, columns, orderByColumn, sortOrder)}`;
+
+  if (chartInfo.limit) {
+    query += ` LIMIT ${chartInfo.limit}`;
+  }
 
   const geostore = chartInfo.areaIntersection ? `&geostore=${chartInfo.areaIntersection}` : '';
 

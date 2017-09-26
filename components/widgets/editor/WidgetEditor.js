@@ -12,6 +12,7 @@ import { connect } from 'react-redux';
 import {
   resetWidgetEditor,
   setFields,
+  setBandsInfo,
   setVisualizationType
 } from 'components/widgets/editor/redux/widgetEditor';
 import { toggleModal } from 'redactions/modal';
@@ -21,20 +22,22 @@ import DatasetService from 'components/widgets/editor/services/DatasetService';
 import WidgetService from 'components/widgets/editor/services/WidgetService';
 
 // Components
-import Select from 'components/form/SelectInput';
-import Spinner from 'components/ui/Spinner';
+import Select from 'components/widgets/editor/form/SelectInput';
+import Spinner from 'components/widgets/editor/ui/Spinner';
 import VegaChart from 'components/widgets/charts/VegaChart';
 
 // Editors
 import ChartEditor from 'components/widgets/editor/chart/ChartEditor';
 import MapEditor from 'components/widgets/editor/map/MapEditor';
 import RasterChartEditor from 'components/widgets/editor/raster/RasterChartEditor';
+import NEXGDDPEditor from 'components/widgets/editor/nexgddp/NEXGDDPEditor';
 
-import Map from 'components/vis/Map';
-import Legend from 'components/ui/Legend';
+import Map from 'components/widgets/editor/map/Map';
+import Legend from 'components/widgets/editor/ui/Legend';
 import TableView from 'components/widgets/editor/table/TableView';
-import Icon from 'components/ui/Icon';
+import Icon from 'components/widgets/editor/ui/Icon';
 import ShareModalExplore from 'components/widgets/editor/modal/ShareModalExplore';
+import EmbedTableModal from 'components/widgets/editor/modal/EmbedTableModal';
 
 // Utils
 import {
@@ -44,8 +47,10 @@ import {
   getChartType,
   isFieldAllowed
 } from 'components/widgets/editor/helpers/WidgetHelper';
-import ChartTheme from 'utils/widgets/theme';
-import LayerManager from 'utils/layers/LayerManager';
+
+import ChartTheme from 'components/widgets/editor/helpers/theme';
+import LayerManager from 'components/widgets/editor/helpers/LayerManager';
+import getQueryByFilters from 'components/widgets/editor/helpers/getQueryByFilters';
 
 const VISUALIZATION_TYPES = [
   { label: 'Chart', value: 'chart', available: true },
@@ -113,10 +118,7 @@ class WidgetEditor extends React.Component {
     super(props);
 
     // We init the state, store and services
-    this.initComponent(props, (state, cb) => {
-      this.state = state;
-      cb();
-    });
+    this.state = this.initComponent(props);
   }
 
   /**
@@ -138,8 +140,9 @@ class WidgetEditor extends React.Component {
   componentWillReceiveProps(nextProps) {
     // If the dataset changes...
     if (nextProps.dataset !== this.props.dataset) {
-      this.initComponent(nextProps, this.setState)
-        .then(() => this.loadData());
+      this.setState(this.initComponent(nextProps), () => {
+        this.loadData();
+      });
     } else if (!isEqual(this.props.widgetEditor.layer, nextProps.widgetEditor.layer)) {
       // We update the layerGroups each time the layer changes
       this.setState({
@@ -253,7 +256,7 @@ class WidgetEditor extends React.Component {
       .catch((err) => {
         this.setState({ fieldsError: true });
         toastr.error('Error loading fields');
-        console.error('Error loading fields', err)
+        console.error('Error loading fields', err);
       })
       // If we reach this point, either we have already resolved the promise
       // and so rejecting it has no effect, or we haven't and so we reject it
@@ -329,6 +332,17 @@ class WidgetEditor extends React.Component {
             alias: getMetadata(field.columnName, 'alias'),
             description: getMetadata(field.columnName, 'description')
           }));
+
+          // If the widget is a raster one, we save the information
+          // related to its bands (alias, description, etc.)
+          if (attributes.type === 'raster' && metadata) {
+            // Here metadata is an object whose keys are names of bands
+            // and the values the following:
+            // { type: string, alias: string, description: string }
+            // NOTE: The object is not exhaustive and it might be empty
+            // whereas there are bands
+            this.props.setBandsInfo(metadata);
+          }
 
           this.props.setFields(fields);
 
@@ -552,7 +566,7 @@ class WidgetEditor extends React.Component {
 
     this.setState({ visualizationOptions }, () => {
       if (this.props.selectedVisualizationType === null) {
-        // We only set a default visualization if none of them has been set in the past
+      // We only set a default visualization if none of them has been set in the past
         // (we don't want to conflict with the "state restoration" made in My RW)
         this.handleVisualizationTypeChange(defaultVis, resetStore);
       }
@@ -569,41 +583,39 @@ class WidgetEditor extends React.Component {
    * @returns {Promise<void>}
    */
   initComponent(props, setState) {
-    return new Promise((resolve) => {
-      // First, we init the services
-      this.datasetService = new DatasetService(props.dataset, {
-        apiURL: process.env.WRI_API_URL
-      });
-
-      this.widgetService = new WidgetService(props.dataset, {
-        apiURL: process.env.WRI_API_URL
-      });
-
-      // Each time the editor is opened again, we reset the Redux's state
-      // associated with it
-      props.resetWidgetEditor();
-
-      // If the there's a layer, we compute the LayerGroup
-      // representation
-      const layerGroups = [];
-      if (props.widgetEditor.layer) {
-        layerGroups.push({
-          dataset: props.widgetEditor.layer.dataset,
-          visible: true,
-          layers: [{
-            id: props.widgetEditor.layer.id,
-            active: true,
-            ...props.widgetEditor.layer
-          }]
-        });
-      }
-
-      // Then we reset the state of the component
-      setState({
-        ...DEFAULT_STATE,
-        layerGroups
-      }, resolve);
+    // First, we init the services
+    this.datasetService = new DatasetService(props.dataset, {
+      apiURL: process.env.WRI_API_URL
     });
+
+    this.widgetService = new WidgetService(props.dataset, {
+      apiURL: process.env.WRI_API_URL
+    });
+
+    // Each time the editor is opened again, we reset the Redux's state
+    // associated with it
+    props.resetWidgetEditor();
+
+    // If the there's a layer, we compute the LayerGroup
+    // representation
+    const layerGroups = [];
+    if (props.widgetEditor.layer) {
+      layerGroups.push({
+        dataset: props.widgetEditor.layer.dataset,
+        visible: true,
+        layers: [{
+          id: props.widgetEditor.layer.id,
+          active: true,
+          ...props.widgetEditor.layer
+        }]
+      });
+    }
+
+    // Then we reset the state of the component
+    return {
+      ...DEFAULT_STATE,
+      layerGroups
+    };
   }
 
   /**
@@ -693,6 +705,56 @@ class WidgetEditor extends React.Component {
     this.props.onUpdateWidget();
   }
 
+  @Autobind
+  handleEmbedTable() {
+    const { tableName } = this.state;
+    const { dataset, widgetEditor } = this.props;
+    const { filters, fields, value, aggregateFunction, category, orderBy,
+      limit, areaIntersection } = widgetEditor;
+    const aggregateFunctionExists = aggregateFunction && aggregateFunction !== 'none';
+
+    const arrColumns = fields.filter(val => val.columnName !== 'cartodb_id' && val.columnType !== 'geometry').map(
+      (val) => {
+        if (value && value.name === val.columnName && aggregateFunctionExists) {
+          // Value
+          return { value: val.columnName, key: val.columnName, aggregateFunction, group: false };
+        } else if (category && category.name === val.columnName && aggregateFunctionExists) {
+          // Category
+          return { value: val.columnName, key: val.columnName, group: true };
+        } else { // eslint-disable-line
+          // Rest of columns
+          return {
+            value: val.columnName,
+            key: val.columnName,
+            remove: aggregateFunctionExists
+          };
+        }
+      }
+    ).filter(val => !val.remove);
+
+    const orderByColumn = orderBy ? [orderBy] : [];
+    if (orderByColumn.length > 0 && value && orderByColumn[0].name === value.name && aggregateFunction && aggregateFunction !== 'none') {
+      orderByColumn[0].name = `${aggregateFunction}(${value.name})`;
+    }
+
+    const geostore = areaIntersection ? `&geostore=${areaIntersection}` : '';
+
+    const sortOrder = orderBy ? orderBy.orderType : 'asc';
+    const query = `${getQueryByFilters(tableName, filters, arrColumns, orderByColumn, sortOrder)} LIMIT ${limit}`;
+    const queryURL = `${process.env.WRI_API_URL}/query/${dataset}?sql=${query}${geostore}`;
+
+    const options = {
+      children: EmbedTableModal,
+      childrenProps: {
+        url: window.location.href,
+        queryURL,
+        toggleModal: this.props.toggleModal
+      }
+    };
+
+    this.props.toggleModal(true, options);
+  }
+
   /**
    * Change the selected visualization in the state
    * @param {string} selectedVisualizationType Visualization type
@@ -733,8 +795,11 @@ class WidgetEditor extends React.Component {
       dataset,
       mode,
       showSaveButton,
-      selectedVisualizationType
+      selectedVisualizationType,
+      showOrderByContainer,
+      showLimitContainer
     } = this.props;
+
 
     // Whether we're still waiting for some data
     const loading = (mode === 'dataset' && !layersLoaded)
@@ -780,14 +845,14 @@ class WidgetEditor extends React.Component {
                         value: selectedVisualizationType
                       }}
                       options={visualizationOptions}
-                      onChange={this.handleVisualizationTypeChange}
+                      onChange={value => this.handleVisualizationTypeChange(value, false)}
                     />
                   </div>
                 </div>
                 {
                   (selectedVisualizationType === 'chart' ||
                   selectedVisualizationType === 'table')
-                    && !fieldsError && tableName
+                    && !fieldsError && tableName && datasetProvider !== 'nexgddp'
                     && (
                       <ChartEditor
                         dataset={dataset}
@@ -799,7 +864,32 @@ class WidgetEditor extends React.Component {
                         mode={chartEditorMode}
                         onUpdateWidget={this.handleUpdateWidget}
                         showSaveButton={showSaveButton}
+                        showLimitContainer={showLimitContainer}
+                        showOrderByContainer={showOrderByContainer}
                         hasGeoInfo={hasGeoInfo}
+                        onEmbedTable={this.handleEmbedTable}
+                      />
+                    )
+                }
+                {
+                  (selectedVisualizationType === 'chart' ||
+                  selectedVisualizationType === 'table')
+                    && !fieldsError && tableName && datasetProvider === 'nexgddp'
+                    && (
+                      <NEXGDDPEditor
+                        dataset={dataset}
+                        datasetType={datasetType}
+                        datasetProvider={datasetProvider}
+                        jiminy={jiminy}
+                        tableName={tableName}
+                        tableViewMode={selectedVisualizationType === 'table'}
+                        mode={chartEditorMode}
+                        onUpdateWidget={this.handleUpdateWidget}
+                        showSaveButton={showSaveButton}
+                        showLimitContainer={false}
+                        showOrderByContainer={false}
+                        hasGeoInfo={hasGeoInfo}
+                        onEmbedTable={this.handleEmbedTable}
                       />
                     )
                 }
@@ -856,6 +946,7 @@ const mapStateToProps = ({ widgetEditor }) => ({
 const mapDispatchToProps = dispatch => ({
   resetWidgetEditor: hardReset => dispatch(resetWidgetEditor(hardReset)),
   setFields: (fields) => { dispatch(setFields(fields)); },
+  setBandsInfo: bands => dispatch(setBandsInfo(bands)),
   setVisualizationType: vis => dispatch(setVisualizationType(vis)),
   toggleModal: (open, options) => dispatch(toggleModal(open, options))
 });
@@ -863,6 +954,8 @@ const mapDispatchToProps = dispatch => ({
 WidgetEditor.propTypes = {
   mode: PropTypes.oneOf(['dataset', 'widget']),
   showSaveButton: PropTypes.bool.isRequired, // Show save button in chart editor or not
+  showLimitContainer: PropTypes.bool.isRequired, // Show the limit container or not
+  showOrderByContainer: PropTypes.bool.isRequired, // Show the limit container or not
   dataset: PropTypes.string, // Dataset ID
   availableVisualizations: PropTypes.arrayOf(
     PropTypes.oneOf(VISUALIZATION_TYPES.map(viz => viz.value))
@@ -872,17 +965,20 @@ WidgetEditor.propTypes = {
   onChange: PropTypes.func,
   onError: PropTypes.func,
   // Store
-  band: PropTypes.string,
+  band: PropTypes.object,
   widgetEditor: PropTypes.object.isRequired,
   resetWidgetEditor: PropTypes.func.isRequired,
   setFields: PropTypes.func.isRequired,
   setVisualizationType: PropTypes.func.isRequired,
   selectedVisualizationType: PropTypes.string,
-  toggleModal: PropTypes.func
+  toggleModal: PropTypes.func,
+  setBandsInfo: PropTypes.func
 };
 
 WidgetEditor.defaultProps = {
-  availableVisualizations: VISUALIZATION_TYPES.map(viz => viz.value)
+  availableVisualizations: VISUALIZATION_TYPES.map(viz => viz.value),
+  showLimitContainer: true,
+  showOrderByContainer: true
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(WidgetEditor);

@@ -18,7 +18,7 @@ import VegaChartTooltip from 'components/widgets/charts/VegaChartTooltip';
 import VegaChartLegend from 'components/widgets/charts/VegaChartLegend';
 
 // Utils
-import { fetchRasterData } from 'utils/widgets/WidgetHelper';
+import { fetchRasterData } from 'components/widgets/editor/helpers/WidgetHelper';
 
 class VegaChart extends React.Component {
   constructor(props) {
@@ -50,8 +50,9 @@ class VegaChart extends React.Component {
     }
   }
 
-  shouldComponentUpdate(nextProps) {
-    return !isEqual(nextProps.data, this.props.data);
+  shouldComponentUpdate(nextProps, nextState) {
+    return !isEqual(nextProps.data, this.props.data)
+    || !isEqual(nextState.vegaConfig, this.state.vegaConfig);
   }
 
   componentDidUpdate() {

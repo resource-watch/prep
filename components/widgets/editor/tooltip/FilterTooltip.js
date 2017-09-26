@@ -1,13 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Autobind } from 'es-decorators';
-import classNames from 'classnames';
-import InputRange from 'react-input-range';
-import debounce from 'lodash/debounce';
-import { toastr } from 'react-redux-toastr';
 
 // Redux
-
 import { connect } from 'react-redux';
 import { toggleTooltip } from 'redactions/tooltip';
 
@@ -15,27 +9,23 @@ import { toggleTooltip } from 'redactions/tooltip';
 import DatasetService from 'components/widgets/editor/services/DatasetService';
 
 // Components
-import CheckboxGroup from 'components/form/CheckboxGroup';
-import Spinner from 'components/ui/Spinner';
-import Button from 'components/ui/Button';
-import Checkbox from 'components/form/Checkbox';
+import Spinner from 'components/widgets/editor/ui/Spinner';
+import Checkbox from 'components/widgets/editor/form/Checkbox';
 
+import FilterStringTooltip from 'components/widgets/editor/tooltip/FilterStringTooltip';
+import FilterNumberTooltip from 'components/widgets/editor/tooltip/FilterNumberTooltip';
+import FilterDateTooltip from 'components/widgets/editor/tooltip/FilterDateTooltip';
 
 class FilterTooltip extends React.Component {
   constructor(props) {
     super(props);
 
+    const filters = props.widgetEditor.filters;
+    const filter = filters && filters.find(f => f.name === props.name);
+
     this.state = {
-      values: [],
-      // Selected strings in the filters
-      selected: this.isCategorical(props) && props.filter
-        ? props.filter
-        : [],
-      // Selected range in the filters
-      rangeValue: !this.isCategorical(props) && props.filter
-        ? { min: props.filter[0], max: props.filter[1] }
-        : null,
-      notNullSelected: props.notNullSelected,
+      selected: (filter) ? filter.value : [],
+      notNullSelected: filter && filter.notNull,
       loading: true
     };
 
@@ -46,110 +36,28 @@ class FilterTooltip extends React.Component {
   }
 
   componentDidMount() {
-    this.getFilter();
-    document.addEventListener('mousedown', this.triggerMouseDown);
+    document.addEventListener('mousedown', this.onScreenClick);
   }
 
   componentWillUnmount() {
-    document.removeEventListener('mousedown', this.triggerMouseDown);
+    document.removeEventListener('mousedown', this.onScreenClick);
   }
 
-  onClearAll() {
-    this.setState({ selected: [] });
+  onChange = (selected) => {
+    this.setState({ selected });
   }
 
-  onSelectAll() {
-    this.setState({
-      selected: this.state.values.map(value => value.value)
-    });
-  }
-
-  onApply() {
-    const { selected, rangeValue, notNullSelected } = this.state;
-    const filter = this.isCategorical() ? selected : [rangeValue.min, rangeValue.max];
-    this.props.onApply(filter, notNullSelected);
+  onApply = () => {
+    const { selected, notNullSelected } = this.state;
+    this.props.onApply(selected, notNullSelected);
 
     // We close the tooltip
-    this.props.toggleTooltip(false);
-  }
-
-  /**
-   * Fetch the data about the column and update the state
-   * consequently
-   */
-  getFilter() {
-    this.datasetService.getFilter({
-      columnType: this.props.type,
-      tableName: this.props.tableName,
-      columnName: this.props.name
-    })
-      .then((result) => {
-        const values = this.props.type === 'string'
-          ? result.properties.map(val => ({ name: val, label: val, value: val }))
-          : null;
-
-        this.setState({
-          values,
-          // We round the values to have a nicer UI
-          min: Math.floor(result.properties.min),
-          max: Math.ceil(result.properties.max)
-        });
-
-        // If we don't have values already set for the filter, then we
-        // set the whole range as the filter
-        if (!this.state.rangeValue) {
-          this.setState({
-            rangeValue: {
-              min: Math.floor(result.properties.min),
-              max: Math.ceil(result.properties.max)
-            }
-          });
-        }
-
-        // We remove the loading state only after being sure we've
-        // updated the range values (if needed)
-        this.setState({ loading: false });
-
-        // We let the tooltip know that the component has been resized
-        if (this.props.onResize) {
-          this.props.onResize();
-        }
-      })
-      .catch(error => toastr.error('Error', error))
-      .then(() => this.setState({ loading: false }));
-  }
-
-  @Autobind
-  handleMinChange(event) {
-    const newValue = event.target.value;
-    this.setState({
-      rangeValue: {
-        min: newValue,
-        max: this.state.rangeValue.max
-      }
+    requestAnimationFrame(() => {
+      this.props.toggleTooltip(false);
     });
   }
 
-  @Autobind
-  handleMaxChange(event) {
-    const newValue = event.target.value;
-    this.setState({
-      rangeValue: {
-        min: this.state.rangeValue.min,
-        max: newValue
-      }
-    });
-  }
-
-  @Autobind
-  handleNotNullSelection(value) {
-    this.setState({
-      notNullSelected: value
-    });
-  }
-
-  @Autobind
-  triggerMouseDown(e) {
+  onScreenClick = (e) => {
     const el = document.querySelector('.c-tooltip');
     const clickOutside = el && el.contains && !el.contains(e.target);
     if (clickOutside) {
@@ -157,68 +65,30 @@ class FilterTooltip extends React.Component {
     }
   }
 
-  isCategorical(props) {
-    return (props || this.props).type === 'string';
+  onToggleLoading = (loading) => {
+    this.setState({ loading });
   }
 
-  renderCheckboxes() {
-    const { values, selected } = this.state;
-
-    return (
-      <div className="checkboxes">
-        <CheckboxGroup
-          selected={selected}
-          options={values}
-          onChange={vals => this.setState({ selected: vals })}
-        />
-      </div>
-    );
-  }
-
-  renderRange() {
-    // Min and max values of the dataset
-    const min = this.state.min;
-    const max = this.state.max;
-
-    // The step must be 1 or lower, otherwise the react-input-range will
-    // automatically move the minimum and the maximum to a multiple of it
-    // See: https://github.com/davidchin/react-input-range/issues/46
-    const step = Math.min(Math.floor((max - min) / 100), 1);
-
-    // Min and max values of the selected range
-    const rangeMin = +this.state.rangeValue.min;
-    const rangeMax = +this.state.rangeValue.max;
-
-    // We debounce the method to avoid having to update the state
-    // to often (around 60 FPS)
-    const updateRange = debounce(range => this.setState({ rangeValue: range }), 16);
-
-    return (
-      <div className="range">
-        <InputRange
-          maxValue={max}
-          minValue={min}
-          value={{ min: rangeMin, max: rangeMax }}
-          step={step}
-          onChange={range => updateRange(range)}
-        />
-      </div>
-    );
+  handleNotNullSelection = (value) => {
+    this.setState({
+      notNullSelected: value
+    });
   }
 
   render() {
-    const { loading, rangeValue, notNullSelected } = this.state;
-    const categoryValue = this.isCategorical();
-    const classNameValue = classNames({
-      'c-filter-tooltip': true
-    });
+    const { type } = this.props;
+    const { loading, notNullSelected } = this.state;
+
     return (
-      <div className={classNameValue}>
-        <Spinner
-          className="-light"
-          isLoading={loading}
-        />
-        { !loading &&
+      <div className="c-filter-tooltip">
+        {!!loading &&
+          <Spinner
+            className="-light -small"
+            isLoading={loading}
+          />
+        }
+
+        {!loading &&
           <div className="c-checkbox-box">
             <Checkbox
               properties={{
@@ -230,40 +100,39 @@ class FilterTooltip extends React.Component {
             />
           </div>
         }
-        { categoryValue && this.renderCheckboxes() }
-        { !categoryValue && !loading && this.renderRange() }
-        { !categoryValue && !loading &&
-          <div className="text-inputs-container">
-            <input className="-first" type="number" value={rangeValue.min} onChange={this.handleMinChange} />
-            -
-            <input className="-last" type="number" value={rangeValue.max} onChange={this.handleMaxChange} />
-          </div>
+
+        {type === 'string' &&
+          <FilterStringTooltip
+            {...this.props}
+            loading={this.state.loading}
+            selected={this.state.selected}
+            onChange={this.onChange}
+            onToggleLoading={this.onToggleLoading}
+            onApply={this.onApply}
+          />
         }
 
-        <div className="buttons">
-          { categoryValue &&
-            <Button
-              properties={{ type: 'button', className: ' -compressed' }}
-              onClick={() => this.onSelectAll()}
-            >
-              Select all
-            </Button>
-          }
-          { categoryValue &&
-            <Button
-              properties={{ type: 'button', className: ' -compressed' }}
-              onClick={() => this.onClearAll()}
-            >
-              Clear
-            </Button>
-          }
-          <Button
-            properties={{ type: 'button', className: '-primary -compressed' }}
-            onClick={() => this.onApply()}
-          >
-            Done
-          </Button>
-        </div>
+        {type === 'number' &&
+          <FilterNumberTooltip
+            {...this.props}
+            loading={this.state.loading}
+            selected={this.state.selected}
+            onChange={this.onChange}
+            onToggleLoading={this.onToggleLoading}
+            onApply={this.onApply}
+          />
+        }
+
+        {type === 'date' &&
+          <FilterDateTooltip
+            {...this.props}
+            loading={this.state.loading}
+            selected={this.state.selected}
+            onChange={this.onChange}
+            onToggleLoading={this.onToggleLoading}
+            onApply={this.onApply}
+          />
+        }
       </div>
     );
   }
@@ -274,12 +143,11 @@ FilterTooltip.propTypes = {
   datasetID: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
-  filter: PropTypes.any, // Current value of the filter
-  notNullSelected: PropTypes.bool,
   onResize: PropTypes.func, // Passed from the tooltip component
   onApply: PropTypes.func.isRequired,
   // store
-  toggleTooltip: PropTypes.func.isRequired
+  toggleTooltip: PropTypes.func.isRequired,
+  widgetEditor: PropTypes.object.isRequired
 };
 
 const mapDispatchToProps = dispatch => ({
@@ -288,4 +156,8 @@ const mapDispatchToProps = dispatch => ({
   }
 });
 
-export default connect(null, mapDispatchToProps)(FilterTooltip);
+const mapStateToProps = state => ({
+  widgetEditor: state.widgetEditor
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(FilterTooltip);

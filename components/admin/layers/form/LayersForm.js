@@ -47,7 +47,7 @@ class LayersForm extends React.Component {
     const { id } = this.state;
 
     if (!id) {
-      this.datasetsService.fetchAllData({
+      this.datasetsService.fetchAdminData({
         applications: this.props.application,
         includes: ''
       })

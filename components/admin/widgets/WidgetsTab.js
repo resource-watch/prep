@@ -7,7 +7,7 @@ import WidgetsNew from 'components/admin/widgets/pages/new';
 import WidgetsShow from 'components/admin/widgets/pages/show';
 
 export default function WidgetsTab(props) {
-  const { tab, subtab, id , dataset } = props;
+  const { tab, subtab, id, dataset } = props;
 
   return (
     <div className="c-widgets-tab">

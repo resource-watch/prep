@@ -79,7 +79,7 @@ export function getDatasets() {
   return (dispatch) => {
     dispatch({ type: GET_DATASETS_LOADING });
 
-    service.fetchAllData({ includes: 'widget,layer,metadata,vocabulary' })
+    service.fetchAdminData({ includes: 'widget,layer,metadata,vocabulary' })
       .then((data) => {
         dispatch({ type: GET_DATASETS_SUCCESS, payload: data });
       })

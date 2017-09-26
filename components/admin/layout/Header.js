@@ -50,30 +50,34 @@ class Header extends React.PureComponent {
           {/* We will load the script generated */}
         </div>
         <div className="l-container">
-          <div className="header-main">
-            <h1 className="header-logo -admin">
-              <Link route="admin_home">
-                <a>
-                  {/* <svg><use xlinkHref="#icon-logo-cms" /></svg> */}
-                  <span>PREP Manager</span>
-                </a>
-              </Link>
-            </h1>
-            <nav className="header-menu">
-              <ul>
-                {items.map((item) => {
-                  const activeClassName = classnames({
-                    '-active': item.pathnames && item.pathnames.includes(routes.pathname)
-                  });
+          <div className="row">
+            <div className="small-12">
+              <div className="header-main">
+                <h1 className="header-logo -admin">
+                  <Link route="admin_home">
+                    <a>
+                      {/* <svg><use xlinkHref="#icon-logo-cms" /></svg> */}
+                      <span>PREP Manager</span>
+                    </a>
+                  </Link>
+                </h1>
+                <nav className="header-menu">
+                  <ul>
+                    {items.map((item) => {
+                      const activeClassName = classnames({
+                        '-active': item.pathnames && item.pathnames.includes(routes.pathname)
+                      });
 
-                  return (
-                    <li key={item.name} className={activeClassName}>
-                      {item.component}
-                    </li>
-                  );
-                })}
-              </ul>
-            </nav>
+                      return (
+                        <li key={item.name} className={activeClassName}>
+                          {item.component}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </nav>
+              </div>
+            </div>
           </div>
         </div>
       </header>

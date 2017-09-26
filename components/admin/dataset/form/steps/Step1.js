@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 
 
 // Constants
-import { PROVIDER_TYPES_DICTIONARY, FORM_ELEMENTS } from 'components/admin/dataset/form/constants';
+import { PROVIDER_TYPES_DICTIONARY, FORM_ELEMENTS, DATASET_TYPES } from 'components/admin/dataset/form/constants';
 
 // Components
 import Field from 'components/form/Field';
@@ -86,7 +86,7 @@ class Step1 extends React.Component {
   render() {
     const { user, columns, basic } = this.props;
     const { dataset } = this.state;
-    const { provider } = this.state.form;
+    const { provider, columnFields } = this.state.form;
 
     // Reset FORM_ELEMENTS
     FORM_ELEMENTS.elements = {};
@@ -101,6 +101,8 @@ class Step1 extends React.Component {
     const isWMS = (provider === 'wms');
     const isDocument = (isJson || isXml || isCsv || isTsv);
 
+    const columnFieldsOptions = (columnFields || []).map(f => ({ label: f, value: f }));
+
     return (
       <fieldset className="c-field-container">
         {user.role === 'ADMIN' && !basic &&
@@ -113,48 +115,10 @@ class Step1 extends React.Component {
               label: 'Do you want to set this dataset as published?',
               value: 'published',
               title: 'Published',
-              defaultChecked: (!dataset) ? user.role === 'ADMIN' : this.props.form.published,
-              checked: this.props.form.published
+              defaultChecked: (!dataset) ? user.role === 'ADMIN' : this.props.form.published
             }}
           >
             {Checkbox}
-          </Field>
-        }
-
-        {user.role === 'ADMIN' ?
-          <Field
-            ref={(c) => { if (c) FORM_ELEMENTS.elements.env = c; }}
-            hint={'Choose "preproduction" to see this dataset it only as admin, "production" option will show it in public site.'}
-            className="-fluid"
-            options={[{ label: 'Pre-production', value: 'preproduction' }, { label: 'Production', value: 'production' }]}
-            onChange={value => this.props.onChange({ env: value })}
-            properties={{
-              name: 'env',
-              label: 'Environment',
-              placeholder: 'Type the columns...',
-              noResultsText: 'Please, type the name of the columns and press enter',
-              promptTextCreator: label => `The name of the column is "${label}"`,
-              default: 'preproduction',
-              value: this.props.form.env
-            }}
-          >
-            {Select}
-          </Field>
-          :
-          <Field
-            ref={(c) => { if (c) FORM_ELEMENTS.elements.env = c; }}
-            hint="Environment"
-            className="-fluid"
-            options={[{ label: 'Pre-production', value: 'preproduction' }, { label: 'Production', value: 'production' }]}
-            properties={{
-              name: 'env',
-              label: 'Environment',
-              hidden: true,
-              default: 'preproduction',
-              value: this.props.form.env
-            }}
-          >
-            {Input}
           </Field>
         }
 
@@ -189,27 +153,58 @@ class Step1 extends React.Component {
         </Field>
 
         <Field
-          ref={(c) => { if (c) FORM_ELEMENTS.elements.geoInfo = c; }}
-          onChange={value => this.props.onChange({ geoInfo: value.checked })}
+          ref={(c) => { if (c) FORM_ELEMENTS.elements.type = c; }}
+          onChange={value => this.props.onChange({ type: value })}
+          className="-fluid"
           validations={['required']}
+          options={DATASET_TYPES}
           properties={{
-            name: 'geoInfo',
-            label: 'Does this dataset contain geographical features such as points, polygons or lines?',
-            value: 'geoInfo',
-            defaultChecked: this.props.form.geoInfo,
-            checked: this.props.form.geoInfo
+            name: 'type',
+            label: 'Type',
+            default: this.state.form.type,
+            value: this.state.form.type,
+            disabled: !!this.state.dataset,
+            required: true,
+            instanceId: 'selectType'
           }}
         >
-          {Checkbox}
+          {Select}
         </Field>
+
+        {this.state.form.type === 'tabular' &&
+          <Field
+            ref={(c) => { if (c) FORM_ELEMENTS.elements.geoInfo = c; }}
+            onChange={value => this.props.onChange({ geoInfo: value.checked })}
+            validations={['required']}
+            properties={{
+              name: 'geoInfo',
+              label: 'Does this dataset contain geographical features such as points, polygons or lines?',
+              value: 'geoInfo',
+              defaultChecked: this.props.form.geoInfo,
+              checked: this.props.form.geoInfo
+            }}
+          >
+            {Checkbox}
+          </Field>
+        }
 
         <Field
           ref={(c) => { if (c) FORM_ELEMENTS.elements.provider = c; }}
-          onChange={value => this.props.onChange({
-            provider: value,
-            connectorType: (PROVIDER_TYPES_DICTIONARY[value]) ?
-              PROVIDER_TYPES_DICTIONARY[value].connectorType : null
-          })}
+          onChange={(value) => {
+            this.props.onChange({
+              provider: value,
+              connectorUrl: '',
+              legend: {
+                lat: undefined,
+                long: undefined,
+                date: [],
+                country: []
+              },
+              connectorType: (PROVIDER_TYPES_DICTIONARY[value]) ?
+                PROVIDER_TYPES_DICTIONARY[value].connectorType : null,
+              columnFields: null
+            });
+          }}
           className="-fluid"
           validations={['required']}
           options={this.setProviderOptions()}
@@ -383,11 +378,32 @@ class Step1 extends React.Component {
           ****************** DOCUMENT ****************
           *****************************************************
         */}
+
+        {isDocument && user.role === 'ADMIN' && !basic &&
+          <Field
+            ref={(c) => { if (c) FORM_ELEMENTS.elements.verified = c; }}
+            onChange={value => this.props.onChange({ verified: value.checked })}
+            validations={['required']}
+            properties={{
+              name: 'verified',
+              label: 'Is this dataset verified?',
+              value: 'verified',
+              title: 'Verified',
+              checked: this.props.form.verified
+            }}
+          >
+            {Checkbox}
+          </Field>
+        }
+
         {isDocument && !dataset &&
           <Field
             ref={(c) => { if (c) FORM_ELEMENTS.elements.connectorUrl = c; }}
-            onChange={(value) => {
-              this.props.onChange({ connectorUrl: value });
+            onChange={({ fields, value }) => {
+              this.props.onChange({
+                connectorUrl: value,
+                ...!!fields && { columnFields: fields }
+              });
             }}
             validations={['required', 'url']}
             className="-fluid"
@@ -448,7 +464,7 @@ class Step1 extends React.Component {
           </Field>
         }
 
-        {isDocument &&
+        {isDocument && columnFields &&
           <div className="c-field-row">
             <div className="row l-row">
               <div className="column small-12 medium-6">
@@ -456,16 +472,18 @@ class Step1 extends React.Component {
                   ref={(c) => { if (c) FORM_ELEMENTS.elements.lat = c; }}
                   onChange={value => this.onLegendChange({ lat: value })}
                   hint="Name of column with latitude value"
+                  options={columnFieldsOptions}
                   className="-fluid"
                   properties={{
                     name: 'lat',
                     label: 'Latitude',
                     type: 'text',
+                    placeholder: 'Select or type the column...',
                     disabled: !!this.state.dataset,
                     default: this.state.form.legend.lat
                   }}
                 >
-                  {Input}
+                  {Select}
                 </Field>
               </div>
 
@@ -474,16 +492,18 @@ class Step1 extends React.Component {
                   ref={(c) => { if (c) FORM_ELEMENTS.elements.long = c; }}
                   onChange={value => this.onLegendChange({ long: value })}
                   hint="Name of column with longitude value"
+                  options={columnFieldsOptions}
                   className="-fluid"
                   properties={{
                     name: 'long',
                     label: 'Longitude',
                     type: 'text',
+                    placeholder: 'Select or type the column...',
                     disabled: !!this.state.dataset,
                     default: this.state.form.legend.long
                   }}
                 >
-                  {Input}
+                  {Select}
                 </Field>
               </div>
 
@@ -492,23 +512,14 @@ class Step1 extends React.Component {
                   ref={(c) => { if (c) FORM_ELEMENTS.elements.date = c; }}
                   onChange={value => this.onLegendChange({ date: value })}
                   hint="Name of columns with date value (ISO Format)"
+                  options={columnFieldsOptions}
                   className="-fluid"
                   properties={{
                     name: 'date',
                     label: 'Date',
-                    multi: true,
+                    type: 'text',
                     disabled: !!this.state.dataset,
-                    creatable: true,
-                    instanceId: 'selectLegendDate',
-                    placeholder: 'Type the columns...',
-                    noResultsText: 'Please, type the name of the columns and press enter',
-                    promptTextCreator: label => `The name of the column is "${label}"`,
-                    default: this.state.form.legend.date.map(
-                      tag => ({ label: tag, value: tag })
-                    ),
-                    value: this.state.form.legend.date.map(
-                      tag => ({ label: tag, value: tag })
-                    )
+                    placeholder: 'Select or type the column..'
                   }}
                 >
                   {Select}
@@ -520,23 +531,14 @@ class Step1 extends React.Component {
                   ref={(c) => { if (c) FORM_ELEMENTS.elements.country = c; }}
                   onChange={value => this.onLegendChange({ country: value })}
                   hint="Name of columns with country value (ISO3 code)"
+                  options={columnFieldsOptions}
                   className="-fluid"
                   properties={{
                     name: 'country',
                     label: 'Country',
-                    multi: true,
+                    type: 'text',
                     disabled: !!this.state.dataset,
-                    creatable: true,
-                    instanceId: 'selectLegendCountry',
-                    placeholder: 'Type the columns...',
-                    noResultsText: 'Please, type the name of the columns and press enter',
-                    promptTextCreator: label => `The name of the column is "${label}"`,
-                    default: this.state.form.legend.country.map(
-                      tag => ({ label: tag, value: tag })
-                    ),
-                    value: this.state.form.legend.country.map(
-                      tag => ({ label: tag, value: tag })
-                    )
+                    placeholder: 'Select or type the column...'
                   }}
                 >
                   {Select}

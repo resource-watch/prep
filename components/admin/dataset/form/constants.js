@@ -20,24 +20,28 @@ export const PROVIDER_TYPES_DICTIONARY = {
   csv: {
     label: 'CSV',
     value: 'csv',
+    basic: true,
     connectorType: 'document',
     connectorUrlHint: 'Format specification: <a href="https://en.wikipedia.org/wiki/Comma-separated_values" target="_blank" >https://en.wikipedia.org/wiki/Comma-separated_values</a>'
   },
   json: {
     label: 'JSON',
     value: 'json',
+    basic: true,
     connectorType: 'document',
     connectorUrlHint: 'Format specification: <a href="http://www.json.org/" target="_blank" >http://www.json.org/</a>'
   },
   tsv: {
     label: 'TSV',
     value: 'tsv',
+    basic: true,
     connectorType: 'document',
     connectorUrlHint: 'Format specification: <a href="https://en.wikipedia.org/wiki/Tab-separated_values" target="_blank" >https://en.wikipedia.org/wiki/Tab-separated_values</a>'
   },
   xml: {
     label: 'XML',
     value: 'xml',
+    basic: true,
     connectorType: 'document',
     connectorUrlHint: 'Format specification: <a href="https://www.w3.org/TR/REC-xml/" target="_blank" >https://www.w3.org/TR/REC-xml/</a>'
   },
@@ -61,14 +65,17 @@ export const STATE_DEFAULT = {
     name: '',
     subtitle: '',
     application: [],
+    type: 'tabular',
     provider: null,
     connectorType: '',
     connectorUrlHint: '',
     published: false,
+    geoInfo: false,
+    verified: false,
+    env: 'production',
+    tableName: '',
     widgetRelevantProps: [],
     layerRelevantProps: [],
-
-    // STEP 2
     connectorUrl: '',
     dataPath: '',
     legend: {
@@ -80,6 +87,16 @@ export const STATE_DEFAULT = {
   }
 };
 
+export const DATASET_TYPES = [
+  {
+    label: 'Tabular',
+    value: 'tabular'
+  },
+  {
+    label: 'Raster',
+    value: 'raster'
+  }
+];
 
 export const FORM_ELEMENTS = {
   elements: {},

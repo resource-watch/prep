@@ -122,21 +122,29 @@ class Widgets extends Page {
         {/* PAGE HEADER */}
         <div className="c-page-header -admin">
           <div className="l-container">
-            <div className="page-header-content">
-              <Breadcrumbs
-                items={[{ name: capitalizeFirstLetter(tab), route: 'admin_widgets', params: { tab } }]}
-              />
-              <Title className="-primary -huge page-header-title" >
-                {this.getName()}
-              </Title>
+            <div className="row">
+              <div className="small-12">
+                <div className="page-header-content">
+                  <Breadcrumbs
+                    items={[{ name: capitalizeFirstLetter(tab), route: 'admin_widgets', params: { tab } }]}
+                  />
+                  <Title className="-primary -huge page-header-title" >
+                    {this.getName()}
+                  </Title>
+                </div>
+              </div>
             </div>
           </div>
         </div>
         <div className="c-page-section">
           <div className="l-container">
-            {tab === 'widgets' &&
-              <WidgetsTab tab={tab} subtab={subtab} id={id} />
-            }
+            <div className="row">
+              <div className="small-12">
+                {tab === 'widgets' &&
+                  <WidgetsTab tab={tab} subtab={subtab} id={id} />
+                }
+              </div>
+            </div>
           </div>
         </div>
       </Layout>

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 // Services
 import DatasetsService from 'services/DatasetsService';
@@ -17,13 +18,18 @@ class LayersForm extends React.Component {
   constructor(props) {
     super(props);
 
+    const formObj = props.dataset ?
+      Object.assign({}, STATE_DEFAULT.form,
+        { dataset: props.dataset, application: props.application }) :
+      Object.assign({}, STATE_DEFAULT.form, {
+        application: props.application
+      });
+
     this.state = Object.assign({}, STATE_DEFAULT, {
       id: props.id,
       dataset: props.dataset,
       datasets: [],
-      form: Object.assign({}, STATE_DEFAULT.form, {
-        application: props.application
-      }),
+      form: formObj,
       loading: !!props.id
     });
 
@@ -43,41 +49,37 @@ class LayersForm extends React.Component {
     this.onStepChange = this.onStepChange.bind(this);
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const { id } = this.state;
 
-    if (!id) {
-      this.datasetsService.fetchAdminData({
-        applications: this.props.application,
-        includes: ''
-      })
-        .then((data) => {
-          this.setState({
-            datasets: data.sort((a, b) => {
-              const nameA = a.name.toLowerCase();
-              const nameB = b.name.toLowerCase();
+    const promises = [
+      this.datasetsService.fetchAllData({})
+    ];
 
-              if (nameA < nameB) return -1;
-              if (nameA > nameB) return 1;
-              return 0;  //no sorting
-            })
-          });
-        })
-        .catch(err => console.error(err));
-    }
-
+    // Add the dashboard promise if the id exists
     if (id) {
-      this.service.fetchData({ id })
-        .then((data) => {
-          this.setState({
-            dataset: data.dataset,
-            form: this.setFormFromParams(data),
-            // Stop the loading
-            loading: false
-          });
-        })
-        .catch(err => console.error(err));
+      promises.push(this.service.fetchData({ id }));
     }
+
+    Promise.all(promises)
+      .then((response) => {
+        const datasets = response[0];
+        const current = response[1];
+        const formState = (id) ? this.setFormFromParams(current) : this.state.form;
+
+        this.setState({
+          // CURRENT LAYER
+          form: formState,
+          loading: false,
+          // CURRENT DATASET
+          dataset: formState.dataset,
+          // OPTIONS
+          datasets: datasets.map(d => ({ label: d.name, value: d.id }))
+        });
+      })
+      .catch((err) => {
+        toastr.error('Error', err);
+      });
   }
 
   /**
@@ -109,31 +111,36 @@ class LayersForm extends React.Component {
             dataset,
             id: id || '',
             type: (id) ? 'PATCH' : 'POST',
-            body: { layer: this.state.form }
+            body: this.state.form
           })
             .then((data) => {
               toastr.success('Success', `The layer "${data.id}" - "${data.name}" has been uploaded correctly`);
               if (this.props.onSubmit) this.props.onSubmit();
             })
-            .catch((err) => {
+            .catch((errors) => {
               this.setState({ submitting: false });
-              toastr.error('Error', `Oops! There was an error, try again`);
-              console.error(err);
+              try {
+                errors.forEach(er =>
+                  toastr.error('Error', er.detail)
+                );
+              } catch (e) {
+                toastr.error('Error', 'Oops! There was an error, try again.');
+              }
             });
         } else {
           this.setState({
             step: this.state.step + 1
-          }, () => console.info(this.state));
+          });
         }
       } else {
-        toastr.error('Error', 'Fill all the required fields');
+        toastr.error('Error', 'Fill all the required fields or correct the invalid values');
       }
     }, 0);
   }
 
   onChange(obj) {
     const form = Object.assign({}, this.state.form, obj);
-    this.setState({ form }, () => console.info(this.state.form));
+    this.setState({ form });
   }
 
   onChangeDataset(dataset) {
@@ -146,12 +153,16 @@ class LayersForm extends React.Component {
 
   // HELPERS
   setFormFromParams(params) {
-    const form = Object.keys(this.state.form);
     const newForm = {};
 
-    form.forEach((f) => {
-      if (params[f] || this.state.form[f]) {
-        newForm[f] = params[f] || this.state.form[f];
+    Object.keys(params).forEach((f) => {
+      switch (f) {
+        default: {
+          if ((typeof params[f] !== 'undefined' || params[f] !== null) ||
+              (typeof this.state.form[f] !== 'undefined' || this.state.form[f] !== null)) {
+            newForm[f] = params[f] || this.state.form[f];
+          }
+        }
       }
     });
 
@@ -189,11 +200,11 @@ class LayersForm extends React.Component {
 }
 
 LayersForm.propTypes = {
-  id: React.PropTypes.string,
-  dataset: React.PropTypes.string,
-  authorization: React.PropTypes.string,
-  application: React.PropTypes.array,
-  onSubmit: React.PropTypes.func
+  id: PropTypes.string,
+  dataset: PropTypes.string,
+  authorization: PropTypes.string,
+  application: PropTypes.array,
+  onSubmit: PropTypes.func
 };
 
 export default LayersForm;

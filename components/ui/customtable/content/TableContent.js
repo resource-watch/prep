@@ -1,9 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 
 export default class TableContent extends React.Component {
-
   getPageBounds() {
     const { pagination } = this.props;
 
@@ -38,16 +38,16 @@ export default class TableContent extends React.Component {
         const rowAField = rowA[sort.field];
         const rowBField = rowB[sort.field];
 
-        const rowACondition = (rowAField && rowAField.toString) ?
+        const rowACondition = (rowAField !== null && typeof rowAField !== 'undefined' && rowAField.toString) ?
           rowAField.toString().toLowerCase().trim() :
           rowAField;
-        const rowBCondition = (rowBField && rowBField.toString) ?
+        const rowBCondition = (rowBField !== null && typeof rowBField !== 'undefined' && rowBField.toString) ?
           rowBField.toString().toLowerCase().trim() :
           rowBField;
 
         return (rowACondition > rowBCondition) ?
-            sort.value :
-            sort.value * -1;
+          sort.value :
+          sort.value * -1;
       });
     }
 
@@ -67,7 +67,7 @@ export default class TableContent extends React.Component {
               {columns.map((col, i) => {
                 const value = row[col.value];
                 const td = col.td ?
-                  <col.td key={i} row={row} value={value} /> :
+                  <col.td {...col.tdProps} key={i} row={row} value={value} /> :
                   <td key={i} className={col.className || ''}>{(value && value.toString) ? value.toString() : value}</td>;
                 return td;
               }
@@ -91,7 +91,7 @@ export default class TableContent extends React.Component {
                       }
                       return (
                         <li key={j}>
-                          <a href={ac.path} >
+                          <a href={ac.path} className="c-btn">
                             {ac.name}
                           </a>
                         </li>
@@ -110,15 +110,15 @@ export default class TableContent extends React.Component {
 }
 
 TableContent.propTypes = {
-  actions: React.PropTypes.object,
-  columns: React.PropTypes.array,
-  filteredData: React.PropTypes.array,
-  pagination: React.PropTypes.object,
-  rowSelection: React.PropTypes.array,
-  sort: React.PropTypes.object,
+  actions: PropTypes.object,
+  columns: PropTypes.array,
+  filteredData: PropTypes.array,
+  pagination: PropTypes.object,
+  rowSelection: PropTypes.array,
+  sort: PropTypes.object,
   // FUNCTIONS
-  onRowDelete: React.PropTypes.func,
-  onToggleSelectedRow: React.PropTypes.func
+  onRowDelete: PropTypes.func,
+  onToggleSelectedRow: PropTypes.func
 };
 
 TableContent.defaultProps = {

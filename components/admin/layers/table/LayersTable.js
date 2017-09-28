@@ -4,7 +4,7 @@ import { Autobind } from 'es-decorators';
 
 // Redux
 import { connect } from 'react-redux';
-import { initStore } from 'store';
+
 import { getLayers, setFilters } from 'redactions/admin/layers';
 
 // Selectors
@@ -23,9 +23,10 @@ import GoToDatasetAction from './actions/GoToDatasetAction';
 
 // TDs
 import NameTD from './td/NameTD';
+import UpdatedAtTD from './td/UpdatedAtTD';
+import OwnershipTD from './td/OwnershipTD';
 
 class LayersTable extends React.Component {
-
   componentDidMount() {
     const { dataset, application } = this.props;
     this.props.setFilters([]);
@@ -50,6 +51,8 @@ class LayersTable extends React.Component {
   }
 
   render() {
+    const { dataset, application, user } = this.props;
+    console.log(user);
     return (
       <div className="c-layer-table">
         <Spinner className="-light" isLoading={this.props.loading} />
@@ -75,7 +78,9 @@ class LayersTable extends React.Component {
           <CustomTable
             columns={[
               { label: 'Name', value: 'name', td: NameTD },
-              { label: 'Provider', value: 'provider' }
+              { label: 'Provider', value: 'provider' },
+              { label: 'Updated at', value: 'updatedAt', td: UpdatedAtTD },
+              { label: 'Ownership', value: 'userId', td: OwnershipTD, tdProps: { user } }
             ]}
             actions={{
               show: true,
@@ -86,19 +91,18 @@ class LayersTable extends React.Component {
               ]
             }}
             sort={{
-              field: 'name',
-              value: 1
+              field: 'updatedAt',
+              value: -1
             }}
             filters={false}
             data={this.getLayers()}
+            onRowDelete={() => this.props.getLayers({ dataset, application })}
             pageSize={20}
             pagination={{
               enabled: true,
               pageSize: 20,
               page: 0
             }}
-            onToggleSelectedRow={(ids) => { console.info(ids); }}
-            onRowDelete={(id) => { console.info(id); }}
           />
         )}
       </div>
@@ -111,7 +115,8 @@ LayersTable.defaultProps = {
   columns: [],
   actions: {},
   // Store
-  layers: []
+  layers: [],
+  users: {}
 };
 
 LayersTable.propTypes = {
@@ -123,6 +128,7 @@ LayersTable.propTypes = {
   loading: PropTypes.bool.isRequired,
   layers: PropTypes.array.isRequired,
   error: PropTypes.string,
+  user: PropTypes.object,
 
   // Actions
   getLayers: PropTypes.func.isRequired,
@@ -132,7 +138,8 @@ LayersTable.propTypes = {
 const mapStateToProps = state => ({
   loading: state.layers.layers.loading,
   layers: getFilteredLayers(state),
-  error: state.layers.layers.error
+  error: state.layers.layers.error,
+  user: state.user
 });
 const mapDispatchToProps = dispatch => ({
   getLayers: ({ dataset, application }) => dispatch(getLayers({ dataset, application })),

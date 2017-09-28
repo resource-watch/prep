@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 // Constants
 import { PROVIDER_OPTIONS, FORM_ELEMENTS } from 'components/admin/layers/form/constants';
@@ -30,9 +31,7 @@ class Step1 extends React.Component {
             ref={(c) => { if (c) FORM_ELEMENTS.elements.dataset = c; }}
             onChange={value => this.props.onChangeDataset(value)}
             validations={['required']}
-            options={this.props.datasets.map(dataset =>
-              ({ label: dataset.name, value: dataset.id })
-            )}
+            options={this.props.datasets}
             properties={{
               name: 'dataset',
               label: 'Dataset',
@@ -95,7 +94,6 @@ class Step1 extends React.Component {
           properties={{
             name: 'layerConfig',
             label: 'Layer config',
-            type: 'textarea',
             default: this.state.form.layerConfig
           }}
         >
@@ -108,8 +106,19 @@ class Step1 extends React.Component {
           properties={{
             name: 'legendConfig',
             label: 'Legend config',
-            type: 'textarea',
             default: this.state.form.legendConfig
+          }}
+        >
+          {Code}
+        </Field>
+
+        <Field
+          ref={(c) => { if (c) FORM_ELEMENTS.elements.interactionConfig = c; }}
+          onChange={value => this.props.onChange({ interactionConfig: value })}
+          properties={{
+            name: 'interactionConfig',
+            label: 'Interaction config',
+            default: this.state.form.interactionConfig
           }}
         >
           {Code}
@@ -141,11 +150,11 @@ Step1.defaultPropTypes = {
 };
 
 Step1.propTypes = {
-  id: React.PropTypes.string,
-  datasets: React.PropTypes.array,
-  form: React.PropTypes.object,
-  onChange: React.PropTypes.func,
-  onChangeDataset: React.PropTypes.func
+  id: PropTypes.string,
+  datasets: PropTypes.array,
+  form: PropTypes.object,
+  onChange: PropTypes.func,
+  onChangeDataset: PropTypes.func
 };
 
 export default Step1;

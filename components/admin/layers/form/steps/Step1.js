@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 // Constants
 import { PROVIDER_OPTIONS, FORM_ELEMENTS } from 'components/admin/layers/form/constants';
 
+// Redux
+import { connect } from 'react-redux';
 
 // Components
 import Field from 'components/form/Field';
@@ -24,6 +26,7 @@ class Step1 extends React.Component {
   }
 
   render() {
+    const { user } = this.props;
     return (
       <fieldset className="c-field-container">
         {!this.state.id &&
@@ -41,6 +44,43 @@ class Step1 extends React.Component {
             }}
           >
             {Select}
+          </Field>
+        }
+
+        {user.role === 'ADMIN' ?
+          <Field
+            ref={(c) => { if (c) FORM_ELEMENTS.elements.env = c; }}
+            hint={'Choose "preproduction" to see this dataset it only as admin, "production" option will show it in public site.'}
+            className="-fluid"
+            options={[{ label: 'Pre-production', value: 'preproduction' }, { label: 'Production', value: 'production' }]}
+            onChange={value => this.props.onChange({ env: value })}
+            properties={{
+              name: 'env',
+              label: 'Environment',
+              placeholder: 'Type the columns...',
+              noResultsText: 'Please, type the name of the columns and press enter',
+              promptTextCreator: label => `The name of the column is "${label}"`,
+              default: 'preproduction',
+              value: this.props.form.env
+            }}
+          >
+            {Select}
+          </Field>
+          :
+          <Field
+            ref={(c) => { if (c) FORM_ELEMENTS.elements.env = c; }}
+            hint="Environment"
+            className="-fluid"
+            options={[{ label: 'Pre-production', value: 'preproduction' }, { label: 'Production', value: 'production' }]}
+            properties={{
+              name: 'env',
+              label: 'Environment',
+              hidden: true,
+              default: 'preproduction',
+              value: this.props.form.env
+            }}
+          >
+            {Input}
           </Field>
         }
 
@@ -154,7 +194,14 @@ Step1.propTypes = {
   datasets: PropTypes.array,
   form: PropTypes.object,
   onChange: PropTypes.func,
-  onChangeDataset: PropTypes.func
+  onChangeDataset: PropTypes.func,
+
+  // Store
+  user: PropTypes.object.isRequired
 };
 
-export default Step1;
+const mapStateToProps = state => ({
+  user: state.user
+});
+
+export default connect(mapStateToProps, null)(Step1);

@@ -117,7 +117,7 @@ class DataDetail extends Page {
       return data.name;
     }
 
-    return null;
+    return 'Dataset -';
   }
 
   render() {

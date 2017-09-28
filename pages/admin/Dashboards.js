@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 // Redux
 import withRedux from 'next-redux-wrapper';
@@ -130,8 +131,8 @@ class Dashboards extends Page {
 }
 
 Dashboards.propTypes = {
-  user: React.PropTypes.object,
-  url: React.PropTypes.object
+  user: PropTypes.object,
+  url: PropTypes.object
 };
 
 export default withRedux(initStore)(Dashboards);

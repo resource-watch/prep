@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import withRedux from 'next-redux-wrapper';
 import { initStore } from 'store';
@@ -108,8 +109,8 @@ class Insights extends Page {
 }
 
 Insights.propTypes = {
-  user: React.PropTypes.object,
-  url: React.PropTypes.object
+  user: PropTypes.object,
+  url: PropTypes.object
 };
 
 

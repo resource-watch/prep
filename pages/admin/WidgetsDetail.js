@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { singular } from 'pluralize';
 
 import withRedux from 'next-redux-wrapper';
@@ -105,7 +106,7 @@ class Widgets extends Page {
       return data.name || data.title;
     }
 
-    return '-';
+    return 'Widgets -';
   }
 
   render() {
@@ -153,8 +154,8 @@ class Widgets extends Page {
 }
 
 Widgets.propTypes = {
-  user: React.PropTypes.object,
-  url: React.PropTypes.object
+  user: PropTypes.object,
+  url: PropTypes.object
 };
 
 export default withRedux(initStore)(Widgets);

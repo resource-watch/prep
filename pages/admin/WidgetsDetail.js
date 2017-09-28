@@ -106,7 +106,7 @@ class Widgets extends Page {
       return data.name || data.title;
     }
 
-    return 'Widgets -';
+    return 'Widgets';
   }
 
   render() {

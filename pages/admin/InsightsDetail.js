@@ -106,7 +106,7 @@ class Insights extends Page {
       return data.name || data.title;
     }
 
-    return 'Insights -';
+    return 'Insights';
   }
 
   render() {

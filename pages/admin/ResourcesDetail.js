@@ -106,7 +106,7 @@ class Resources extends Page {
       return data.name;
     }
 
-    return 'Resources -';
+    return 'Resources';
   }
 
   render() {

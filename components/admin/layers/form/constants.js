@@ -6,6 +6,7 @@ export const STATE_DEFAULT = {
   form: {
     name: '',
     description: '',
+    env: 'preproduction',
     provider: null,
     layerConfig: {},
     legendConfig: {},

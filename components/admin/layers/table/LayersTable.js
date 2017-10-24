@@ -52,7 +52,7 @@ class LayersTable extends React.Component {
 
   render() {
     const { dataset, application, user } = this.props;
-    console.log(user);
+
     return (
       <div className="c-layer-table">
         <Spinner className="-light" isLoading={this.props.loading} />

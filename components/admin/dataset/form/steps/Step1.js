@@ -5,7 +5,6 @@ import compact from 'lodash/compact';
 // Redux
 import { connect } from 'react-redux';
 
-
 // Constants
 import { PROVIDER_TYPES_DICTIONARY, FORM_ELEMENTS, DATASET_TYPES } from 'components/admin/dataset/form/constants';
 
